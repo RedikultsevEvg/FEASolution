@@ -1,4 +1,5 @@
 using FeaSolution.Core.Enums;
+using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
@@ -23,7 +24,7 @@ public class ElementNode(ElementNodeType type) : IElementNode
         {
             if (Type.Dimension == DimensionalType.OneDimensional)
             {
-                throw new InvalidOperationException("Cannot set Y coordinate for one-dimensional node.");
+                throw new FeaException("Cannot set Y coordinate for one-dimensional node.");
             }
             field = value;
         }
@@ -39,9 +40,9 @@ public class ElementNode(ElementNodeType type) : IElementNode
         {
             field = Type.Dimension switch
             {
-                DimensionalType.OneDimensional => throw new InvalidOperationException(
+                DimensionalType.OneDimensional => throw new FeaException(
                     "Cannot set Z coordinate for one-dimensional node."),
-                DimensionalType.TwoDimensional => throw new InvalidOperationException(
+                DimensionalType.TwoDimensional => throw new FeaException(
                     "Cannot set Z coordinate for two-dimensional node."),
                 _ => value
             };
