@@ -4,5 +4,5 @@ namespace FeaSolution.Core.Types;
 
 public class ElementNodeType
 {
-    public DimensionalType Dimension { get; set; }
+    public DimensionalType Dimension { get; init; }
 }
