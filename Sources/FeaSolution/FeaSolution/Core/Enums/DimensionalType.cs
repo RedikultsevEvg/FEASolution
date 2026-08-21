@@ -1,9 +1,8 @@
-namespace FeaSolution.Core.Enums
+namespace FeaSolution.Core.Enums;
+
+public enum DimensionalType
 {
-    public enum DimensionalType
-    {
-        OneDimensional = 1,
-        TwoDimensional = 2,
-        ThreeDimensional = 3
-    }
+    OneDimensional = 1,
+    TwoDimensional = 2,
+    ThreeDimensional = 3
 }
