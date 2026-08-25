@@ -1,6 +1,6 @@
 namespace FeaSolution.Core.Enums;
 
-public enum DimensionalType
+public enum Dimensional
 {
     OneDimensional = 1,
     TwoDimensional = 2,

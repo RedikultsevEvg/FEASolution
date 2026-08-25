@@ -13,22 +13,22 @@ public class ElementNodeTests
     public void Constructor_SetsType()
     {
         // Arrange
-        var type = new ElementNodeType { Dimension = DimensionalType.TwoDimensional };
+        var type = new ElementNodeType { Dimension = Dimensional.TwoDimensional };
 
         // Act
         var node = new ElementNode(type);
 
         // Assert
-        Assert.AreEqual(DimensionalType.TwoDimensional, node.Type.Dimension);
+        Assert.AreEqual(Dimensional.TwoDimensional, node.Type.Dimension);
     }
 
     #region X-coordinate
 
     [Test]
-    [TestCase(DimensionalType.OneDimensional)]
-    [TestCase(DimensionalType.TwoDimensional)]
-    [TestCase(DimensionalType.ThreeDimensional)]
-    public void X_CanBeSetForAllDimensions(DimensionalType dimension)
+    [TestCase(Dimensional.OneDimensional)]
+    [TestCase(Dimensional.TwoDimensional)]
+    [TestCase(Dimensional.ThreeDimensional)]
+    public void X_CanBeSetForAllDimensions(Dimensional dimension)
     {
         // Arrange
         var node = CreateNewElementNode(dimension);
@@ -48,7 +48,7 @@ public class ElementNodeTests
     public void Y_ReturnsZero_WhenOneDimensional()
     {
         // Arrange
-        var node = CreateNewElementNode(DimensionalType.OneDimensional);
+        var node = CreateNewElementNode(Dimensional.OneDimensional);
 
         // Act
         var result = node.Y;
@@ -61,16 +61,16 @@ public class ElementNodeTests
     public void Y_Set_ThrowsFeaException_WhenOneDimensional()
     {
         // Arrange
-        var node = CreateNewElementNode(DimensionalType.OneDimensional);
+        var node = CreateNewElementNode(Dimensional.OneDimensional);
 
         // Act & Assert
         Assert.Throws<FeaException>(() => node.Y = 3.0);
     }
 
     [Test]
-    [TestCase(DimensionalType.TwoDimensional)]
-    [TestCase(DimensionalType.ThreeDimensional)]
-    public void Y_CanBeSet_WhenNotOneDimensional(DimensionalType dimension)
+    [TestCase(Dimensional.TwoDimensional)]
+    [TestCase(Dimensional.ThreeDimensional)]
+    public void Y_CanBeSet_WhenNotOneDimensional(Dimensional dimension)
     {
         // Arrange
         var node = CreateNewElementNode(dimension);
@@ -87,9 +87,9 @@ public class ElementNodeTests
     #region Z-coordinate
 
     [Test]
-    [TestCase(DimensionalType.OneDimensional)]
-    [TestCase(DimensionalType.TwoDimensional)]
-    public void Z_ReturnsZero_WhenOneDimensionalOrTwoDimensional(DimensionalType dimension)
+    [TestCase(Dimensional.OneDimensional)]
+    [TestCase(Dimensional.TwoDimensional)]
+    public void Z_ReturnsZero_WhenOneDimensionalOrTwoDimensional(Dimensional dimension)
     {
         // Arrange
         var node = CreateNewElementNode(dimension);
@@ -105,7 +105,7 @@ public class ElementNodeTests
     public void Z_Set_ThrowsFeaException_WhenOneDimensional()
     {
         // Arrange
-        var node = CreateNewElementNode(DimensionalType.OneDimensional);
+        var node = CreateNewElementNode(Dimensional.OneDimensional);
 
         // Act & Assert
         Assert.Throws<FeaException>(() => node.Z = 7.0);
@@ -115,7 +115,7 @@ public class ElementNodeTests
     public void Z_Set_ThrowsFeaException_WhenTwoDimensional()
     {
         // Arrange
-        var node = CreateNewElementNode(DimensionalType.TwoDimensional);
+        var node = CreateNewElementNode(Dimensional.TwoDimensional);
 
         // Act & Assert
         Assert.Throws<FeaException>(() => node.Z = 7.0);
@@ -125,7 +125,7 @@ public class ElementNodeTests
     public void Z_CanBeSet_WhenThreeDimensional()
     {
         // Arrange
-        var node = CreateNewElementNode(DimensionalType.ThreeDimensional);
+        var node = CreateNewElementNode(Dimensional.ThreeDimensional);
 
         // Act
         node.Z = 7.0;
@@ -136,6 +136,6 @@ public class ElementNodeTests
 
     #endregion
 
-    private static ElementNode CreateNewElementNode(DimensionalType dimension) =>
+    private static ElementNode CreateNewElementNode(Dimensional dimension) =>
         new(new ElementNodeType { Dimension = dimension });
 }

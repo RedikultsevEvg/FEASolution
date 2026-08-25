@@ -17,12 +17,12 @@ public class ElementNode(ElementNodeType type) : IElementNode
     // <inheritdoc />
     public double Y
     {
-        get => Type.Dimension == DimensionalType.OneDimensional 
+        get => Type.Dimension == Dimensional.OneDimensional 
             ? 0 
             : field;
         set
         {
-            if (Type.Dimension == DimensionalType.OneDimensional)
+            if (Type.Dimension == Dimensional.OneDimensional)
             {
                 throw new FeaException("Cannot set Y coordinate for one-dimensional node.");
             }
@@ -33,16 +33,16 @@ public class ElementNode(ElementNodeType type) : IElementNode
     // <inheritdoc />
     public double Z
     {
-        get => Type.Dimension is DimensionalType.OneDimensional or DimensionalType.TwoDimensional
+        get => Type.Dimension is Dimensional.OneDimensional or Dimensional.TwoDimensional
             ? 0
             : field;
         set
         {
             field = Type.Dimension switch
             {
-                DimensionalType.OneDimensional => throw new FeaException(
+                Dimensional.OneDimensional => throw new FeaException(
                     "Cannot set Z coordinate for one-dimensional node."),
-                DimensionalType.TwoDimensional => throw new FeaException(
+                Dimensional.TwoDimensional => throw new FeaException(
                     "Cannot set Z coordinate for two-dimensional node."),
                 _ => value
             };
