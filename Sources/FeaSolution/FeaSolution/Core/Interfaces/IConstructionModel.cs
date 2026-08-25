@@ -7,7 +7,7 @@ public interface IConstructionModel
     /// <summary>
     /// Допустимый тип узлов модели конструкции.
     /// </summary>
-    ElementNodeType NodeType { get; }
+    ElementNodeType AllowedNodeType { get; }
 
     /// <summary>
     /// Коллекция конечных элементов модели конструкции.

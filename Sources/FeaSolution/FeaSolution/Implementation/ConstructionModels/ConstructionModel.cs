@@ -3,9 +3,18 @@ using FeaSolution.Core.Types;
 
 namespace FeaSolution.Implementation.ConstructionModels;
 
+/// <summary>
+/// Модель конструкции.
+/// </summary>
 public class ConstructionModel : IConstructionModel
 {
-    public required ElementNodeType NodeType { get; init; }
+    /// <summary>
+    /// Допустимый тип элемента.
+    /// </summary>
+    public required ElementNodeType AllowedNodeType { get; init; }
 
-    public ICollection<IFiniteElement> Elements { get; } = new List<IFiniteElement>();
+    /// <summary>
+    /// Коллекция конечных элементов.
+    /// </summary>
+    public ICollection<IFiniteElement> Elements { get; } = (List<IFiniteElement>)[];
 }
