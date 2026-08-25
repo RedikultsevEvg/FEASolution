@@ -15,15 +15,15 @@ public interface IElementNode
     /// <summary>
     /// Координата X. 
     /// </summary>
-    double X { get; set; }
+    CoordinateValue X { get; set; }
 
     /// <summary>
     /// Координата Y. Равна 0 если тип узла OneDimensional.
     /// </summary>
-    double Y { get; set; }
+    CoordinateValue Y { get; set; }
 
     /// <summary>
     /// Координата Z. Равна 0 если тип узла OneDimensional или TwoDimensional.
     /// </summary>
-    double Z { get; set; }
+    CoordinateValue Z { get; set; }
 }
