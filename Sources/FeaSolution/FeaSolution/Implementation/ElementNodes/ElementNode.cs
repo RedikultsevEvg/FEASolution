@@ -3,13 +3,13 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Entities.Implementation;
+namespace FeaSolution.Implementation.ElementNodes;
 
 // <inheritdoc />
 public class ElementNode(ElementNodeType type) : IElementNode
 {
     // <inheritdoc />
-    public ElementNodeType Type { get; private set; } = type;
+    public ElementNodeType Type { get; } = type;
 
     // <inheritdoc />
     public double X { get; set; }

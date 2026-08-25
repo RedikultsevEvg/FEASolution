@@ -1,9 +1,9 @@
-﻿using FeaSolution.Core.Entities.Implementation;
-using FeaSolution.Core.Enums;
+﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Types;
+using FeaSolution.Implementation.ElementNodes;
 
-namespace FeaSolution.UnitTests.Core.Entities.Implementation;
+namespace FeaSolution.UnitTests.Implementation.ElementNodes;
 
 [TestFixture]
 [TestOf(typeof(ElementNode))]
