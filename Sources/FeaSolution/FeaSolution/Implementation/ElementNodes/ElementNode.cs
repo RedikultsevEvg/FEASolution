@@ -5,17 +5,17 @@ using FeaSolution.Core.Types;
 
 namespace FeaSolution.Implementation.ElementNodes;
 
-// <inheritdoc />
+/// <inheritdoc cref="IElementNode" />
 public class ElementNode(ElementNodeType type) : IElementNode
 {
-    // <inheritdoc />
+    /// <inheritdoc />
     public ElementNodeType Type { get; } = type;
 
-    // <inheritdoc />
-    public double X { get; set; }
+    /// <inheritdoc />
+    public CoordinateValue X { get; set; }
 
-    // <inheritdoc />
-    public double Y
+    /// <inheritdoc />
+    public CoordinateValue Y
     {
         get => Type.Dimension == Dimensional.OneDimensional 
             ? 0 
@@ -30,8 +30,8 @@ public class ElementNode(ElementNodeType type) : IElementNode
         }
     }
 
-    // <inheritdoc />
-    public double Z
+    /// <inheritdoc />
+    public CoordinateValue Z
     {
         get => Type.Dimension is Dimensional.OneDimensional or Dimensional.TwoDimensional
             ? 0

@@ -2,6 +2,9 @@ using FeaSolution.Core.Types;
 
 namespace FeaSolution.Core.Interfaces;
 
+/// <summary>
+/// Модель конструкции.
+/// </summary>
 public interface IConstructionModel
 {
     /// <summary>
