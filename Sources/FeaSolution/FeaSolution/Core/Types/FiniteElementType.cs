@@ -6,5 +6,5 @@ public class FiniteElementType
 
     public required ElementNodeType NodeType { get; init; }
 
-    public required Action<double> StiffnessMatrixCalculationMethod { get; init; }
+    public required Action<MatrixValue> StiffnessMatrixCalculationMethod { get; init; }
 }
