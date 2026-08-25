@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="FeaSolution">
+      <HintPath>..\FeaSolution\bin\Debug\net10.0\FeaSolution.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
