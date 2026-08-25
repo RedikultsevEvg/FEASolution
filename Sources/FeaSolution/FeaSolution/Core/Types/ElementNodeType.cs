@@ -6,3 +6,4 @@ public class ElementNodeType
 {
     public Dimensional Dimension { get; init; }
 }
+
