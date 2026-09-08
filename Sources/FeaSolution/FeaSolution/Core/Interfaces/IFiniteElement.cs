@@ -5,22 +5,22 @@ namespace FeaSolution.Core.Interfaces;
 public interface IFiniteElement
 {
     /// <summary>
-    /// Уникальный пользовательский идентификатор в рамках решения.
+    /// Unique user-defined identifier within the solution.
     /// </summary>
     string UserId { get; }
 
     /// <summary>
-    /// Тип конечного элемента.
+    /// Finite element type.
     /// </summary>
     FiniteElementType ElementType { get; }
 
     /// <summary>
-    /// Узлы конечного элемента.
+    /// Finite element nodes.
     /// </summary>
     IElementNode[] Nodes { get; }
 
     /// <summary>
-    /// Матрица жесткости конечного элемента.
+    /// Finite element stiffness matrix.
     /// </summary>
     IFiniteElementStiffnessMatrix StiffnessMatrix { get; }
 }

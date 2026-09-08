@@ -3,27 +3,27 @@ using FeaSolution.Core.Types;
 namespace FeaSolution.Core.Interfaces;
 
 /// <summary>
-/// Узел конечного элемента. Узел может быть одномерным, двумерным или трехмерным.
+/// Finite element node. A node can be one-dimensional, two-dimensional, or three-dimensional.
 /// </summary>
 public interface IElementNode
 {
     /// <summary>
-    /// Тип узла конечного элемента. Определяет размерность узла.
+    /// Finite element node type.
     /// </summary>
     ElementNodeType Type { get; }
 
     /// <summary>
-    /// Координата X. 
+    /// X coordinate.
     /// </summary>
     CoordinateValue X { get; set; }
 
     /// <summary>
-    /// Координата Y. Равна 0 если тип узла OneDimensional.
+    /// Y coordinate. Equals 0 if the node type is OneDimensional.
     /// </summary>
     CoordinateValue Y { get; set; }
 
     /// <summary>
-    /// Координата Z. Равна 0 если тип узла OneDimensional или TwoDimensional.
+    /// Z coordinate. Equals 0 if the node type is OneDimensional or TwoDimensional.
     /// </summary>
     CoordinateValue Z { get; set; }
 }

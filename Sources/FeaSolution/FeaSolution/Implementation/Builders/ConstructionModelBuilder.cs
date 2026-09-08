@@ -5,9 +5,9 @@ namespace FeaSolution.Implementation.Builders;
 public static class ConstructionModelBuilder
 {
     /// <summary>
-    /// Создает новую модель конструкции.
+    /// Creates a new structural model.
     /// </summary>
-    /// <returns>Новая модель конструкции с типом узла 1D.</returns>
+    /// <returns>A new structural model with a 1D node type.</returns>
     public static ConstructionModel CreateNew1D()
         => new()
         {
@@ -15,9 +15,9 @@ public static class ConstructionModelBuilder
         };
 
     /// <summary>
-    /// Создает новую модель конструкции.
+    /// Creates a new structural model.
     /// </summary>
-    /// <returns>Новая модель конструкции с типом узла 2D.</returns>
+    /// <returns>A new structural model with a 2D node type.</returns>
     public static ConstructionModel CreateNew2D()
         => new()
         {
@@ -25,9 +25,9 @@ public static class ConstructionModelBuilder
         };
 
     /// <summary>
-    /// Создает новую модель конструкции.
+    /// Creates a new structural model.
     /// </summary>
-    /// <returns>Новая модель конструкции с типом узла 3D.</returns>
+    /// <returns>A new structural model with a 3D node type.</returns>
     public static ConstructionModel CreateNew3D()
         => new()
         {

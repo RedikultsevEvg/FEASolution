@@ -3,13 +3,12 @@ using FeaSolution.Core.Enums;
 namespace FeaSolution.Core.Types;
 
 /// <summary>
-/// Тип узла конечного элемента.
+/// Finite element node type.
 /// </summary>
 public class ElementNodeType
 {
     /// <summary>
-    /// Размерность узла.
+    /// Node dimensionality.
     /// </summary>
     public Dimensional Dimension { get; init; }
 }
-

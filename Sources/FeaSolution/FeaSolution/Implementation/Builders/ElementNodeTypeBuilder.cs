@@ -6,20 +6,20 @@ namespace FeaSolution.Implementation.Builders;
 public static class ElementNodeTypeBuilder
 {
     /// <summary>
-    /// Создает новый тип узла 1D.
+    /// Creates a new 1D node type.
     /// </summary>
-    /// <returns>Новый тип узла 1D.</returns>
+    /// <returns>A new 1D node type.</returns>
     public static ElementNodeType CreateNew1D() => new() { Dimension = Dimensional.OneDimensional };
 
     /// <summary>
-    /// Создает новый тип узла 2D.
+    /// Creates a new 2D node type.
     /// </summary>
-    /// <returns>Новый тип узла 2D.</returns>
+    /// <returns>A new 2D node type.</returns>
     public static ElementNodeType CreateNew2D() => new() { Dimension = Dimensional.TwoDimensional };
 
     /// <summary>
-    /// Создает новый тип узла 3D.
+    /// Creates a new 3D node type.
     /// </summary>
-    /// <returns>Новый тип узла 3D.</returns>
+    /// <returns>A new 3D node type.</returns>
     public static ElementNodeType CreateNew3D() => new() { Dimension = Dimensional.ThreeDimensional };
 }

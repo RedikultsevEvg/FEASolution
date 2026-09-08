@@ -1,5 +1,8 @@
 namespace FeaSolution.Core.Exceptions;
 
+/// <summary>
+/// General FEA exception.
+/// </summary>
 public class FeaException : Exception
 {
     public FeaException()

@@ -3,17 +3,17 @@ using FeaSolution.Core.Types;
 namespace FeaSolution.Core.Interfaces;
 
 /// <summary>
-/// Модель конструкции.
+/// Construction model.
 /// </summary>
 public interface IConstructionModel
 {
     /// <summary>
-    /// Допустимый тип узлов модели конструкции.
+    /// Allowed node type of the construction model.
     /// </summary>
     ElementNodeType AllowedNodeType { get; }
 
     /// <summary>
-    /// Коллекция конечных элементов модели конструкции.
+    /// Collection of finite elements of the construction model.
     /// </summary>
     ICollection<IFiniteElement> Elements { get; }
 }
