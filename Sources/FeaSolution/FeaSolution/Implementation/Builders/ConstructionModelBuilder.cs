@@ -1,36 +1,30 @@
+using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModels;
 
 namespace FeaSolution.Implementation.Builders;
 
-public static class ConstructionModelBuilder
+public class ConstructionModelBuilder
 {
     /// <summary>
-    /// Creates a new structural model.
+    /// Creates construction model.
     /// </summary>
-    /// <returns>A new structural model with a 1D node type.</returns>
-    public static ConstructionModel CreateNew1D()
+    /// <returns>A new construction model.</returns>
+    public ConstructionModel CreateModel()
         => new()
         {
-            AllowedNodeType = ElementNodeTypeBuilder.CreateNew1D(),
+            AllowedNodeType = NodesType,
         };
 
     /// <summary>
-    /// Creates a new structural model.
+    /// Sets the node type for all finite elements in construction model.
     /// </summary>
-    /// <returns>A new structural model with a 2D node type.</returns>
-    public static ConstructionModel CreateNew2D()
-        => new()
-        {
-            AllowedNodeType = ElementNodeTypeBuilder.CreateNew2D(),
-        };
+    /// <param name="nodeType">Node type.</param>
+    /// <returns>The reference to the current builder.</returns>
+    public  ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
+    {
+        NodesType = nodeType;
+        return this;
+    }
 
-    /// <summary>
-    /// Creates a new structural model.
-    /// </summary>
-    /// <returns>A new structural model with a 3D node type.</returns>
-    public static ConstructionModel CreateNew3D()
-        => new()
-        {
-            AllowedNodeType = ElementNodeTypeBuilder.CreateNew3D(),
-        };
+    private ElementNodeType NodesType { get; set; } = new();
 }

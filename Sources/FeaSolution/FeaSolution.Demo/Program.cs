@@ -1,4 +1,4 @@
 ﻿
-using FeaSolution.Demo.Demo1;
+using FeaSolution.Demo.Demo1D;
 
-ConstructionModelDemo.BuildConstructionModel();
+BuildModel.BuildEmptyConstructionModel();

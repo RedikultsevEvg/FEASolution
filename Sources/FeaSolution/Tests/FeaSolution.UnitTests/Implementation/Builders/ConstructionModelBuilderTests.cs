@@ -1,4 +1,5 @@
 ﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.UnitTests.Implementation.Builders;
@@ -11,7 +12,9 @@ public class ConstructionModelBuilderTests
     public void CreateNew1D_SetsAllowedNodeTypeAndInitializesEmptyElements()
     {
         // Act
-        var model = ConstructionModelBuilder.CreateNew1D();
+        var model = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1d)
+            .CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.OneDimensional));
@@ -22,7 +25,9 @@ public class ConstructionModelBuilderTests
     public void CreateNew2D_SetsAllowedNodeTypeAndInitializesEmptyElements()
     {
         // Act
-        var model = ConstructionModelBuilder.CreateNew2D();
+        var model = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type2d)
+            .CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -33,7 +38,9 @@ public class ConstructionModelBuilderTests
     public void CreateNew3D_SetsAllowedNodeTypeAndInitializesEmptyElements()
     {
         // Act
-        var model = ConstructionModelBuilder.CreateNew3D();
+        var model = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type3d)
+            .CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
