@@ -1,3 +1,5 @@
+using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModels;
 
@@ -12,7 +14,8 @@ public class ConstructionModelBuilder
     public ConstructionModel CreateModel()
         => new()
         {
-            AllowedNodeType = NodesType,
+            AllowedNodeType = NodeType,
+            Elements = Elements
         };
 
     /// <summary>
@@ -22,9 +25,26 @@ public class ConstructionModelBuilder
     /// <returns>The reference to the current builder.</returns>
     public  ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
     {
-        NodesType = nodeType;
+        NodeType = nodeType;
         return this;
     }
 
-    private ElementNodeType NodesType { get; set; } = new();
+    public ConstructionModelBuilder AddElements(params ICollection<IFiniteElement> elements)
+    {
+        if (elements.Any(e => e.ElementType.NodeType != NodeType))
+        {
+            throw new FeaException($"All added elements should have node type = {NodeType.Dimension.ToString()}");
+        }
+
+        foreach (var element in elements)
+        {
+            Elements.Add(element);
+        }
+        return this;
+
+    }
+
+    private ElementNodeType NodeType { get; set; } = new();
+
+    private ICollection<IFiniteElement> Elements { get; set; } = [];
 }

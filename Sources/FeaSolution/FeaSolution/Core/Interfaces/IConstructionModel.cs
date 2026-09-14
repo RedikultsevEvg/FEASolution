@@ -16,11 +16,4 @@ public interface IConstructionModel
     /// Collection of finite elements of the construction model.
     /// </summary>
     ICollection<IFiniteElement> Elements { get; }
-
-    /// <summary>
-    /// Add one finite element to construstion model.
-    /// </summary>
-    /// <param name="element">The finite element.</param>
-    /// <returns>The reference to the current construstion model.</returns>
-    IConstructionModel AddElement(IFiniteElement element);
 }

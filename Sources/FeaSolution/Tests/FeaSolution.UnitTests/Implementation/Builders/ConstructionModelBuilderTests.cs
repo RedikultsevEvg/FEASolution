@@ -9,12 +9,14 @@ namespace FeaSolution.UnitTests.Implementation.Builders;
 public class ConstructionModelBuilderTests
 {
     [Test]
-    public void CreateNew1D_SetsAllowedNodeTypeAndInitializesEmptyElements()
+    public void CreateModel_WhenNodeTypeIs1D_ReturnsTheModel()
     {
+        // Arrange
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1d);
+
         // Act
-        var model = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type1d)
-            .CreateModel();
+        var model = builder.CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.OneDimensional));
@@ -22,12 +24,14 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateNew2D_SetsAllowedNodeTypeAndInitializesEmptyElements()
+    public void CreateModel_WhenNodeTypeIs2D_ReturnsTheModel()
     {
+        // Arrange
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type2d);
+
         // Act
-        var model = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2d)
-            .CreateModel();
+        var model = builder.CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -35,12 +39,14 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateNew3D_SetsAllowedNodeTypeAndInitializesEmptyElements()
+    public void CreateModel_WhenNodeTypeIs3D_ReturnsTheModel()
     {
+        // Arrange
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type3d);
+
         // Act
-        var model = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3d)
-            .CreateModel();
+        var model = builder.CreateModel();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
