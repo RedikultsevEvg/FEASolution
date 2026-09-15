@@ -1,6 +1,10 @@
 ﻿
 using FeaSolution.Demo.Demo1D;
 
-ConstructionModel1D.Build_Empty_ConstructionModel();
-ConstructionModel1D.Build_Model_1_Element();
-ConstructionModel1D.Build_Model_3_Element();
+ConstructionModel1DExamples.Build_Empty_ConstructionModel();
+
+ConstructionModel1DExamples.Build_Model_From_Element();
+
+ConstructionModel1DExamples.Build_Model_From_3_Elements();
+
+ConstructionModel1DExamples.Build_Model_From_CollectionOfElements();

@@ -3,7 +3,7 @@ using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo1D;
 
-internal static class ConstructionModel1D
+internal static class ConstructionModel1DExamples
 {
     public static void Build_Empty_ConstructionModel()
     {
@@ -13,7 +13,7 @@ internal static class ConstructionModel1D
         modelBuilder.CreateModel();
     }
 
-    public static void Build_Model_1_Element()
+    public static void Build_Model_From_Element()
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
@@ -28,7 +28,7 @@ internal static class ConstructionModel1D
             .CreateModel();
     }
 
-    public static void Build_Model_3_Element()
+    public static void Build_Model_From_3_Elements()
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
@@ -54,6 +54,37 @@ internal static class ConstructionModel1D
         new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddElements(element1, element2, element3)
+            .CreateModel();
+    }
+
+    public static void Build_Model_From_CollectionOfElements()
+    {
+        var element1 = new FiniteElementBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddNode(3.4)
+            .AddNode(5.7)
+            .AddNode(2.5)
+            .CreateElement();
+
+        var element2 = new FiniteElementBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddNode(2.444)
+            .AddNode(504.7f)
+            .AddNode(254.54)
+            .CreateElement();
+
+        var element3 = new FiniteElementBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddNode(2.444)
+            .AddNode(504.7f)
+            .AddNode(254.54)
+            .CreateElement();
+
+        var elementCollection = new [] { element1, element2, element3 };
+
+        new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(elementCollection)
             .CreateModel();
     }
 }
