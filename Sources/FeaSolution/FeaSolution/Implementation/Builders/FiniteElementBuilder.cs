@@ -125,5 +125,5 @@ public class FiniteElementBuilder
 
     private ElementNodeType NodeType { get; set; } = new();
     
-    private ICollection<IElementNode> Nodes { get; set; } = [];
+    private ICollection<IElementNode> Nodes { get; } = [];
 }

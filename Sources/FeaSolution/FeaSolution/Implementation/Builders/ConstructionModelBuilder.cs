@@ -12,11 +12,18 @@ public class ConstructionModelBuilder
     /// </summary>
     /// <returns>A new construction model.</returns>
     public ConstructionModel CreateModel()
-        => new()
+    {
+        if (NodeType == null)
+        {
+            throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
+        }
+
+        return new ConstructionModel
         {
             AllowedNodeType = NodeType,
             Elements = Elements
         };
+    }
 
     /// <summary>
     /// Sets the node type for all finite elements in construction model.
@@ -25,15 +32,27 @@ public class ConstructionModelBuilder
     /// <returns>The reference to the current builder.</returns>
     public  ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
     {
+        ArgumentNullException.ThrowIfNull(nodeType);
+        if (Elements.Count != 0)
+        {
+            throw new FeaModelBuilderException("You have to remove all elements before changing node type.");
+        }
+
         NodeType = nodeType;
         return this;
     }
 
     public ConstructionModelBuilder AddElements(params ICollection<IFiniteElement> elements)
     {
-        if (elements.Any(e => e.ElementType.NodeType != NodeType))
+        ArgumentNullException.ThrowIfNull(elements);
+        if (NodeType == null!)
         {
-            throw new FeaCommonException($"All added elements should have node type = {NodeType.Dimension.ToString()}");
+            throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
+        }
+
+        if (elements.Any(element => element.ElementType.NodeType.Dimension != NodeType.Dimension))
+        {
+            throw new FeaModelBuilderException($"Dimensional of all elements should be equal to {NodeType.Dimension.ToString()}.");
         }
 
         foreach (var element in elements)
@@ -44,7 +63,9 @@ public class ConstructionModelBuilder
 
     }
 
-    private ElementNodeType NodeType { get; set; } = new();
+    private ElementNodeType? NodeType { get; set; }
 
-    private ICollection<IFiniteElement> Elements { get; set; } = [];
+    private ICollection<IFiniteElement> Elements { get; } = [];
+
+    private const string NodeTypeNullExceptionMessage = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
 }
