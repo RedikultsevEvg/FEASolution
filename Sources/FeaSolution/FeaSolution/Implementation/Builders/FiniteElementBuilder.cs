@@ -12,7 +12,7 @@ public class FiniteElementBuilder
     /// <summary>
     /// Creates a new finite element.
     /// </summary>
-    /// <returns>A new 1D node type.</returns>
+    /// <returns>The new element.</returns>
     public IFiniteElement CreateElement(string userId = "")
     {
         var elementType = new FiniteElementType
@@ -46,6 +46,12 @@ public class FiniteElementBuilder
         return this;
     }
 
+    /// <summary>
+    /// Adds 1D node.
+    /// </summary>
+    /// <param name="x">The X-coordinate.</param>
+    /// <returns>The reference to the current builder.</returns>
+    /// <exception cref="FeaException">Raise an exception if builder dimension is not 1D.</exception>
     public FiniteElementBuilder AddNode(double x)
     {
         if (NodeType.Dimension != Dimensional.OneDimensional)
