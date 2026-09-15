@@ -17,7 +17,7 @@ public interface IFiniteElement
     /// <summary>
     /// Finite element nodes.
     /// </summary>
-    IElementNode[] Nodes { get; }
+    ICollection<IElementNode> Nodes { get; } 
 
     /// <summary>
     /// Finite element stiffness matrix.

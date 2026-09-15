@@ -13,7 +13,7 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type1d);
+            .SetNodesType(ElementNodeType.Type1D);
 
         // Act
         var model = builder.CreateModel();
@@ -28,7 +28,7 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2d);
+            .SetNodesType(ElementNodeType.Type2D);
 
         // Act
         var model = builder.CreateModel();
@@ -43,7 +43,7 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3d);
+            .SetNodesType(ElementNodeType.Type3D);
 
         // Act
         var model = builder.CreateModel();

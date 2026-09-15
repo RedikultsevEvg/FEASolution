@@ -68,6 +68,55 @@ public class FiniteElementBuilderTests
         Assert.That(first, Is.Not.SameAs(second));
     }
 
+    [Test]
+    public void CreateElement_WhenHasNodeType_ShouldReturnElementWithCorrectNodeType()
+    {
+        // Arrange
+        _builder
+            .SetNodesType(ElementNodeType.Type1D);
+
+        // Act
+        var element = _builder.CreateElement();
+
+        // Assert
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.ElementType.NodeType, Is.EqualTo(ElementNodeType.Type1D));
+    }
+
+    [Test]
+    public void CreateElement_WhenHasOneNode_ShouldReturnElementWithOneNode()
+    {
+        // Arrange
+        _builder
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddNode(1.3, 2.4);
+
+        // Act
+        var element = _builder.CreateElement();
+
+        // Assert
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Nodes, Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void CreateElement_WhenHasTreeNodes_ShouldReturnElementWithTreeNode()
+    {
+        // Arrange
+        _builder
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddNode(1.3, 2.4)
+            .AddNode(2.3, 3.4)
+            .AddNode(3.3, 4.4);
+
+        // Act
+        var element = _builder.CreateElement();
+
+        // Assert
+        Assert.That(element, Is.Not.Null);
+        Assert.That(element.Nodes, Has.Count.EqualTo(3));
+    }
+
     #endregion
 
     #region SetNodesType

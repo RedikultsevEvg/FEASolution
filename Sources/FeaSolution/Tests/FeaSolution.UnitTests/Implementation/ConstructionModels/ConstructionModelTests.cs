@@ -24,9 +24,9 @@ public class ConstructionModelTests
     public void AllowedNodeType_WhenSetViaBuilder_ReturnsExpectedDimension()
     {
         // Arrange & Act
-        var model1D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type1d).CreateModel();
-        var model2D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type2d).CreateModel();
-        var model3D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type3d).CreateModel();
+        var model1D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type1D).CreateModel();
+        var model2D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type2D).CreateModel();
+        var model3D = new ConstructionModelBuilder().SetNodesType(ElementNodeType.Type3D).CreateModel();
 
         // Assert
         Assert.That(model1D.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.OneDimensional));
@@ -38,7 +38,7 @@ public class ConstructionModelTests
     public void Constructor_WhenInitializedWithRequiredProperty_SetsAllowedNodeType()
     {
         // Arrange
-        var nodeType = ElementNodeType.Type1d;
+        var nodeType = ElementNodeType.Type1D;
 
         // Act
         var model = new ConstructionModel { AllowedNodeType = nodeType };

@@ -25,7 +25,12 @@ public class FiniteElementBuilder
             StiffnessMatrixCalculationMethod = null!
         };
 
-        var newElement = new FiniteElement(userId, elementType);
+        var newElement = new FiniteElement
+        {
+            UserId = userId,
+            ElementType = elementType,
+            Nodes = Nodes,
+        };
 
         return newElement;
     }

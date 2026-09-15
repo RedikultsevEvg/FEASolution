@@ -4,16 +4,16 @@ using FeaSolution.Core.Types;
 namespace FeaSolution.Implementation.FiniteElements;
 
 /// <inheritdoc/>
-public class FiniteElement(string userId, FiniteElementType elementType) : IFiniteElement
+public class FiniteElement : IFiniteElement
 {
     /// <inheritdoc/>
-    public string UserId { get; } = userId;
+    public string UserId { get; init; } = "";
 
     /// <inheritdoc/>
-    public FiniteElementType ElementType { get; } = elementType;
+    public required FiniteElementType ElementType { get; init; } 
 
     /// <inheritdoc/>
-    public IElementNode[] Nodes { get; }
+    public ICollection<IElementNode> Nodes { get; init; } = [];
 
     /// <inheritdoc/>
     public IFiniteElementStiffnessMatrix StiffnessMatrix { get; }
