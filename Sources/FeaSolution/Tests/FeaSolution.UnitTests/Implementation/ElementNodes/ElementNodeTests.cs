@@ -64,7 +64,7 @@ public class ElementNodeTests
         var node = CreateNewElementNode(Dimensional.OneDimensional);
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => node.Y = 3.0);
+        Assert.Throws<FeaCommonException>(() => node.Y = 3.0);
     }
 
     [Test]
@@ -108,7 +108,7 @@ public class ElementNodeTests
         var node = CreateNewElementNode(Dimensional.OneDimensional);
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => node.Z = 7.0);
+        Assert.Throws<FeaCommonException>(() => node.Z = 7.0);
     }
 
     [Test]
@@ -118,7 +118,7 @@ public class ElementNodeTests
         var node = CreateNewElementNode(Dimensional.TwoDimensional);
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => node.Z = 7.0);
+        Assert.Throws<FeaCommonException>(() => node.Z = 7.0);
     }
 
     [Test]

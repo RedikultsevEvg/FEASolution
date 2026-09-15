@@ -94,10 +94,10 @@ public class FiniteElementBuilderTests
         _builder.AddNode(1.0);
 
         // Act
-        var ex = Assert.Throws<FeaException>(() => _builder.SetNodesType(nodeType));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.SetNodesType(nodeType));
 
         // Assert
-        Assert.That(ex!.Message, Does.Contain("remove all nodes"));
+        Assert.That(ex!.Message, Is.EqualTo("You have to remove all nodes before changing node type."));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class FiniteElementBuilderTests
     public void AddNode_WithoutSettingNodeType_ShouldThrowBecauseDefaultIsNotOneDimensional()
     {
         // Act & Assert
-        var e = Assert.Throws<FeaException>(() => _builder.AddNode(1.0));
+        var e = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
         Assert.That(e.Message, Is.EqualTo("The current accepted node type is 0. You should use another method to specify all dimentions."));
     }
 
@@ -168,7 +168,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
 
         // Act
-        var ex = Assert.Throws<FeaException>(() => _builder.AddNode(1.0));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is TwoDimensional. You should use another method to specify all dimentions."));
@@ -273,7 +273,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
 
         // Act
-        var ex = Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is OneDimensional. You should use another method to specify all dimentions."));
@@ -286,7 +286,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
     }
 
     [Test]
@@ -396,7 +396,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
 
         // Act
-        var ex = Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is OneDimensional. You should use another method to specify all dimentions."));
@@ -409,7 +409,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
     }
 
     [Test]
@@ -491,7 +491,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
     }
 
     [Test]
@@ -501,7 +501,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
     }
 
     [Test]
@@ -511,7 +511,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
     }
 
     [Test]
@@ -521,7 +521,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
 
         // Act & Assert
-        Assert.Throws<FeaException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
     }
 
     [Test]
@@ -531,7 +531,7 @@ public class FiniteElementBuilderTests
         _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
 
         // Act
-        var ex = Assert.Throws<FeaException>(() => _builder.AddNode(1.0));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
 
         // Assert
         Assert.That(ex!.Message, Does.Contain(Dimensional.TwoDimensional.ToString()));

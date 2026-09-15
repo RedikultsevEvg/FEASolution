@@ -24,7 +24,7 @@ public class ElementNode(ElementNodeType type) : IElementNode
         {
             if (Type.Dimension == Dimensional.OneDimensional)
             {
-                throw new FeaException("Cannot set Y coordinate for one-dimensional node.");
+                throw new FeaCommonException("Cannot set Y coordinate for one-dimensional node.");
             }
             field = value;
         }
@@ -40,9 +40,9 @@ public class ElementNode(ElementNodeType type) : IElementNode
         {
             field = Type.Dimension switch
             {
-                Dimensional.OneDimensional => throw new FeaException(
+                Dimensional.OneDimensional => throw new FeaCommonException(
                     "Cannot set Z coordinate for one-dimensional node."),
-                Dimensional.TwoDimensional => throw new FeaException(
+                Dimensional.TwoDimensional => throw new FeaCommonException(
                     "Cannot set Z coordinate for two-dimensional node."),
                 _ => value
             };

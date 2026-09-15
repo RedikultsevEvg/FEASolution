@@ -39,7 +39,7 @@ public class FiniteElementBuilder
     {
         if (Nodes.Count != 0)
         {
-            throw new FeaException("You have to remove all nodes before changing node type.");
+            throw new FeaElementBuilderException("You have to remove all nodes before changing node type.");
         }
 
         NodeType = nodeType;
@@ -51,12 +51,12 @@ public class FiniteElementBuilder
     /// </summary>
     /// <param name="x">The X-coordinate.</param>
     /// <returns>The reference to the current builder.</returns>
-    /// <exception cref="FeaException">Raise an exception if builder dimension is not 1D.</exception>
+    /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 1D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x)
     {
         if (NodeType.Dimension != Dimensional.OneDimensional)
         {
-            throw new FeaException($"The current accepted node type is {NodeType.Dimension.ToString()}. You should use another method to specify all dimentions.");
+            throw new FeaElementBuilderException(NodeType);
         }
 
         var node = new ElementNode(NodeType)
@@ -74,12 +74,12 @@ public class FiniteElementBuilder
     /// <param name="x">The X-coordinate.</param>
     /// <param name="y">The Y-coordinate.</param>
     /// <returns>The reference to the current builder.</returns>
-    /// <exception cref="FeaException">Raise an exception if builder dimension is not 2D.</exception>
+    /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 2D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y)
     {
         if (NodeType.Dimension != Dimensional.TwoDimensional)
         {
-            throw new FeaException($"The current accepted node type is {NodeType.Dimension.ToString()}. You should use another method to specify all dimentions.");
+            throw new FeaElementBuilderException(NodeType);
         }
 
         var node = new ElementNode(NodeType)
@@ -99,12 +99,12 @@ public class FiniteElementBuilder
     /// <param name="y">The Y-coordinate.</param>
     /// <param name="z">The Z-coordinate.</param>
     /// <returns>The reference to the current builder.</returns>
-    /// <exception cref="FeaException">Raise an exception if builder dimension is not 3D.</exception>
+    /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 3D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, CoordinateValue z)
     {
         if (NodeType.Dimension != Dimensional.ThreeDimensional)
         {
-            throw new FeaException($"The current accepted node type is {NodeType.Dimension.ToString()}. You should use another method to specify all dimentions.");
+            throw new FeaElementBuilderException(NodeType);
         }
 
         var node = new ElementNode(NodeType)

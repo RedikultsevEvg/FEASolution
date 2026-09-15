@@ -33,7 +33,7 @@ public class ConstructionModelBuilder
     {
         if (elements.Any(e => e.ElementType.NodeType != NodeType))
         {
-            throw new FeaException($"All added elements should have node type = {NodeType.Dimension.ToString()}");
+            throw new FeaCommonException($"All added elements should have node type = {NodeType.Dimension.ToString()}");
         }
 
         foreach (var element in elements)

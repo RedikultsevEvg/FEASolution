@@ -7,10 +7,10 @@ namespace FeaSolution.Implementation.FiniteElements;
 public class FiniteElement(string userId, FiniteElementType elementType) : IFiniteElement
 {
     /// <inheritdoc/>
-    public string UserId { get; set; } = userId;
+    public string UserId { get; } = userId;
 
     /// <inheritdoc/>
-    public FiniteElementType ElementType { get; set; } = elementType;
+    public FiniteElementType ElementType { get; } = elementType;
 
     /// <inheritdoc/>
     public IElementNode[] Nodes { get; }
