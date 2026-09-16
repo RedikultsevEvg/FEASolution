@@ -11,7 +11,7 @@ public class ConstructionModelBuilder
     /// Creates construction model.
     /// </summary>
     /// <returns>A new construction model.</returns>
-    public ConstructionModel CreateModel()
+    public ConstructionModel Build()
     {
         if (NodeType == null)
         {

@@ -20,13 +20,13 @@ public class FiniteElementBuilderTests
         _builder = new FiniteElementBuilder();
     }
 
-    #region CreateElement
+    #region Build
 
     [Test]
-    public void CreateElement_ShouldReturnNonNullElement()
+    public void Build_ShouldReturnNonNullElement()
     {
         // Act
-        var element = _builder.CreateElement();
+        var element = _builder.Build();
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -34,49 +34,50 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void CreateElement_WithDefaultUserId_ShouldCreateElement()
+    public void Build_WithDefaultUserId_ShouldCreateElement()
     {
         // Act
-        var element = _builder.CreateElement();
+        var element = _builder.Build();
 
         // Assert
         Assert.That(element, Is.InstanceOf<FiniteElement>());
     }
 
     [Test]
-    public void CreateElement_WithCustomUserId_ShouldCreateElement()
+    public void Build_WithCustomUserId_ShouldCreateElement()
     {
         // Arrange
         const string userId = "user-123";
 
         // Act
-        var element = _builder.CreateElement(userId);
+        var element = _builder.Build(userId);
 
         // Assert
         Assert.That(element, Is.Not.Null);
         Assert.That(element, Is.InstanceOf<FiniteElement>());
+        Assert.That(element.UserId, Is.EqualTo(userId));
     }
 
     [Test]
-    public void CreateElement_WhenCalledTwice_ShouldReturnDifferentInstances()
+    public void Build_WhenCalledTwice_ShouldReturnDifferentInstances()
     {
         // Act
-        var first = _builder.CreateElement();
-        var second = _builder.CreateElement();
+        var first = _builder.Build();
+        var second = _builder.Build();
 
         // Assert
         Assert.That(first, Is.Not.SameAs(second));
     }
 
     [Test]
-    public void CreateElement_WhenHasNodeType_ShouldReturnElementWithCorrectNodeType()
+    public void Build_WhenHasNodeType_ShouldReturnElementWithCorrectNodeType()
     {
         // Arrange
         _builder
             .SetNodesType(ElementNodeType.Type1D);
 
         // Act
-        var element = _builder.CreateElement();
+        var element = _builder.Build();
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -84,7 +85,7 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void CreateElement_WhenHasOneNode_ShouldReturnElementWithOneNode()
+    public void Build_WhenHasOneNode_ShouldReturnElementWithOneNode()
     {
         // Arrange
         _builder
@@ -92,7 +93,7 @@ public class FiniteElementBuilderTests
             .AddNode(1.3, 2.4);
 
         // Act
-        var element = _builder.CreateElement();
+        var element = _builder.Build();
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -100,7 +101,7 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void CreateElement_WhenHasTreeNodes_ShouldReturnElementWithTreeNode()
+    public void Build_WhenHasTreeNodes_ShouldReturnElementWithTreeNode()
     {
         // Arrange
         _builder
@@ -110,7 +111,7 @@ public class FiniteElementBuilderTests
             .AddNode(3.3, 4.4);
 
         // Act
-        var element = _builder.CreateElement();
+        var element = _builder.Build();
 
         // Assert
         Assert.That(element, Is.Not.Null);

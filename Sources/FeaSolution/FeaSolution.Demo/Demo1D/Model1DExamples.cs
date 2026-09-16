@@ -3,14 +3,14 @@ using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo1D;
 
-internal static class ConstructionModel1DExamples
+internal static class Model1DExamples
 {
     public static void Build_Empty_ConstructionModel()
     {
         var modelBuilder = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D);
 
-        modelBuilder.CreateModel();
+        modelBuilder.Build();
     }
 
     public static void Build_Model_From_Element()
@@ -20,12 +20,12 @@ internal static class ConstructionModel1DExamples
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
-            .CreateElement();
+            .Build();
 
         new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddElements(element1)
-            .CreateModel();
+            .Build();
     }
 
     public static void Build_Model_From_3_Elements()
@@ -35,26 +35,26 @@ internal static class ConstructionModel1DExamples
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
-            .CreateElement();
+            .Build();
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
-            .CreateElement();
+            .Build();
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
-            .CreateElement();
+            .Build();
 
         new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddElements(element1, element2, element3)
-            .CreateModel();
+            .Build();
     }
 
     public static void Build_Model_From_CollectionOfElements()
@@ -64,27 +64,27 @@ internal static class ConstructionModel1DExamples
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
-            .CreateElement();
+            .Build();
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
-            .CreateElement();
+            .Build();
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
-            .CreateElement();
+            .Build();
 
         var elementCollection = new [] { element1, element2, element3 };
 
         new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddElements(elementCollection)
-            .CreateModel();
+            .Build();
     }
 }

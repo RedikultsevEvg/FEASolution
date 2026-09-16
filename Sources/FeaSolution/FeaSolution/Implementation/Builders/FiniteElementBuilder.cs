@@ -13,7 +13,7 @@ public class FiniteElementBuilder
     /// Creates a new finite element.
     /// </summary>
     /// <returns>The new element.</returns>
-    public IFiniteElement CreateElement(string userId = "")
+    public IFiniteElement Build(string userId = "")
     {
         var elementType = new FiniteElementType
         {

@@ -19,25 +19,25 @@ public class ConstructionModelBuilderTests
         _builder = new ConstructionModelBuilder();
     }
 
-    #region CreateModel
+    #region Build
 
     [Test]
-    public void CreateModel_WhenNoNodeType_ShouldThrowFeaModelBuilderException()
+    public void Build_WhenNoNodeType_ShouldThrowFeaModelBuilderException()
     {
         // Act & Assert
         Assert.Throws<FeaModelBuilderException>(
-            () => _builder.CreateModel());
+            () => _builder.Build());
     }
 
     [Test]
-    public void CreateModel_WhenNodeTypeIs1D_ReturnsTheModel()
+    public void Build_WhenNodeTypeIs1D_ReturnsTheModel()
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type1D);
 
         // Act
-        var model = builder.CreateModel();
+        var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.OneDimensional));
@@ -45,14 +45,14 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateModel_WhenNodeTypeIs2D_ReturnsTheModel()
+    public void Build_WhenNodeTypeIs2D_ReturnsTheModel()
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D);
 
         // Act
-        var model = builder.CreateModel();
+        var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -60,14 +60,14 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateModel_WhenNodeTypeIs3D_ReturnsTheModel()
+    public void Build_WhenNodeTypeIs3D_ReturnsTheModel()
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type3D);
 
         // Act
-        var model = builder.CreateModel();
+        var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
@@ -75,7 +75,7 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateModel_AfterAddingElements_ReturnsModelWithThoseElements()
+    public void Build_AfterAddingElements_ReturnsModelWithThoseElements()
     {
         // Arrange
         var element = CreateTestElement(Dimensional.OneDimensional);
@@ -84,7 +84,7 @@ public class ConstructionModelBuilderTests
             .AddElements(element);
 
         // Act
-        var model = builder.CreateModel();
+        var model = builder.Build();
 
         // Assert
         Assert.That(model.Elements, Has.Count.EqualTo(1));
@@ -92,7 +92,7 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateModel_AfterAddingMultipleElements_ReturnsModelWithAllElements()
+    public void Build_AfterAddingMultipleElements_ReturnsModelWithAllElements()
     {
         // Arrange
         var first = CreateTestElement(Dimensional.OneDimensional);
@@ -102,7 +102,7 @@ public class ConstructionModelBuilderTests
             .AddElements(first, second);
 
         // Act
-        var model = builder.CreateModel();
+        var model = builder.Build();
 
         // Assert
         Assert.That(model.Elements, Has.Count.EqualTo(2));
@@ -111,27 +111,27 @@ public class ConstructionModelBuilderTests
     }
 
     [Test]
-    public void CreateModel_WhenCalledTwice_ReturnsDifferentInstances()
+    public void Build_WhenCalledTwice_ReturnsDifferentInstances()
     {
         // Arrange
         _builder.SetNodesType(ElementNodeType.Type1D);
 
         // Act
-        var first = _builder.CreateModel();
-        var second = _builder.CreateModel();
+        var first = _builder.Build();
+        var second = _builder.Build();
 
         // Assert
         Assert.That(first, Is.Not.SameAs(second));
     }
 
     [Test]
-    public void CreateModel_PreservesAllowedNodeTypeSetByBuilder()
+    public void Build_PreservesAllowedNodeTypeSetByBuilder()
     {
         // Arrange
         _builder.SetNodesType(ElementNodeType.Type2D);
 
         // Act
-        var model = _builder.CreateModel();
+        var model = _builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -206,7 +206,7 @@ public class ConstructionModelBuilderTests
 
         // Act
         _builder.SetNodesType(ElementNodeType.Type2D);
-        var model = _builder.CreateModel();
+        var model = _builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -393,7 +393,7 @@ public class ConstructionModelBuilderTests
                 throw new ArgumentOutOfRangeException(nameof(dimension), dimension, null);
         }
 
-        return builder.CreateElement();
+        return builder.Build();
     }
 
     private static ElementNodeType GetNodeType(Dimensional dimension) => dimension switch

@@ -5,30 +5,30 @@ using FeaSolution.Demo.Demo3D;
 
 // 1D
 
-ConstructionModel1DExamples.Build_Empty_ConstructionModel();
+Model1DExamples.Build_Empty_ConstructionModel();
 
-ConstructionModel1DExamples.Build_Model_From_Element();
+Model1DExamples.Build_Model_From_Element();
 
-ConstructionModel1DExamples.Build_Model_From_3_Elements();
+Model1DExamples.Build_Model_From_3_Elements();
 
-ConstructionModel1DExamples.Build_Model_From_CollectionOfElements();
+Model1DExamples.Build_Model_From_CollectionOfElements();
 
 
 // 2D
-ConstructionModel2DExamples.Build_Empty_ConstructionModel();
+Model2DExamples.Build_Empty_ConstructionModel();
 
-ConstructionModel2DExamples.Build_Model_From_Element();
+Model2DExamples.Build_Model_From_Element();
 
-ConstructionModel2DExamples.Build_Model_From_3_Elements();
+Model2DExamples.Build_Model_From_3_Elements();
 
-ConstructionModel2DExamples.Build_Model_From_CollectionOfElements();
+Model2DExamples.Build_Model_From_CollectionOfElements();
 
 // 3D
-ConstructionModel3DExamples.Build_Empty_ConstructionModel();
+Model3DExamples.Build_Empty_Model();
 
-ConstructionModel3DExamples.Build_Model_From_Element();
+Model3DExamples.Build_Model_From_Element();
 
-ConstructionModel3DExamples.Build_Model_From_3_Elements();
+Model3DExamples.Build_Model_From_3_Elements();
 
-ConstructionModel3DExamples.Build_Model_From_CollectionOfElements();
+Model3DExamples.Build_Model_From_CollectionOfElements();
 
