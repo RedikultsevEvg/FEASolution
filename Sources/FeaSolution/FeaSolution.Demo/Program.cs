@@ -23,6 +23,8 @@ Model2DExamples.Build_Model_From_3_Elements();
 
 Model2DExamples.Build_Model_From_CollectionOfElements();
 
+Model2D_Two_Triangles.Build_Model_From_Two_Triangles();
+
 // 3D
 Model3DExamples.Build_Empty_Model();
 

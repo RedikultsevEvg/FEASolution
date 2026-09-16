@@ -42,6 +42,12 @@ public class ConstructionModelBuilder
         return this;
     }
 
+    /// <summary>
+    /// Adds elements to the model.
+    /// </summary>
+    /// <param name="elements">Collection of elements.</param>
+    /// <returns></returns>
+    /// <exception cref="FeaModelBuilderException"></exception>
     public ConstructionModelBuilder AddElements(params ICollection<IFiniteElement> elements)
     {
         ArgumentNullException.ThrowIfNull(elements);
@@ -63,9 +69,22 @@ public class ConstructionModelBuilder
 
     }
 
+    /// <summary>
+    /// Find and union the common nodes.
+    /// </summary>
+    /// <param name="delta"></param>
+    /// <returns></returns>
+    public ConstructionModelBuilder Merge(CoordinateValue delta = DeltaDefaultValue)
+    {
+        return this;
+    }
+
+    private const CoordinateValue DeltaDefaultValue = 0.0001;
+
     private ElementNodeType? NodeType { get; set; }
 
     private ICollection<IFiniteElement> Elements { get; } = [];
 
     private const string NodeTypeNullExceptionMessage = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
+
 }
