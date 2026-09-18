@@ -10,5 +10,10 @@ public class ConstructionModel : IConstructionModel
     public required ElementNodeType AllowedNodeType { get; init; }
 
     /// <inheritdoc/>
-    public ICollection<IFiniteElement> Elements { get; set; } = (List<IFiniteElement>)[];
+    public ICollection<IFiniteElement> Elements { get; init; } = (List<IFiniteElement>)[];
+
+    public ICollection<IElementNode> GetNodes()
+    {
+        return [.. Elements.SelectMany(element => element.Nodes)];
+    }
 }
