@@ -18,4 +18,12 @@ public class FeaElementBuilderException : FeaCommonException
     public FeaElementBuilderException(string message) : base(message)
     {
     }
+
+    public static void ThrowIfTrue(bool condition, string message)
+    {
+        if (condition)
+        {
+            throw new FeaElementBuilderException(message);
+        }
+    }
 }

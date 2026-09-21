@@ -9,12 +9,19 @@ namespace FeaSolution.Implementation.Builders;
 
 public class FiniteElementBuilder
 {
+    private ElementNodeType NodeType { get; set; } = new();
+
+    private ICollection<IElementNode> Nodes { get; } = [];
+
     /// <summary>
     /// Creates a new finite element.
     /// </summary>
     /// <returns>The new element.</returns>
     public IFiniteElement Build(string userId = "")
     {
+        ArgumentNullException.ThrowIfNull(NodeType);
+        ArgumentNullException.ThrowIfNull(Nodes);
+
         var elementType = new FiniteElementType
         {
             NodeType = NodeType,
@@ -42,10 +49,7 @@ public class FiniteElementBuilder
     /// <returns>The reference to the current builder.</returns>
     public FiniteElementBuilder SetNodesType(ElementNodeType nodeType)
     {
-        if (Nodes.Count != 0)
-        {
-            throw new FeaElementBuilderException("You have to remove all nodes before changing node type.");
-        }
+        FeaElementBuilderException.ThrowIfTrue(Nodes.Count != 0, "You have to remove all nodes before changing node type.");
 
         NodeType = nodeType;
         return this;
@@ -122,8 +126,4 @@ public class FiniteElementBuilder
         Nodes.Add(node);
         return this;
     }
-
-    private ElementNodeType NodeType { get; set; } = new();
-    
-    private ICollection<IElementNode> Nodes { get; } = [];
 }
