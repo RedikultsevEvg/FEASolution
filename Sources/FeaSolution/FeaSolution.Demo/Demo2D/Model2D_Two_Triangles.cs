@@ -1,11 +1,12 @@
 ﻿using FeaSolution.Core.Types;
+using FeaSolution.Demo.Common;
 using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo2D;
 
-internal static class Model2D_Two_Triangles
+internal static class Model2DTwoTriangles
 {
-    public static void Build_Model_From_Two_Triangles()
+    public static void Get_Solution_For_Two_Triangles_Example()
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type2D)
@@ -21,10 +22,21 @@ internal static class Model2D_Two_Triangles
             .AddNode(4.0, 1.0)
             .Build("The second triangle");
 
-        new ConstructionModelBuilder()
+        var model = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Merge()
             .Build();
+
+        var solution = new SolutionBuilder()
+            .SetModel(model)
+            .Assembly()
+            .ValidateForCountOfElement()
+            .ValidateForCommonElements()
+            .ValidateForQualityOfElements()
+            .ValidateForZeroSquareElements()
+            .Build();
+
+        DemoAssistant.ConsoleWriteExampleResults(nameof(Get_Solution_For_Two_Triangles_Example), solution);
     }
 }
