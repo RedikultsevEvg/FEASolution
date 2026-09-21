@@ -111,6 +111,12 @@ public class SolutionBuilder
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
     public SolutionBuilder ValidateForQualityOfElements() => this;
+
+    /// <summary>
+    /// Does all available validations.
+    /// </summary>
+    /// <returns>The reference to the current builder.</returns>
+    public SolutionBuilder ValidateAll() => this;
     
     /// <summary>
     /// Gets the zero square elements.
