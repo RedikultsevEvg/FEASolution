@@ -2,11 +2,14 @@ using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
-using FeaSolution.Implementation.ElementNodes;
 
 namespace FeaSolution.Implementation.Builders;
 
-public class SolutionBuilder
+/// <summary>
+/// Solution builder.
+/// </summary>
+/// <param name="constructionModel">Construction model.</param>
+public class SolutionBuilder(IConstructionModel constructionModel)
 {
     /// <summary>
     /// Creates a construction model solution.
@@ -15,69 +18,25 @@ public class SolutionBuilder
     public ConstructionModelSolution Build()
     {
         // Demo data should be replaced later with production code.
+        ArgumentNullException.ThrowIfNull(constructionModel);
 
         var degree = new DegreeOfFreedom
         {
             Freedom = Freedom.Temperature
         };
 
+        var items = constructionModel.Elements.SelectMany(elem => 
+            elem.Nodes.Select(node => new SolutionItem
+        {
+            DegreeOfFreedom = degree,
+            Node = node,
+            Value = 20
+        })).ToArray();
+
         return new ConstructionModelSolution
         {
-            Items =
-            [
-                new SolutionItem
-                {
-                    DegreeOfFreedom = degree,
-                    Node = new ElementNode(ElementNodeType.Type2D)
-                    {
-                        X = 0,
-                        Y = 1
-                    },
-                    Value = 20
-                },
-                new SolutionItem
-                {
-                    DegreeOfFreedom = degree,
-                    Node = new ElementNode(ElementNodeType.Type2D)
-                    {
-                        X = 2,
-                        Y = 2
-                    },
-                    Value = 60
-                },
-                new SolutionItem
-                {
-                    DegreeOfFreedom = degree,
-                    Node = new ElementNode(ElementNodeType.Type2D)
-                    {
-                        X = 2,
-                        Y = 0
-                    },
-                    Value = 60
-                },
-                new SolutionItem
-                {
-                    DegreeOfFreedom = degree,
-                    Node = new ElementNode(ElementNodeType.Type2D)
-                    {
-                        X = 4,
-                        Y = 1
-                    },
-                    Value = 100
-                }
-            ]
+            Items = items,
         };
-    }
-
-    /// <summary>
-    /// Sets the construction model.
-    /// </summary>
-    /// <param name="model">Construction model.</param>
-    /// <returns>The reference to the current builder.</returns>
-    public  SolutionBuilder SetModel(IConstructionModel model)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-        return this;
     }
 
     /// <summary>

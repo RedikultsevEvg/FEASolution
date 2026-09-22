@@ -28,8 +28,7 @@ internal static class Model2DTwoTriangles
             .Merge()
             .Build();
 
-        var solution = new SolutionBuilder()
-            .SetModel(model)
+        var solution = new SolutionBuilder(model)
             .Assembly()
             .ValidateForCountOfElement()
             .ValidateForCommonElements()
