@@ -7,6 +7,14 @@ namespace FeaSolution.Implementation.Builders;
 
 public class ConstructionModelBuilder
 {
+    private const CoordinateValue DeltaDefaultValue = 0.0001;
+
+    private ElementNodeType? NodeType { get; set; }
+
+    private ICollection<IFiniteElement> Elements { get; } = [];
+
+    private const string NodeTypeNullExceptionMessage = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
+
     /// <summary>
     /// Creates construction model.
     /// </summary>
@@ -72,19 +80,16 @@ public class ConstructionModelBuilder
     /// <summary>
     /// Find and union the common nodes.
     /// </summary>
-    /// <param name="delta"></param>
+    /// <param name="elementsToMerge">Elements to merge. The null-value accepted and means to merge nodes in all model elements.</param>
+    /// <param name="delta">Maximum difference in coordinates for common node.</param>
     /// <returns></returns>
-    public ConstructionModelBuilder Merge(CoordinateValue delta = DeltaDefaultValue)
+    public ConstructionModelBuilder Merge(IEnumerable<IFiniteElement>? elementsToMerge, CoordinateValue delta = DeltaDefaultValue)
     {
+        if (elementsToMerge == null)
+        {
+            // merge all elements in model.
+        }
+
         return this;
     }
-
-    private const CoordinateValue DeltaDefaultValue = 0.0001;
-
-    private ElementNodeType? NodeType { get; set; }
-
-    private ICollection<IFiniteElement> Elements { get; } = [];
-
-    private const string NodeTypeNullExceptionMessage = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
-
 }
