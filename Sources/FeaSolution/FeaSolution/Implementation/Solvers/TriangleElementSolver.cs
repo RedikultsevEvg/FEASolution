@@ -10,7 +10,6 @@ namespace FeaSolution.Implementation.Solvers;
 /// </summary>
 public sealed class TriangleElementSolver
 {
-    // Координаты узлов (локальные 1,2,3)
     private CoordinateValue X1 { get; }
     private CoordinateValue Y1 { get; }
     private CoordinateValue X2 { get; }
@@ -19,7 +18,7 @@ public sealed class TriangleElementSolver
     private CoordinateValue Y3 { get; }
 
     // Геометрическая площадь
-    public MatrixValue Area { get; }
+    public MatrixValue ElementSquare { get; }
 
     public LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; private set; }
 
@@ -41,7 +40,7 @@ public sealed class TriangleElementSolver
         Y2 = nodes[1].Y;
         Y3 = nodes[2].Y;
 
-        Area = ComputeElementSquare();
+        ElementSquare = GetElementSquare();
     }
 
     /// <summary>
@@ -56,38 +55,41 @@ public sealed class TriangleElementSolver
             return LocalMatrix;
         }
 
-        // Шаг 2: коэффициенты b
         var b1 = Y2 - Y3;
         var b2 = Y3 - Y1;
         var b3 = Y1 - Y2;
-        MatrixValue[] b = [b1, b2, b3];
+        MatrixValue[] vectorB = [b1, b2, b3];
 
-        // Шаг 3: коэффициенты c
         var c1 = X3 - X2;
         var c2 = X1 - X3;
         var c3 = X2 - X1;
-        MatrixValue[] c = [c1, c2, c3];
+        MatrixValue[] vectorC = [c1, c2, c3];
 
-        // Шаг 5: множитель λ·t / (4A)
-        var coef = lambda * thickness / (4.0 * Area);
-
-        // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
+        var multiplier= lambda * thickness / (4.0 * ElementSquare);
 
         LocalMatrix = new LocalSymmetricMatrix<MatrixValue>(3);
-
-        // убрать лишние
-        for (var i = 0; i < 3; i++)
-        {
-            for (var j = 0; j < 3; j++)
-            {
-                LocalMatrix[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
-            }
-        }
+        SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
     }
-    
+
+    private void SetUpMatrix(double multiplier, MatrixValue[] vectorB, MatrixValue[] vectorC)
+    {
+        ArgumentNullException.ThrowIfNull(LocalMatrix);
+
+        for (var i = 0; i < 3; i++)
+        {
+            // start with new value due to symmetrix matrix.
+            for (var j = i; j < 3; j++)
+            {
+                LocalMatrix[i, j] = multiplier * (vectorB[i] * vectorB[j] + vectorC[i] * vectorC[j]);
+            }
+        }
+    }
+
     public bool ValidateMatrixIsSymmetric(MatrixValue tolerance = 1e-12)
     {
+        ArgumentNullException.ThrowIfNull(LocalMatrix);
+
         for (var i = 0; i < 3; i++)
             for (var j = i + 1; j < 3; j++)
                 if (Math.Abs(LocalMatrix[i, j] - LocalMatrix[j, i]) > tolerance)
@@ -97,6 +99,8 @@ public sealed class TriangleElementSolver
 
     public bool ValidateMatrixHasZeroRowSums(MatrixValue tolerance = 1e-12)
     {
+        ArgumentNullException.ThrowIfNull(LocalMatrix);
+
         for (var i = 0; i < 3; i++)
         {
             var sum = LocalMatrix[i, 0] + LocalMatrix[i, 1] + LocalMatrix[i, 2];
@@ -105,7 +109,7 @@ public sealed class TriangleElementSolver
         return true;
     }
 
-    private MatrixValue ComputeElementSquare()
+    private MatrixValue GetElementSquare()
     {
         var signedTwice =
             X1 * (Y2 - Y3) +
