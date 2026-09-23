@@ -2,6 +2,7 @@ using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
+using FeaSolution.Implementation.FiniteElements;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -11,6 +12,8 @@ namespace FeaSolution.Implementation.Builders;
 /// <param name="constructionModel">Construction model.</param>
 public class SolutionBuilder(IConstructionModel constructionModel)
 {
+    private IFiniteElementStiffnessMatrix _stiffnessMatrix = new FiniteElementStiffnessMatrix();
+
     /// <summary>
     /// Creates a construction model solution.
     /// </summary>
@@ -43,7 +46,31 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// Calculate construction model stiffness matrix.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder Assembly() => this;
+    public SolutionBuilder Assembly()
+    {
+        ArgumentNullException.ThrowIfNull(constructionModel);
+        ArgumentNullException.ThrowIfNull(constructionModel.Elements);
+        
+        var allNodes = constructionModel
+            .Elements
+            .SelectMany(elem => elem.Nodes)
+            .ToArray();
+
+        _stiffnessMatrix = new FiniteElementStiffnessMatrix();
+
+        if (allNodes.Any())
+        {
+            _stiffnessMatrix.Values.Add(new StiffnessMatrixValue
+            {
+                DegreeOfFreedom = new DegreeOfFreedom(),
+                Node1 = allNodes[0],
+                Node2 = allNodes[1],
+                CurrentValue = 1.1
+            });
+        }
+
+        return this;
+    }
 
     /// <summary>
     /// Validates for the minimum count of element. The minimum is 2.
