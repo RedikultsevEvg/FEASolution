@@ -11,12 +11,12 @@ namespace FeaSolution.Implementation.Solvers;
 public sealed class TriangleElementSolver
 {
     // Координаты узлов (локальные 1,2,3)
-    public CoordinateValue X1 { get; }
-    public CoordinateValue Y1 { get; }
-    public CoordinateValue X2 { get; }
-    public CoordinateValue Y2 { get; }
-    public CoordinateValue X3 { get; }
-    public CoordinateValue Y3 { get; }
+    private CoordinateValue X1 { get; }
+    private CoordinateValue Y1 { get; }
+    private CoordinateValue X2 { get; }
+    private CoordinateValue Y2 { get; }
+    private CoordinateValue X3 { get; }
+    private CoordinateValue Y3 { get; }
 
     // Физические параметры
     public MatrixValue Lambda { get; }   // коэффициент теплопроводности, W/(m·K)
@@ -55,13 +55,15 @@ public sealed class TriangleElementSolver
 
         var nodes = element.Nodes.ToArray();
 
-        X1 = nodes[0].X; 
-        X2 = nodes[1].X; 
-        X3 = nodes[2].X; 
-        
+        X1 = nodes[0].X;
+        X2 = nodes[1].X;
+        X3 = nodes[2].X;
+
         Y1 = nodes[0].Y;
         Y2 = nodes[1].Y;
         Y3 = nodes[2].Y;
+
+        Area = ComputeArea();
     }
 
     /// <summary>
@@ -85,17 +87,6 @@ public sealed class TriangleElementSolver
         var coef = lambda * thickness / (4.0 * Area);
 
         // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
-        
-        /*
-        var k = new MatrixValue[3, 3];
-        for (var i = 0; i < 3; i++)
-        {
-            for (var j = 0; j < 3; j++)
-            {
-                k[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
-            }
-        }
-        */
 
         var matrix = new LocalSymmetricMatrix<MatrixValue>(3);
 
@@ -109,9 +100,7 @@ public sealed class TriangleElementSolver
         }
         return matrix;
     }
-
-
-
+    
     /// <summary>
     /// Шаг 4: геометрическая площадь A = |A_signed|.
     /// </summary>

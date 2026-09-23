@@ -1,4 +1,6 @@
-﻿using FeaSolution.Implementation.Solvers;
+﻿using FeaSolution.Core.Types;
+using FeaSolution.Implementation.Builders;
+using FeaSolution.Implementation.Solvers;
 
 namespace FeaSolution.UnitTests.Implementation.Solvers;
 
@@ -35,15 +37,20 @@ public class TriangleElementSolverTests
             { -0.250,  0.625, -0.375 },
             { -0.250, -0.375,  0.625 }
         };
+        
+        var element = new FiniteElementBuilder()
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddNode(0, 1.0)
+            .AddNode(2.0, 2.0)
+            .AddNode(2.0, 0)
+            .Build("The test triangle");
 
-        var e1 = new TriangleElementSolver(0, 1, 2, 2, 2, 0, 1.0, 1.0);
+        var triangleElementSolver = new TriangleElementSolver(element);
 
         // Act
-
-        var matrix = e1.BuildLocalMatrix(1.0, 1.0);
+        var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
-
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(matrix[i, j],
@@ -82,10 +89,17 @@ public class TriangleElementSolverTests
             { -0.375, -0.250,  0.625 }
         };
 
-        var e1 = new TriangleElementSolver(2, 2, 4, 1, 2, 0, 1.0, 1.0);
+        var element = new FiniteElementBuilder()
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddNode(2.0, 2.0)
+            .AddNode(4.0, 1.0)
+            .AddNode(2.0, 0)
+            .Build("The test triangle");
+
+        var triangleElementSolver = new TriangleElementSolver(element);
 
         // Act
-        var matrix = e1.BuildLocalMatrix(1.0, 1.0);
+        var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
         for (int i = 0; i < 3; i++)
