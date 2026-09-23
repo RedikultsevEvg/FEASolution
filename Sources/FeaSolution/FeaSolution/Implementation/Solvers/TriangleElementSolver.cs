@@ -1,4 +1,8 @@
-﻿namespace FeaSolution.Implementation.Solvers;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
+
+namespace FeaSolution.Implementation.Solvers;
 
 /// <summary>
 /// Линейный треугольный конечный элемент для задачи стационарной
@@ -23,7 +27,7 @@ public sealed class TriangleElementSolver
     public MatrixValue Area { get; }
 
     // Локальная матрица жёсткости 3x3
-    public MatrixValue[,] Ke { get; }
+    public MatrixValue[,]? Ke { get; }
 
     public TriangleElementSolver(
         double x1, double y1,
@@ -41,12 +45,79 @@ public sealed class TriangleElementSolver
         Ke = BuildLocalMatrix();
     }
 
+    public TriangleElementSolver(IFiniteElement element)
+    {
+        FeaCommonException.ThrowIfTrue(element.ElementType.NodeType.Dimension != Dimensional.TwoDimensional,
+            $"Accepted only TwoDimensional element. Current element dimention is '{element.ElementType.NodeType.Dimension.ToString()}'");
+
+        FeaCommonException.ThrowIfTrue(element.Nodes.Count != 3,
+            $"Accepted only Triangle element (node count is 3). Current node count is '{element.Nodes.Count}'");
+
+        var nodes = element.Nodes.ToArray();
+
+        X1 = nodes[0].X; 
+        X2 = nodes[1].X; 
+        X3 = nodes[2].X; 
+        
+        Y1 = nodes[0].Y;
+        Y2 = nodes[1].Y;
+        Y3 = nodes[2].Y;
+    }
+
+    /// <summary>
+    /// Полный алгоритм получения локальной матрицы K_e.
+    /// </summary>
+    public LocalSymmetricMatrix<MatrixValue> BuildLocalMatrix(MatrixValue lambda, MatrixValue thickness)
+    {
+        // Шаг 2: коэффициенты b
+        var b1 = Y2 - Y3;
+        var b2 = Y3 - Y1;
+        var b3 = Y1 - Y2;
+        MatrixValue[] b = [b1, b2, b3];
+
+        // Шаг 3: коэффициенты c
+        var c1 = X3 - X2;
+        var c2 = X1 - X3;
+        var c3 = X2 - X1;
+        MatrixValue[] c = [c1, c2, c3];
+
+        // Шаг 5: множитель λ·t / (4A)
+        var coef = lambda * thickness / (4.0 * Area);
+
+        // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
+        
+        /*
+        var k = new MatrixValue[3, 3];
+        for (var i = 0; i < 3; i++)
+        {
+            for (var j = 0; j < 3; j++)
+            {
+                k[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
+            }
+        }
+        */
+
+        var matrix = new LocalSymmetricMatrix<MatrixValue>(3);
+
+        // убрать лишние
+        for (var i = 0; i < 3; i++)
+        {
+            for (var j = 0; j < 3; j++)
+            {
+                matrix[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
+            }
+        }
+        return matrix;
+    }
+
+
+
     /// <summary>
     /// Шаг 4: геометрическая площадь A = |A_signed|.
     /// </summary>
-    private double ComputeArea()
+    private MatrixValue ComputeArea()
     {
-        double signedTwice =
+        var signedTwice =
             X1 * (Y2 - Y3) +
             X2 * (Y3 - Y1) +
             X3 * (Y1 - Y2);
@@ -57,28 +128,28 @@ public sealed class TriangleElementSolver
     /// <summary>
     /// Полный алгоритм получения локальной матрицы K_e.
     /// </summary>
-    private double[,] BuildLocalMatrix()
+    private MatrixValue[,] BuildLocalMatrix()
     {
         // Шаг 2: коэффициенты b
-        double b1 = Y2 - Y3;
-        double b2 = Y3 - Y1;
-        double b3 = Y1 - Y2;
-        double[] b = [b1, b2, b3];
+        var b1 = Y2 - Y3;
+        var b2 = Y3 - Y1;
+        var b3 = Y1 - Y2;
+        MatrixValue[] b = [b1, b2, b3];
 
         // Шаг 3: коэффициенты c
-        double c1 = X3 - X2;
-        double c2 = X1 - X3;
-        double c3 = X2 - X1;
-        double[] c = [c1, c2, c3];
+        var c1 = X3 - X2;
+        var c2 = X1 - X3;
+        var c3 = X2 - X1;
+        MatrixValue[] c = [c1, c2, c3];
 
         // Шаг 5: множитель λ·t / (4A)
-        double coef = Lambda * Thickness / (4.0 * Area);
+        var coef = Lambda * Thickness / (4.0 * Area);
 
         // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
-        var k = new double[3, 3];
-        for (int i = 0; i < 3; i++)
+        var k = new MatrixValue[3, 3];
+        for (var i = 0; i < 3; i++)
         {
-            for (int j = 0; j < 3; j++)
+            for (var j = 0; j < 3; j++)
             {
                 k[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
             }
@@ -87,21 +158,21 @@ public sealed class TriangleElementSolver
         return k;
     }
 
-    public bool ValidateIsSymmetric(double tol = 1e-12)
+    public bool ValidateIsSymmetric(MatrixValue tolerance = 1e-12)
     {
-        for (int i = 0; i < 3; i++)
-            for (int j = i + 1; j < 3; j++)
-                if (Math.Abs(Ke[i, j] - Ke[j, i]) > tol)
+        for (var i = 0; i < 3; i++)
+            for (var j = i + 1; j < 3; j++)
+                if (Math.Abs(Ke[i, j] - Ke[j, i]) > tolerance)
                     return false;
         return true;
     }
 
-    public bool ValidateHasZeroRowSums(double tol = 1e-12)
+    public bool ValidateHasZeroRowSums(MatrixValue tolerance = 1e-12)
     {
-        for (int i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
-            double sum = Ke[i, 0] + Ke[i, 1] + Ke[i, 2];
-            if (Math.Abs(sum) > tol) return false;
+            var sum = Ke[i, 0] + Ke[i, 1] + Ke[i, 2];
+            if (Math.Abs(sum) > tolerance) return false;
         }
         return true;
     }

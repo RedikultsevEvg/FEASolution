@@ -18,4 +18,12 @@ public class FeaCommonException : Exception
         : base(message, innerException)
     {
     }
+
+    public static void ThrowIfTrue(bool condition, string message)
+    {
+        if (condition)
+        {
+            throw new FeaCommonException(message);
+        }
+    }
 }

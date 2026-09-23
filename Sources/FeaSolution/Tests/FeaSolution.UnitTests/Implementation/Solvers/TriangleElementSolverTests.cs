@@ -10,7 +10,7 @@ public class TriangleElementSolverTests
     {
         var e1 = new TriangleElementSolver(0, 1, 2, 2, 2, 0, 1.0, 1.0);
 
-        Assert.That(e1.Area, Is.EqualTo(2.0).Within(1e-12));
+        Assert.That(e1.Area, Is.EqualTo(2.0));
 
         double[,] expected =
         {
@@ -22,7 +22,32 @@ public class TriangleElementSolverTests
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(e1.Ke[i, j],
-                Is.EqualTo(expected[i, j]).Within(1e-12));
+                Is.EqualTo(expected[i, j]));
+    }
+
+    [Test]
+    public void BuildLocalMatrix_WhenSolverHasCorrectCoordinates1_ReturnsExpectedLocalMatrix()
+    {
+        // Arrange
+        double[,] expectedValues =
+        {
+            {  0.500, -0.250, -0.250 },
+            { -0.250,  0.625, -0.375 },
+            { -0.250, -0.375,  0.625 }
+        };
+
+        var e1 = new TriangleElementSolver(0, 1, 2, 2, 2, 0, 1.0, 1.0);
+
+        // Act
+
+        var matrix = e1.BuildLocalMatrix(1.0, 1.0);
+
+        // Assert
+
+        for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            Assert.That(matrix[i, j],
+                Is.EqualTo(expectedValues[i, j]));
     }
 
     [Test]
@@ -30,7 +55,7 @@ public class TriangleElementSolverTests
     {
         var e1 = new TriangleElementSolver(2, 2, 4, 1, 2, 0, 1.0, 1.0);
 
-        Assert.That(e1.Area, Is.EqualTo(2.0).Within(1e-12));
+        Assert.That(e1.Area, Is.EqualTo(2.0));
 
         double[,] expected =
         {
@@ -42,7 +67,31 @@ public class TriangleElementSolverTests
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(e1.Ke[i, j],
-                Is.EqualTo(expected[i, j]).Within(1e-12));
+                Is.EqualTo(expected[i, j]));
+    }
+
+
+    [Test]
+    public void BuildLocalMatrix_WhenSolverHasCorrectCoordinates2_ReturnsExpectedLocalMatrix()
+    {
+        // Arrange
+        double[,] expectedValues =
+        {
+            {  0.625, -0.250, -0.375 },
+            { -0.250,  0.500, -0.250 },
+            { -0.375, -0.250,  0.625 }
+        };
+
+        var e1 = new TriangleElementSolver(2, 2, 4, 1, 2, 0, 1.0, 1.0);
+
+        // Act
+        var matrix = e1.BuildLocalMatrix(1.0, 1.0);
+
+        // Assert
+        for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            Assert.That(matrix[i, j],
+                Is.EqualTo(expectedValues[i, j]));
     }
 
     [Test]

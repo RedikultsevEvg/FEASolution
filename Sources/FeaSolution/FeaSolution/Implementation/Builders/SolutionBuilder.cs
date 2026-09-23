@@ -58,7 +58,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
 
         _stiffnessMatrix = new FiniteElementStiffnessMatrix();
 
-        if (allNodes.Any())
+        /*if (allNodes.Any())
         {
             _stiffnessMatrix.Values.Add(new StiffnessMatrixValue
             {
@@ -67,7 +67,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                 Node2 = allNodes[1],
                 CurrentValue = 1.1
             });
-        }
+        }*/
 
         return this;
     }
