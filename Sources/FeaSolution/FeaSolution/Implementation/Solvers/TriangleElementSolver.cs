@@ -18,34 +18,10 @@ public sealed class TriangleElementSolver
     private CoordinateValue X3 { get; }
     private CoordinateValue Y3 { get; }
 
-    // Физические параметры
-    public MatrixValue Lambda { get; }   // коэффициент теплопроводности, W/(m·K)
-
-    public MatrixValue Thickness { get; } // толщина, м
-
     // Геометрическая площадь
     public MatrixValue Area { get; }
 
-    // Локальная матрица жёсткости 3x3
-    public MatrixValue[,]? Ke { get; }
-
     public LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; private set; }
-
-    public TriangleElementSolver(
-        double x1, double y1,
-        double x2, double y2,
-        double x3, double y3,
-        double lambda, double thickness)
-    {
-        X1 = x1; Y1 = y1;
-        X2 = x2; Y2 = y2;
-        X3 = x3; Y3 = y3;
-        Lambda = lambda;
-        Thickness = thickness;
-
-        Area = ComputeArea();
-        Ke = BuildLocalMatrix();
-    }
 
     public TriangleElementSolver(IFiniteElement element)
     {
@@ -65,12 +41,14 @@ public sealed class TriangleElementSolver
         Y2 = nodes[1].Y;
         Y3 = nodes[2].Y;
 
-        Area = ComputeArea();
+        Area = ComputeElementSquare();
     }
 
     /// <summary>
-    /// Полный алгоритм получения локальной матрицы K_e.
+    /// Полный алгоритм получения локальной матрицы елемента.
     /// </summary>
+    /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>
+    /// <param name="thickness">Толщина, м</param>
     public LocalSymmetricMatrix<MatrixValue> BuildLocalMatrix(MatrixValue lambda, MatrixValue thickness)
     {
         if (LocalMatrix != null)
@@ -108,53 +86,7 @@ public sealed class TriangleElementSolver
         return LocalMatrix;
     }
     
-    /// <summary>
-    /// Шаг 4: геометрическая площадь A = |A_signed|.
-    /// </summary>
-    private MatrixValue ComputeArea()
-    {
-        var signedTwice =
-            X1 * (Y2 - Y3) +
-            X2 * (Y3 - Y1) +
-            X3 * (Y1 - Y2);
-
-        return 0.5 * Math.Abs(signedTwice);
-    }
-
-    /// <summary>
-    /// Полный алгоритм получения локальной матрицы K_e.
-    /// </summary>
-    private MatrixValue[,] BuildLocalMatrix()
-    {
-        // Шаг 2: коэффициенты b
-        var b1 = Y2 - Y3;
-        var b2 = Y3 - Y1;
-        var b3 = Y1 - Y2;
-        MatrixValue[] b = [b1, b2, b3];
-
-        // Шаг 3: коэффициенты c
-        var c1 = X3 - X2;
-        var c2 = X1 - X3;
-        var c3 = X2 - X1;
-        MatrixValue[] c = [c1, c2, c3];
-
-        // Шаг 5: множитель λ·t / (4A)
-        var coef = Lambda * Thickness / (4.0 * Area);
-
-        // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
-        var k = new MatrixValue[3, 3];
-        for (var i = 0; i < 3; i++)
-        {
-            for (var j = 0; j < 3; j++)
-            {
-                k[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
-            }
-        }
-
-        return k;
-    }
-
-    public bool ValidateIsSymmetric(MatrixValue tolerance = 1e-12)
+    public bool ValidateMatrixIsSymmetric(MatrixValue tolerance = 1e-12)
     {
         for (var i = 0; i < 3; i++)
             for (var j = i + 1; j < 3; j++)
@@ -163,7 +95,7 @@ public sealed class TriangleElementSolver
         return true;
     }
 
-    public bool ValidateHasZeroRowSums(MatrixValue tolerance = 1e-12)
+    public bool ValidateMatrixHasZeroRowSums(MatrixValue tolerance = 1e-12)
     {
         for (var i = 0; i < 3; i++)
         {
@@ -171,5 +103,15 @@ public sealed class TriangleElementSolver
             if (Math.Abs(sum) > tolerance) return false;
         }
         return true;
+    }
+
+    private MatrixValue ComputeElementSquare()
+    {
+        var signedTwice =
+            X1 * (Y2 - Y3) +
+            X2 * (Y3 - Y1) +
+            X3 * (Y1 - Y2);
+
+        return 0.5 * Math.Abs(signedTwice);
     }
 }

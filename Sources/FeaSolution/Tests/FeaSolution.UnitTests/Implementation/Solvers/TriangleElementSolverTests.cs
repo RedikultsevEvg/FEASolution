@@ -8,26 +8,6 @@ namespace FeaSolution.UnitTests.Implementation.Solvers;
 public class TriangleElementSolverTests
 {
     [Test]
-    public void E1_MatchesReferenceMatrix()
-    {
-        var e1 = new TriangleElementSolver(0, 1, 2, 2, 2, 0, 1.0, 1.0);
-
-        Assert.That(e1.Area, Is.EqualTo(2.0));
-
-        double[,] expected =
-        {
-            {  0.500, -0.250, -0.250 },
-            { -0.250,  0.625, -0.375 },
-            { -0.250, -0.375,  0.625 }
-        };
-
-        for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            Assert.That(e1.Ke[i, j],
-                Is.EqualTo(expected[i, j]));
-    }
-
-    [Test]
     public void BuildLocalMatrix_WhenSolverHasCorrectCoordinates1_ReturnsExpectedLocalMatrix()
     {
         // Arrange
@@ -51,35 +31,14 @@ public class TriangleElementSolverTests
         var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
-        Assert.IsTrue(triangleElementSolver.ValidateIsSymmetric());
-        Assert.IsTrue(triangleElementSolver.ValidateHasZeroRowSums());
+        Assert.IsTrue(triangleElementSolver.ValidateMatrixIsSymmetric());
+        Assert.IsTrue(triangleElementSolver.ValidateMatrixHasZeroRowSums());
 
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(matrix[i, j],
                 Is.EqualTo(expectedValues[i, j]));
     }
-
-    [Test]
-    public void E2_MatchesReferenceMatrix()
-    {
-        var e1 = new TriangleElementSolver(2, 2, 4, 1, 2, 0, 1.0, 1.0);
-
-        Assert.That(e1.Area, Is.EqualTo(2.0));
-
-        double[,] expected =
-        {
-            {  0.625, -0.250, -0.375 },
-            { -0.250,  0.500, -0.250 },
-            { -0.375, -0.250,  0.625 }
-        };
-
-        for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            Assert.That(e1.Ke[i, j],
-                Is.EqualTo(expected[i, j]));
-    }
-
 
     [Test]
     public void BuildLocalMatrix_WhenSolverHasCorrectCoordinates2_ReturnsExpectedLocalMatrix()
@@ -105,8 +64,8 @@ public class TriangleElementSolverTests
         var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
-        Assert.IsTrue(triangleElementSolver.ValidateIsSymmetric());
-        Assert.IsTrue(triangleElementSolver.ValidateHasZeroRowSums());
+        Assert.IsTrue(triangleElementSolver.ValidateMatrixIsSymmetric());
+        Assert.IsTrue(triangleElementSolver.ValidateMatrixHasZeroRowSums());
 
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
