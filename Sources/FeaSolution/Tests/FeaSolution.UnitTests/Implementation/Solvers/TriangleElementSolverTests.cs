@@ -51,6 +51,9 @@ public class TriangleElementSolverTests
         var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
+        Assert.IsTrue(triangleElementSolver.ValidateIsSymmetric());
+        Assert.IsTrue(triangleElementSolver.ValidateHasZeroRowSums());
+
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(matrix[i, j],
@@ -102,17 +105,12 @@ public class TriangleElementSolverTests
         var matrix = triangleElementSolver.BuildLocalMatrix(1.0, 1.0);
 
         // Assert
+        Assert.IsTrue(triangleElementSolver.ValidateIsSymmetric());
+        Assert.IsTrue(triangleElementSolver.ValidateHasZeroRowSums());
+
         for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             Assert.That(matrix[i, j],
                 Is.EqualTo(expectedValues[i, j]));
-    }
-
-    [Test]
-    public void E1_SymmetryAndZeroRowSums()
-    {
-        var e1 = new TriangleElementSolver(0, 1, 2, 2, 2, 0, 1.0, 1.0);
-        Assert.IsTrue(e1.ValidateIsSymmetric());
-        Assert.IsTrue(e1.ValidateHasZeroRowSums());
     }
 }

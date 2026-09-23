@@ -29,6 +29,8 @@ public sealed class TriangleElementSolver
     // Локальная матрица жёсткости 3x3
     public MatrixValue[,]? Ke { get; }
 
+    public LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; private set; }
+
     public TriangleElementSolver(
         double x1, double y1,
         double x2, double y2,
@@ -71,6 +73,11 @@ public sealed class TriangleElementSolver
     /// </summary>
     public LocalSymmetricMatrix<MatrixValue> BuildLocalMatrix(MatrixValue lambda, MatrixValue thickness)
     {
+        if (LocalMatrix != null)
+        {
+            return LocalMatrix;
+        }
+
         // Шаг 2: коэффициенты b
         var b1 = Y2 - Y3;
         var b2 = Y3 - Y1;
@@ -88,17 +95,17 @@ public sealed class TriangleElementSolver
 
         // Шаг 6: K[i,j] = coef * (b[i]*b[j] + c[i]*c[j])
 
-        var matrix = new LocalSymmetricMatrix<MatrixValue>(3);
+        LocalMatrix = new LocalSymmetricMatrix<MatrixValue>(3);
 
         // убрать лишние
         for (var i = 0; i < 3; i++)
         {
             for (var j = 0; j < 3; j++)
             {
-                matrix[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
+                LocalMatrix[i, j] = coef * (b[i] * b[j] + c[i] * c[j]);
             }
         }
-        return matrix;
+        return LocalMatrix;
     }
     
     /// <summary>
@@ -151,7 +158,7 @@ public sealed class TriangleElementSolver
     {
         for (var i = 0; i < 3; i++)
             for (var j = i + 1; j < 3; j++)
-                if (Math.Abs(Ke[i, j] - Ke[j, i]) > tolerance)
+                if (Math.Abs(LocalMatrix[i, j] - LocalMatrix[j, i]) > tolerance)
                     return false;
         return true;
     }
@@ -160,7 +167,7 @@ public sealed class TriangleElementSolver
     {
         for (var i = 0; i < 3; i++)
         {
-            var sum = Ke[i, 0] + Ke[i, 1] + Ke[i, 2];
+            var sum = LocalMatrix[i, 0] + LocalMatrix[i, 1] + LocalMatrix[i, 2];
             if (Math.Abs(sum) > tolerance) return false;
         }
         return true;
