@@ -83,7 +83,7 @@ public class ConstructionModelBuilder
     /// <param name="elementsToMerge">Elements to merge. The null-value accepted and means to merge nodes in all model elements.</param>
     /// <param name="delta">Maximum difference in coordinates for common node.</param>
     /// <returns></returns>
-    public ConstructionModelBuilder Merge(IEnumerable<IFiniteElement>? elementsToMerge, CoordinateValue delta = DeltaDefaultValue)
+    public ConstructionModelBuilder Merge(IEnumerable<IFiniteElement>? elementsToMerge = null, CoordinateValue delta = DeltaDefaultValue)
     {
         if (elementsToMerge == null)
         {
