@@ -376,6 +376,7 @@ public class ConstructionModelBuilderTests
     private static IFiniteElement CreateTestElement(Dimensional dimension)
     {
         var builder = new FiniteElementBuilder()
+            .SetFreedoms(Freedom.Temperature)
             .SetNodesType(GetNodeType(dimension));
 
         switch (dimension)

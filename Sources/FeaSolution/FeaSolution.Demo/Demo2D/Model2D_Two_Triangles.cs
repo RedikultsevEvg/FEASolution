@@ -1,4 +1,5 @@
-﻿using FeaSolution.Core.Types;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Types;
 using FeaSolution.Demo.Common;
 using FeaSolution.Implementation.Builders;
 
@@ -9,6 +10,7 @@ internal static class Model2DTwoTriangles
     public static void Get_Solution_For_Two_Triangles_Example()
     {
         var element1 = new FiniteElementBuilder()
+            .SetFreedoms(Freedom.Temperature)
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
             .AddNode(2.0, 2.0)

@@ -1,4 +1,5 @@
-﻿using FeaSolution.Core.Types;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.Solvers;
 
@@ -19,6 +20,7 @@ public class TriangleElementSolverTests
         };
         
         var element = new FiniteElementBuilder()
+            .SetFreedoms(Freedom.Temperature)
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
             .AddNode(2.0, 2.0)
@@ -52,6 +54,7 @@ public class TriangleElementSolverTests
         };
 
         var element = new FiniteElementBuilder()
+            .SetFreedoms(Freedom.Temperature)
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(2.0, 2.0)
             .AddNode(4.0, 1.0)
