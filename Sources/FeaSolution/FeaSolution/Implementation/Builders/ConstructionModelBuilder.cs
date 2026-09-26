@@ -19,6 +19,7 @@ public class ConstructionModelBuilder
     /// Creates construction model.
     /// </summary>
     /// <returns>A new construction model.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public ConstructionModel Build()
     {
         if (NodeType == null)
@@ -26,10 +27,24 @@ public class ConstructionModelBuilder
             throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
         }
 
+        FeaModelBuilderException.ThrowIfTrue(
+            !Elements.Any(), 
+            $"Can't build the model with empty element collection. Use '{nameof(AddElements)}' to add elements.");
+
+        var freedomsIntersection = Elements
+            .Select(e => e.Type.Freedoms.AsEnumerable())
+            .Aggregate((current, next) => current.Intersect(next))
+            .ToArray();
+
+        FeaModelBuilderException.ThrowIfTrue(
+            !freedomsIntersection.Any(),
+            "Can't build the model - all added elements should have at least one common freedom.");
+
         return new ConstructionModel
         {
             AllowedNodeType = NodeType,
-            Elements = Elements
+            Elements = Elements,
+            Freedoms = freedomsIntersection
         };
     }
 

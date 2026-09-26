@@ -34,14 +34,15 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type1D);
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(CreateTestElement(Dimensional.OneDimensional));
 
         // Act
         var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.OneDimensional));
-        Assert.That(model.Elements, Is.Empty);
+        Assert.That(model.Elements, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -49,14 +50,15 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D);
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddElements(CreateTestElement(Dimensional.TwoDimensional));
 
         // Act
         var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
-        Assert.That(model.Elements, Is.Empty);
+        Assert.That(model.Elements, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -64,14 +66,15 @@ public class ConstructionModelBuilderTests
     {
         // Arrange
         var builder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3D);
+            .SetNodesType(ElementNodeType.Type3D)
+            .AddElements(CreateTestElement(Dimensional.ThreeDimensional));
 
         // Act
         var model = builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
-        Assert.That(model.Elements, Is.Empty);
+        Assert.That(model.Elements, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -114,7 +117,9 @@ public class ConstructionModelBuilderTests
     public void Build_WhenCalledTwice_ReturnsDifferentInstances()
     {
         // Arrange
-        _builder.SetNodesType(ElementNodeType.Type1D);
+        _builder
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(CreateTestElement(Dimensional.OneDimensional)); 
 
         // Act
         var first = _builder.Build();
@@ -128,13 +133,142 @@ public class ConstructionModelBuilderTests
     public void Build_PreservesAllowedNodeTypeSetByBuilder()
     {
         // Arrange
-        _builder.SetNodesType(ElementNodeType.Type2D);
+        _builder
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddElements(CreateTestElement(Dimensional.TwoDimensional));
 
         // Act
         var model = _builder.Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
+    }
+
+    [Test]
+    public void Build_WhenNoElementsAdded_ShouldThrowFeaModelBuilderException()
+    {
+        // Arrange
+        _builder.SetNodesType(ElementNodeType.Type1D);
+
+        // Act & Assert
+        Assert.Throws<FeaModelBuilderException>(() => _builder.Build());
+    }
+
+    [Test]
+    public void Build_WhenNoElementsAdded_ShouldThrowWithExpectedMessage()
+    {
+        // Arrange
+        _builder.SetNodesType(ElementNodeType.Type1D);
+
+        // Act
+        var ex = Assert.Throws<FeaModelBuilderException>(() => _builder.Build());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(
+            "Can't build the model with empty element collection. Use 'AddElements' to add elements."));
+    }
+
+    [Test]
+    public void Build_WhenElementsHaveCommonFreedoms_ShouldPopulateFreedomsProperty()
+    {
+        // Arrange
+        var first = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.AnotherFreedom);
+        var second = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.NotSupported);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(first, second);
+
+        // Act
+        var model = builder.Build();
+
+        // Assert
+        Assert.That(model.Freedoms, Is.Not.Null);
+        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
+        Assert.That(model.Freedoms, Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void Build_WhenElementsHaveMultipleCommonFreedoms_ShouldReturnAllCommonFreedoms()
+    {
+        // Arrange
+        var first = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.AnotherFreedom);
+        var second = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.AnotherFreedom);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(first, second);
+
+        // Act
+        var model = builder.Build();
+
+        // Assert
+        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
+        Assert.That(model.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(model.Freedoms, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public void Build_WhenElementsHaveNoCommonFreedoms_ShouldThrowFeaModelBuilderException()
+    {
+        // Arrange
+        var first = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature);
+        var second = CreateTestElement(Dimensional.OneDimensional, Freedom.AnotherFreedom);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(first, second);
+
+        // Act & Assert
+        Assert.Throws<FeaModelBuilderException>(() => builder.Build());
+    }
+
+    [Test]
+    public void Build_WhenElementsHaveNoCommonFreedoms_ShouldThrowWithExpectedMessage()
+    {
+        // Arrange
+        var first = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature);
+        var second = CreateTestElement(Dimensional.OneDimensional, Freedom.AnotherFreedom);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(first, second);
+
+        // Act
+        var ex = Assert.Throws<FeaModelBuilderException>(() => builder.Build());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(
+            "Can't build the model - all added elements should have at least one common freedom."));
+    }
+
+    [Test]
+    public void Build_WhenThreeElementsOnlyTwoShareFreedom_ShouldThrow()
+    {
+        // Arrange
+        var first = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.AnotherFreedom);
+        var second = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature);
+        var third = CreateTestElement(Dimensional.OneDimensional, Freedom.AnotherFreedom);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(first, second, third);
+
+        // Act & Assert
+        Assert.Throws<FeaModelBuilderException>(() => builder.Build());
+    }
+
+    [Test]
+    public void Build_WhenSingleElement_ShouldReturnItsFreedoms()
+    {
+        // Arrange
+        var element = CreateTestElement(Dimensional.OneDimensional, Freedom.Temperature, Freedom.AnotherFreedom);
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type1D)
+            .AddElements(element);
+
+        // Act
+        var model = builder.Build();
+
+        // Assert
+        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
+        Assert.That(model.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(model.Freedoms, Has.Count.EqualTo(2));
     }
 
     #endregion
@@ -206,7 +340,9 @@ public class ConstructionModelBuilderTests
 
         // Act
         _builder.SetNodesType(ElementNodeType.Type2D);
-        var model = _builder.Build();
+        var model = _builder
+            .AddElements(CreateTestElement(Dimensional.TwoDimensional))
+            .Build();
 
         // Assert
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
@@ -373,10 +509,10 @@ public class ConstructionModelBuilderTests
 
     #region Helpers
 
-    private static IFiniteElement CreateTestElement(Dimensional dimension)
+    private static IFiniteElement CreateTestElement(Dimensional dimension, params Freedom[] freedoms)
     {
         var builder = new FiniteElementBuilder()
-            .SetFreedoms(Freedom.Temperature)
+            .SetFreedoms(freedoms)
             .SetNodesType(GetNodeType(dimension));
 
         switch (dimension)
@@ -396,6 +532,9 @@ public class ConstructionModelBuilderTests
 
         return builder.Build();
     }
+
+    private static IFiniteElement CreateTestElement(Dimensional dimension)
+        => CreateTestElement(dimension, Freedom.Temperature);
 
     private static ElementNodeType GetNodeType(Dimensional dimension) => dimension switch
     {

@@ -1,3 +1,4 @@
+using FeaSolution.Core.Enums;
 using FeaSolution.Core.Types;
 
 namespace FeaSolution.Core.Interfaces;
@@ -16,4 +17,9 @@ public interface IConstructionModel
     /// Collection of finite elements of the construction model.
     /// </summary>
     ICollection<IFiniteElement> Elements { get; }
+
+    /// <summary>
+    /// Collection of degree of freedom.
+    /// </summary>
+    ICollection<Freedom> Freedoms { get; init; }
 }

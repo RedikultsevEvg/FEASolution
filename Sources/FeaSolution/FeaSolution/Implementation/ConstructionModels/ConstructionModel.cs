@@ -1,3 +1,4 @@
+using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
@@ -11,6 +12,9 @@ public class ConstructionModel : IConstructionModel
 
     /// <inheritdoc/>
     public ICollection<IFiniteElement> Elements { get; init; } = (List<IFiniteElement>)[];
+
+    public ICollection<Freedom> Freedoms { get; init; } = [];
+
 
     public ICollection<IElementNode> GetNodes()
     {
