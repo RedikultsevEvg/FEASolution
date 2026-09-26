@@ -64,7 +64,7 @@ public class ConstructionModelBuilder
             throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
         }
 
-        if (elements.Any(element => element.ElementType.NodeType.Dimension != NodeType.Dimension))
+        if (elements.Any(element => element.Type.NodeType.Dimension != NodeType.Dimension))
         {
             throw new FeaModelBuilderException($"Dimensional of all elements should be equal to {NodeType.Dimension.ToString()}.");
         }

@@ -10,7 +10,7 @@ public class FiniteElement : IFiniteElement
     public string UserId { get; init; } = "";
 
     /// <inheritdoc/>
-    public required FiniteElementType ElementType { get; init; } 
+    public required FiniteElementType Type { get; init; } 
 
     /// <inheritdoc/>
     public ICollection<IElementNode> Nodes { get; init; } = [];

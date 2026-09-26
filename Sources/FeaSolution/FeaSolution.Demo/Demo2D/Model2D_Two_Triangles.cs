@@ -19,6 +19,7 @@ internal static class Model2DTwoTriangles
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type2D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(2.0, 2.0)
             .AddNode(2.0, 0)
             .AddNode(4.0, 1.0)

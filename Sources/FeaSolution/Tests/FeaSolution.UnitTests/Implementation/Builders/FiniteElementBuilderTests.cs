@@ -105,7 +105,7 @@ public class FiniteElementBuilderTests
 
         // Assert
         Assert.That(element, Is.Not.Null);
-        Assert.That(element.ElementType.NodeType, Is.EqualTo(ElementNodeType.Type1D));
+        Assert.That(element.Type.NodeType, Is.EqualTo(ElementNodeType.Type1D));
     }
 
     [Test]
@@ -197,9 +197,9 @@ public class FiniteElementBuilderTests
         var element = _builder.Build();
 
         // Assert
-        Assert.That(element.ElementType.Freedoms, Has.Count.EqualTo(2));
-        Assert.That(element.ElementType.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(element.ElementType.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
+        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.Temperature));
+        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.AnotherFreedom));
     }
 
     [Test]
@@ -253,7 +253,7 @@ public class FiniteElementBuilderTests
         var element = _builder.Build();
 
         // Assert
-        Assert.That(element.ElementType.NodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
+        Assert.That(element.Type.NodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
     }
 
     [Test]
@@ -269,7 +269,7 @@ public class FiniteElementBuilderTests
         var element = _builder.Build();
 
         // Assert
-        Assert.That(element.ElementType.StiffnessMatrixCalculationMethod, Is.Null);
+        Assert.That(element.Type.StiffnessMatrixCalculationMethod, Is.Null);
     }
 
     #endregion
@@ -389,7 +389,7 @@ public class FiniteElementBuilderTests
         var element = _builder.Build();
 
         // Assert
-        Assert.That(element.ElementType.Freedoms, Has.Count.EqualTo(3));
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(3));
     }
 
     [Test]
@@ -406,9 +406,9 @@ public class FiniteElementBuilderTests
         var element = _builder.Build();
 
         // Assert
-        Assert.That(element.ElementType.Freedoms, Has.Count.EqualTo(2));
-        Assert.That(element.ElementType.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(element.ElementType.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
+        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.Temperature));
+        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.AnotherFreedom));
     }
 
     [Test]

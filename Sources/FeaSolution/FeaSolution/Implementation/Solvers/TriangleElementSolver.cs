@@ -24,8 +24,8 @@ public sealed class TriangleElementSolver
 
     public TriangleElementSolver(IFiniteElement element)
     {
-        FeaCommonException.ThrowIfTrue(element.ElementType.NodeType.Dimension != Dimensional.TwoDimensional,
-            $"Accepted only TwoDimensional element. Current element dimention is '{element.ElementType.NodeType.Dimension.ToString()}'");
+        FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
+            $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
 
         FeaCommonException.ThrowIfTrue(element.Nodes.Count != 3,
             $"Accepted only Triangle element (node count is 3). Current node count is '{element.Nodes.Count}'");

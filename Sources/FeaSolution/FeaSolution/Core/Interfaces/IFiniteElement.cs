@@ -12,7 +12,7 @@ public interface IFiniteElement
     /// <summary>
     /// Finite element type.
     /// </summary>
-    FiniteElementType ElementType { get; }
+    FiniteElementType Type { get; }
 
     /// <summary>
     /// Finite element nodes.
