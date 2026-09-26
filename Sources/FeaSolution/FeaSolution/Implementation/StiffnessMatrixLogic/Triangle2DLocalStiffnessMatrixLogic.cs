@@ -2,13 +2,13 @@
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 
-namespace FeaSolution.Implementation.Solvers;
+namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 /// <summary>
 /// Линейный треугольный конечный элемент для задачи стационарной
 /// теплопроводности: -div(λ ∇T) = 0.
 /// </summary>
-public sealed class TriangleElementSolver
+public sealed class Triangle2DLocalStiffnessMatrixLogic
 {
     private CoordinateValue X1 { get; }
     private CoordinateValue Y1 { get; }
@@ -18,11 +18,11 @@ public sealed class TriangleElementSolver
     private CoordinateValue Y3 { get; }
 
     // Геометрическая площадь
-    public MatrixValue ElementSquare { get; }
+    private MatrixValue ElementSquare { get; }
 
     public LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; private set; }
 
-    public TriangleElementSolver(IFiniteElement element)
+    public Triangle2DLocalStiffnessMatrixLogic(IFiniteElement element)
     {
         FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
             $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
@@ -48,7 +48,7 @@ public sealed class TriangleElementSolver
     /// </summary>
     /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>
     /// <param name="thickness">Толщина, м</param>
-    public LocalSymmetricMatrix<MatrixValue> BuildLocalMatrix(MatrixValue lambda, MatrixValue thickness)
+    public LocalSymmetricMatrix<MatrixValue> GetLocalMatrix(MatrixValue lambda, MatrixValue thickness)
     {
         if (LocalMatrix != null)
         {
