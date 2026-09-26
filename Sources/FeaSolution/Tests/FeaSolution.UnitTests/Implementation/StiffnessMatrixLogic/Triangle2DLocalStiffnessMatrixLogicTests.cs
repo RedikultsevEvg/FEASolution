@@ -27,10 +27,10 @@ public class Triangle2DLocalStiffnessMatrixLogicTests
             .AddNode(2.0, 0)
             .Build("The test triangle");
 
-        var triangleElementSolver = new Triangle2DLocalStiffnessMatrixLogic(element);
+        var triangleElementSolver = new Triangle2DLocalStiffnessMatrixLogic();
 
         // Act
-        var matrix = triangleElementSolver.GetLocalMatrix(1.0, 1.0);
+        var matrix = triangleElementSolver.GetLocalMatrix(element, 1.0, 1.0);
 
         // Assert
         Assert.IsTrue(triangleElementSolver.ValidateMatrixIsSymmetric());
@@ -61,10 +61,10 @@ public class Triangle2DLocalStiffnessMatrixLogicTests
             .AddNode(2.0, 0)
             .Build("The test triangle");
 
-        var triangleElementSolver = new Triangle2DLocalStiffnessMatrixLogic(element);
+        var triangleElementSolver = new Triangle2DLocalStiffnessMatrixLogic();
 
         // Act
-        var matrix = triangleElementSolver.GetLocalMatrix(1.0, 1.0);
+        var matrix = triangleElementSolver.GetLocalMatrix(element, 1.0, 1.0);
 
         // Assert
         Assert.IsTrue(triangleElementSolver.ValidateMatrixIsSymmetric());

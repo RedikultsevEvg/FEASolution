@@ -8,21 +8,22 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 /// Линейный треугольный конечный элемент для задачи стационарной
 /// теплопроводности: -div(λ ∇T) = 0.
 /// </summary>
-public sealed class Triangle2DLocalStiffnessMatrixLogic
+public sealed class Triangle2DLocalStiffnessMatrixLogic : ILocalStiffnessMatrixLogic
 {
-    private CoordinateValue X1 { get; }
-    private CoordinateValue Y1 { get; }
-    private CoordinateValue X2 { get; }
-    private CoordinateValue Y2 { get; }
-    private CoordinateValue X3 { get; }
-    private CoordinateValue Y3 { get; }
+    private CoordinateValue X1 { get; set; }
+    private CoordinateValue Y1 { get; set; }
+    private CoordinateValue X2 { get; set; }
+    private CoordinateValue Y2 { get; set; }
+    private CoordinateValue X3 { get; set; }
+    private CoordinateValue Y3 { get; set; }
 
     // Геометрическая площадь
-    private MatrixValue ElementSquare { get; }
+    private MatrixValue ElementSquare { get; set; }
 
-    public LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; private set; }
+    private LocalSymmetricMatrix<MatrixValue>? LocalMatrix { get; set; }
 
-    public Triangle2DLocalStiffnessMatrixLogic(IFiniteElement element)
+    /// <inheritdoc/> 
+    public LocalSymmetricMatrix<MatrixValue> GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness)
     {
         FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
             $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
@@ -41,15 +42,7 @@ public sealed class Triangle2DLocalStiffnessMatrixLogic
         Y3 = nodes[2].Y;
 
         ElementSquare = GetElementSquare();
-    }
 
-    /// <summary>
-    /// Полный алгоритм получения локальной матрицы елемента.
-    /// </summary>
-    /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>
-    /// <param name="thickness">Толщина, м</param>
-    public LocalSymmetricMatrix<MatrixValue> GetLocalMatrix(MatrixValue lambda, MatrixValue thickness)
-    {
         if (LocalMatrix != null)
         {
             return LocalMatrix;
