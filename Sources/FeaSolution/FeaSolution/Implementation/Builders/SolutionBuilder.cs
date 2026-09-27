@@ -3,6 +3,7 @@ using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.FiniteElements;
+using FeaSolution.Implementation.StiffnessMatrixLogic;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -51,10 +52,19 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(constructionModel.Elements);
         
-        var allNodes = constructionModel
-            .Elements
-            .SelectMany(elem => elem.Nodes)
-            .ToArray();
+        var freedoms = constructionModel.Freedoms;
+        var elements = constructionModel.Elements;
+
+        foreach (var finiteElement in elements)
+        {
+            // todo: упростить - передаем только элемент
+            var logic = LocalStiffnessMatrixLogicFactory.GetLogic(freedoms, finiteElement.Type.NodeType.Dimension,
+                finiteElement.Nodes.Count);
+
+            // todo: Здесь нужно передавать опции (материал и геометрические параметры)
+            var localMatrix  = logic.GetLocalMatrix(finiteElement, 4.0, 2.0);
+        }
+
 
         _stiffnessMatrix = new FiniteElementStiffnessMatrix();
 

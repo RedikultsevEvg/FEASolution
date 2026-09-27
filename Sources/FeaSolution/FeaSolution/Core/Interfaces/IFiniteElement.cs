@@ -22,5 +22,5 @@ public interface IFiniteElement
     /// <summary>
     /// Finite element stiffness matrix.
     /// </summary>
-    IFiniteElementStiffnessMatrix StiffnessMatrix { get; }
+    IFiniteElementStiffnessMatrix StiffnessMatrix { get; set; }
 }
