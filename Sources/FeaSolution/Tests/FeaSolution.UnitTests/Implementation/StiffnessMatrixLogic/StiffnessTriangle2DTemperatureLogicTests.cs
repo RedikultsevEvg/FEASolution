@@ -1,4 +1,5 @@
 ﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
@@ -9,11 +10,22 @@ namespace FeaSolution.UnitTests.Implementation.StiffnessMatrixLogic;
 [TestOf(typeof(StiffnessTriangle2DTemperatureLogic))]
 public class StiffnessTriangle2DTemperatureLogicTests
 {
+    private const double Tolerance = 1e-9;
+    private StiffnessTriangle2DTemperatureLogic _logic = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _logic = new StiffnessTriangle2DTemperatureLogic();
+    }
 
     [Test]
-    public void GetLocalMatrix_WhenSolverHasCorrectCoordinates1_ReturnsExpectedLocalMatrix()
+    public void GetLocalMatrix_WhenElementHasNodesWithCorrectCoordinates1_ReturnsExpectedMatrix()
     {
         // Arrange
+        const double thickness = 1.0;
+        const double thermalConductivity = 1.0;
+
         double[,] expectedValues =
         {
             {  0.500, -0.250, -0.250 },
@@ -29,31 +41,21 @@ public class StiffnessTriangle2DTemperatureLogicTests
             .AddNode(2.0, 0)
             .Build("The test triangle");
 
-        var nodes = element.Nodes.ToArray();
-        var logic = new StiffnessTriangle2DTemperatureLogic();
-
         // Act
-        var matrix = logic.GetLocalMatrix(element, 1.0, 1.0);
+        var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
 
         // Assert
-        Assert.IsTrue(logic.ValidateMatrixIsSymmetric());
-        Assert.IsTrue(logic.ValidateMatrixHasZeroRowSums());
-        
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-            {
-                var nodeI = nodes[i];
-                var nodeJ = nodes[j];
-
-                Assert.That(matrix[nodeI, nodeJ],
-                    Is.EqualTo(expectedValues[i, j]));
-            }
+        AssertMatrixIsValid(_logic);
+        AssertMatrixMatchesExpected(element, matrix, expectedValues);
     }
 
     [Test]
-    public void GetLocalMatrix_WhenSolverHasCorrectCoordinates2_ReturnsExpectedLocalMatrix()
+    public void GetLocalMatrix_WhenElementHasNodesWithCorrectCoordinates2_ReturnsExpectedMatrix()
     {
         // Arrange
+        const double thickness = 1.0;
+        const double thermalConductivity = 1.0;
+
         double[,] expectedValues =
         {
             {  0.625, -0.250, -0.375 },
@@ -69,24 +71,41 @@ public class StiffnessTriangle2DTemperatureLogicTests
             .AddNode(2.0, 0)
             .Build("The test triangle");
 
-        var nodes = element.Nodes.ToArray();
-        var triangleElementSolver = new StiffnessTriangle2DTemperatureLogic();
-
         // Act
-        var matrix = triangleElementSolver.GetLocalMatrix(element, 1.0, 1.0);
+        var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
 
         // Assert
-        Assert.IsTrue(triangleElementSolver.ValidateMatrixIsSymmetric());
-        Assert.IsTrue(triangleElementSolver.ValidateMatrixHasZeroRowSums());
+        AssertMatrixIsValid(_logic);
+        AssertMatrixMatchesExpected(element, matrix, expectedValues);
+    }
 
-        for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
+    // ---------- Helpers ----------
+
+    private static void AssertMatrixIsValid(StiffnessTriangle2DTemperatureLogic logic)
+    {
+        Assert.Multiple(() =>
         {
-            var nodeI = nodes[i];
-            var nodeJ = nodes[j];
+            Assert.That(logic.ValidateMatrixIsSymmetric(), Is.True,
+                "Stiffness matrix must be symmetric.");
+            Assert.That(logic.ValidateMatrixHasZeroRowSums(), Is.True,
+                "Stiffness matrix rows must sum to zero.");
+        });
+    }
 
-            Assert.That(matrix[nodeI, nodeJ],
-                Is.EqualTo(expectedValues[i, j]));
+    private static void AssertMatrixMatchesExpected(
+        IFiniteElement element,
+        StiffnessMatrix matrix,
+        double[,] expected)
+    {
+        var nodes = element.Nodes.ToArray();
+
+        for (int i = 0; i < nodes.Length; i++)
+        for (int j = 0; j < nodes.Length; j++)
+        {
+            Assert.That(
+                matrix[nodes[i], nodes[j]],
+                Is.EqualTo(expected[i, j]).Within(Tolerance),
+                $"Mismatch at row={i}, col={j}.");
         }
     }
 }

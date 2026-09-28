@@ -8,7 +8,7 @@ public interface IStiffnessMatrixLogic
     /// Полный алгоритм получения матрицы жесткости элемента.
     /// </summary>
     /// <param name="element"></param>
-    /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>
+    /// <param name="thermalConductivity">Коэффициент теплопроводности, W/(m·K)</param>
     /// <param name="thickness">Толщина, м</param>
-    StiffnessMatrix GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness);
+    StiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness);
 }

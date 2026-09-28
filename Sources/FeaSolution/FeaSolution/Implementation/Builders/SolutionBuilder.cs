@@ -62,7 +62,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                 finiteElement.Nodes.Count);
 
             // todo: Здесь нужно передавать опции (материал и геометрические параметры)
-            var localMatrix  = logic.GetLocalMatrix(finiteElement, 4.0, 2.0);
+            var localMatrix  = logic.GetMatrix(finiteElement, 4.0, 2.0);
         }
 
 
