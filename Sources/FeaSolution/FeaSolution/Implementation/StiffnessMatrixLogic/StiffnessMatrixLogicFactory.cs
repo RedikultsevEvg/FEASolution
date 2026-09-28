@@ -2,10 +2,13 @@
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
-public static class LocalStiffnessMatrixLogicFactory
+/// <summary>
+/// Stiffness Matrix Logic Factory.
+/// </summary>
+public static class StiffnessMatrixLogicFactory
 {
     public static ILocalStiffnessMatrixLogic GetLogic(ICollection<Freedom> freedoms, Dimensional dimensional, int nodeCount)
     {
-        return new Triangle2DLocalStiffnessMatrixLogic();
+        return new Triangle2DLocalSparceSymmetricMatrixLogic();
     }
 }

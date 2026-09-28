@@ -8,7 +8,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 /// Линейный треугольный конечный элемент для задачи стационарной
 /// теплопроводности: -div(λ ∇T) = 0.
 /// </summary>
-public sealed class Triangle2DLocalSparceSymmetricMatrixLogic
+public sealed class Triangle2DLocalSparceSymmetricMatrixLogic : ILocalStiffnessMatrixLogic
 {
     private IElementNode[] _nodes;
 
@@ -22,10 +22,10 @@ public sealed class Triangle2DLocalSparceSymmetricMatrixLogic
     // Геометрическая площадь
     private MatrixValue ElementSquare { get; set; }
 
-    private SparseSymmetricMatrix? LocalMatrix { get; set; }
+    private StiffnessMatrix? LocalMatrix { get; set; }
 
     /// <inheritdoc/> 
-    public SparseSymmetricMatrix GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness)
+    public StiffnessMatrix GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness)
     {
         FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
             $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
@@ -62,7 +62,7 @@ public sealed class Triangle2DLocalSparceSymmetricMatrixLogic
 
         var multiplier= lambda * thickness / (4.0 * ElementSquare);
 
-        LocalMatrix = new SparseSymmetricMatrix();
+        LocalMatrix = new StiffnessMatrix();
         SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
     }

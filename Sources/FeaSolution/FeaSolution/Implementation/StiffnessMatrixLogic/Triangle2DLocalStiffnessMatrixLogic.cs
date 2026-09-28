@@ -8,7 +8,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 /// Линейный треугольный конечный элемент для задачи стационарной
 /// теплопроводности: -div(λ ∇T) = 0.
 /// </summary>
-public sealed class Triangle2DLocalStiffnessMatrixLogic : ILocalStiffnessMatrixLogic
+public sealed class Triangle2DLocalStiffnessMatrixLogic 
 {
     private CoordinateValue X1 { get; set; }
     private CoordinateValue Y1 { get; set; }

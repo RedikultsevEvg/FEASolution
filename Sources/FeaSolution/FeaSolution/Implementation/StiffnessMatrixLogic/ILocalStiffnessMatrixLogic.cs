@@ -10,5 +10,5 @@ public interface ILocalStiffnessMatrixLogic
     /// <param name="element"></param>
     /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>
     /// <param name="thickness">Толщина, м</param>
-    LocalSymmetricMatrix<MatrixValue> GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness);
+    StiffnessMatrix GetLocalMatrix(IFiniteElement element, MatrixValue lambda, MatrixValue thickness);
 }

@@ -3,11 +3,11 @@
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 /// <summary>
-/// Разреженная симметричная матрица. Каждый ElementNode маппится в int-индекс,
-/// ключ хранится как упакованный long (min << 32 | max).
+/// Разреженная симметричная матрица.<br/>
+/// Каждый ElementNode маппится в int-индекс, ключ хранится как упакованный long (min | max).<br/>
 /// Узел регистрируется только при записи ненулевого значения.
 /// </summary>
-public sealed class SparseSymmetricMatrix
+public sealed class StiffnessMatrix
 {
     private readonly Dictionary<IElementNode, int> _nodes =
         new(ReferenceEqualityComparer.Instance);
