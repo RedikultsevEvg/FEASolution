@@ -55,6 +55,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         var freedoms = constructionModel.Freedoms;
         var elements = constructionModel.Elements;
 
+        var globalStiffnessMatrix = new StiffnessMatrix();
+
         foreach (var finiteElement in elements)
         {
             // todo: упростить - передаем только элемент
@@ -63,24 +65,13 @@ public class SolutionBuilder(IConstructionModel constructionModel)
 
             // todo: Здесь нужно передавать опции (материал и геометрические параметры)
             var localMatrix  = logic.GetMatrix(finiteElement, 4.0, 2.0);
+
+            globalStiffnessMatrix.AddMatrix(localMatrix);
         }
-
-
-        _stiffnessMatrix = new FiniteElementStiffnessMatrix();
-
-        /*if (allNodes.Any())
-        {
-            _stiffnessMatrix.Values.Add(new StiffnessMatrixValue
-            {
-                DegreeOfFreedom = new DegreeOfFreedom(),
-                Node1 = allNodes[0],
-                Node2 = allNodes[1],
-                CurrentValue = 1.1
-            });
-        }*/
 
         return this;
     }
+
 
     /// <summary>
     /// Validates for the minimum count of element. The minimum is 2.

@@ -2,15 +2,12 @@
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
-/// <summary>
-/// Разреженная симметричная матрица.<br/>
-/// Каждый ElementNode маппится в int-индекс, ключ хранится как упакованный long (min | max).<br/>
-/// Узел регистрируется только при записи ненулевого значения.
-/// </summary>
 public sealed class StiffnessMatrix
 {
     private readonly Dictionary<IElementNode, int> _nodes =
         new(ReferenceEqualityComparer.Instance);
+
+    private readonly List<IElementNode> _indexToNode = [];
 
     private readonly Dictionary<long, MatrixValue> _matrixData = [];
 
@@ -19,6 +16,9 @@ public sealed class StiffnessMatrix
     public int NoneZeroElementCount => _matrixData.Count;
 
     public int NodeCount => _nodes.Count;
+
+    /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
+    public IReadOnlyList<IElementNode> Nodes => _indexToNode;
 
     public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
     {
@@ -29,25 +29,21 @@ public sealed class StiffnessMatrix
             {
                 return DefaultValue;
             }
-
             return _matrixData.GetValueOrDefault(GetKey(a, b), DefaultValue);
         }
         set
         {
             if (value == DefaultValue)
             {
-                // Удаление: узлы уже могут быть зарегистрированы
                 if (!_nodes.TryGetValue(firstElement, out var a) ||
                     !_nodes.TryGetValue(secondElement, out var b))
                 {
-                    return; // связи и так нет
+                    return;
                 }
-
                 _matrixData.Remove(GetKey(a, b));
                 return;
             }
 
-            // Запись ненулевого значения — регистрируем оба узла
             int ia = GetOrAddIndex(firstElement);
             int ib = GetOrAddIndex(secondElement);
             _matrixData[GetKey(ia, ib)] = value;
@@ -65,24 +61,33 @@ public sealed class StiffnessMatrix
     }
 
     /// <summary>
-    /// Get key for the dictionary. Min/Max format. 
+    /// Обходит ненулевые ячейки верхнего треугольника.
+    /// Каждая симметричная пара (i, j) выдаётся один раз.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
+    public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements()
+    {
+        foreach (var (key, value) in _matrixData)
+        {
+            var a = (int)(key >> 32);
+            var b = (int)(key & 0xFFFFFFFF);
+
+            yield return (_indexToNode[a], _indexToNode[b], value);
+        }
+    }
+
     private static long GetKey(int a, int b)
     {
         if (a > b) (a, b) = (b, a);
         return ((long)a << 32) | (uint)b;
     }
 
-    // Регистрация узла и выдача индекса
     private int GetOrAddIndex(IElementNode node)
     {
         if (_nodes.TryGetValue(node, out var idx)) return idx;
 
-        idx = _nodes.Count;
+        idx = _indexToNode.Count;
         _nodes[node] = idx;
+        _indexToNode.Add(node);
         return idx;
     }
 }
