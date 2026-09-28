@@ -12,16 +12,6 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 {
     private IElementNode[] _nodes;
 
-    private CoordinateValue X0 { get; set; }
-    private CoordinateValue Y0 { get; set; }
-    private CoordinateValue X1 { get; set; }
-    private CoordinateValue Y1 { get; set; }
-    private CoordinateValue X2 { get; set; }
-    private CoordinateValue Y2 { get; set; }
-
-    // Element square.
-    private MatrixValue ElementSquare { get; set; }
-
     private StiffnessMatrix? LocalMatrix { get; set; }
 
     /// <inheritdoc/> 
@@ -33,34 +23,20 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
         FeaCommonException.ThrowIfTrue(element.Nodes.Count != 3,
             $"Accepted only Triangle element (node count is 3). Current node count is '{element.Nodes.Count}'");
 
-        _nodes = element.Nodes.ToArray();
+        _nodes = [.. element.Nodes];
 
-        X0 = _nodes[0].X;
-        X1 = _nodes[1].X;
-        X2 = _nodes[2].X;
+        var (x0, y0) = (_nodes[0].X, _nodes[0].Y);
+        var (x1, y1) = (_nodes[1].X, _nodes[1].Y);
+        var (x2, y2) = (_nodes[2].X, _nodes[2].Y);
 
-        Y0 = _nodes[0].Y;
-        Y1 = _nodes[1].Y;
-        Y2 = _nodes[2].Y;
+        var square = GetElementSquare(x0, y0, x1, y1, x2, y2);
+        FeaCommonException.ThrowIfTrue(square <= 0,
+            "Element has zero or negative square (degenerate triangle).");
 
-        ElementSquare = GetElementSquare();
+        MatrixValue[] vectorB = [y1 - y2, y2 - y0, y0 - y1];
+        MatrixValue[] vectorC = [x2 - x1, x0 - x2, x1 - x0];
 
-        if (LocalMatrix != null)
-        {
-            return LocalMatrix;
-        }
-
-        var b1 = Y1 - Y2;
-        var b2 = Y2 - Y0;
-        var b3 = Y0 - Y1;
-        MatrixValue[] vectorB = [b1, b2, b3];
-
-        var c1 = X2 - X1;
-        var c2 = X0 - X2;
-        var c3 = X1 - X0;
-        MatrixValue[] vectorC = [c1, c2, c3];
-
-        var multiplier= thermalConductivity * thickness / (4.0 * ElementSquare);
+        var multiplier= thermalConductivity * thickness / (4.0 * square);
 
         LocalMatrix = new StiffnessMatrix();
         SetUpMatrix(multiplier, vectorB, vectorC);
@@ -113,13 +89,12 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
         return true;
     }
 
-    private MatrixValue GetElementSquare()
+    private static MatrixValue GetElementSquare(
+        double x0, double y0, double x1, double y1, double x2, double y2)
     {
-        var signedTwice =
-            X0 * (Y1 - Y2) +
-            X1 * (Y2 - Y0) +
-            X2 * (Y0 - Y1);
+        var dx1 = x1 - x0; var dy1 = y1 - y0;
+        var dx2 = x2 - x0; var dy2 = y2 - y0;
 
-        return 0.5 * Math.Abs(signedTwice);
+        return 0.5 * Math.Abs(dx1 * dy2 - dx2 * dy1);
     }
 }
