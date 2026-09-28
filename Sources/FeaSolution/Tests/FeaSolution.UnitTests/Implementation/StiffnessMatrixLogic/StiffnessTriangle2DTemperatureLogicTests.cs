@@ -20,17 +20,17 @@ public class StiffnessTriangle2DTemperatureLogicTests
     }
 
     [Test]
-    public void GetLocalMatrix_WhenElementHasNodesWithCorrectCoordinates1_ReturnsExpectedMatrix()
+    public void GetLocalMatrix_WhenThermalConductivityMoreThanThickness_ReturnsExpectedMatrix()
     {
         // Arrange
         const double thickness = 1.0;
-        const double thermalConductivity = 1.0;
+        const double thermalConductivity = 4.0;
 
         double[,] expectedValues =
         {
-            {  0.500, -0.250, -0.250 },
-            { -0.250,  0.625, -0.375 },
-            { -0.250, -0.375,  0.625 }
+            {  2.000, -1.000, -1.000 },
+            { -1.000,  2.500, -1.500 },
+            { -1.000, -1.500,  2.500 }
         };
 
         var element = new FiniteElementBuilder()
@@ -50,17 +50,17 @@ public class StiffnessTriangle2DTemperatureLogicTests
     }
 
     [Test]
-    public void GetLocalMatrix_WhenElementHasNodesWithCorrectCoordinates2_ReturnsExpectedMatrix()
+    public void GetLocalMatrix_WhenThicknessIsMoreThanThermalConductivity_ReturnsExpectedMatrix()
     {
         // Arrange
-        const double thickness = 1.0;
+        const double thickness = 2.0;
         const double thermalConductivity = 1.0;
 
         double[,] expectedValues =
         {
-            {  0.625, -0.250, -0.375 },
-            { -0.250,  0.500, -0.250 },
-            { -0.375, -0.250,  0.625 }
+            {  1.250, -0.500, -0.750 },
+            { -0.500,  1.000, -0.500 },
+            { -0.750, -0.500,  1.250 }
         };
 
         var element = new FiniteElementBuilder()
