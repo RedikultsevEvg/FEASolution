@@ -2,10 +2,10 @@
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
-public interface ILocalStiffnessMatrixLogic
+public interface IStiffnessMatrixLogic
 {
     /// <summary>
-    /// Полный алгоритм получения локальной матрицы елемента.
+    /// Полный алгоритм получения матрицы жесткости элемента.
     /// </summary>
     /// <param name="element"></param>
     /// <param name="lambda">Коэффициент теплопроводности, W/(m·K)</param>

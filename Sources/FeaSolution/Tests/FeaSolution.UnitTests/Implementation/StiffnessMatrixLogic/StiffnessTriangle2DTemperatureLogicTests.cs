@@ -6,8 +6,8 @@ using FeaSolution.Implementation.StiffnessMatrixLogic;
 namespace FeaSolution.UnitTests.Implementation.StiffnessMatrixLogic;
 
 [TestFixture]
-[TestOf(typeof(Triangle2DLocalSparceSymmetricMatrixLogic))]
-public class Triangle2DLocalSparceSymmetricMatrixLogicTests
+[TestOf(typeof(StiffnessTriangle2DTemperatureLogic))]
+public class StiffnessTriangle2DTemperatureLogicTests
 {
 
     [Test]
@@ -30,7 +30,7 @@ public class Triangle2DLocalSparceSymmetricMatrixLogicTests
             .Build("The test triangle");
 
         var nodes = element.Nodes.ToArray();
-        var logic = new Triangle2DLocalSparceSymmetricMatrixLogic();
+        var logic = new StiffnessTriangle2DTemperatureLogic();
 
         // Act
         var matrix = logic.GetLocalMatrix(element, 1.0, 1.0);
@@ -70,7 +70,7 @@ public class Triangle2DLocalSparceSymmetricMatrixLogicTests
             .Build("The test triangle");
 
         var nodes = element.Nodes.ToArray();
-        var triangleElementSolver = new Triangle2DLocalSparceSymmetricMatrixLogic();
+        var triangleElementSolver = new StiffnessTriangle2DTemperatureLogic();
 
         // Act
         var matrix = triangleElementSolver.GetLocalMatrix(element, 1.0, 1.0);

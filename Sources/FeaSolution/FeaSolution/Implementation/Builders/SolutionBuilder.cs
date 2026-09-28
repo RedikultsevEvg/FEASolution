@@ -58,7 +58,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         foreach (var finiteElement in elements)
         {
             // todo: упростить - передаем только элемент
-            var logic = StiffnessMatrixLogicFactory.GetLogic(freedoms, finiteElement.Type.NodeType.Dimension,
+            var logic = StiffnessMatrixStrategy.GetLogic(freedoms, finiteElement.Type.NodeType.Dimension,
                 finiteElement.Nodes.Count);
 
             // todo: Здесь нужно передавать опции (материал и геометрические параметры)
