@@ -16,5 +16,5 @@ public class FiniteElement : IFiniteElement
     public ICollection<IElementNode> Nodes { get; init; } = [];
 
     /// <inheritdoc/>
-    public IFiniteElementStiffnessMatrix StiffnessMatrix { get; }
+    public IFiniteElementStiffnessMatrix StiffnessMatrix { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using FeaSolution.Implementation.ElementNodes;
+﻿using FeaSolution.Core.Interfaces;
+using FeaSolution.Implementation.ElementNodes;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
@@ -9,7 +10,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 /// </summary>
 public sealed class SparseSymmetricMatrix
 {
-    private readonly Dictionary<ElementNode, int> _indexes =
+    private readonly Dictionary<IElementNode, int> _indexes =
         new(ReferenceEqualityComparer.Instance);
 
     private readonly Dictionary<long, double> _data = [];
@@ -20,7 +21,7 @@ public sealed class SparseSymmetricMatrix
 
     public int MatrixDimension => _indexes.Count;
 
-    public double this[ElementNode firstElement, ElementNode secondElement]
+    public double this[IElementNode firstElement, IElementNode secondElement]
     {
         get
         {
@@ -55,7 +56,7 @@ public sealed class SparseSymmetricMatrix
         }
     }
 
-    public bool HasRelation(ElementNode i, ElementNode j)
+    public bool HasRelation(IElementNode i, IElementNode j)
     {
         if (!_indexes.TryGetValue(i, out var a) ||
             !_indexes.TryGetValue(j, out var b))
@@ -73,7 +74,7 @@ public sealed class SparseSymmetricMatrix
     }
 
     // Регистрация узла и выдача индекса
-    private int GetOrAddIndex(ElementNode node)
+    private int GetOrAddIndex(IElementNode node)
     {
         if (_indexes.TryGetValue(node, out var idx)) return idx;
 
