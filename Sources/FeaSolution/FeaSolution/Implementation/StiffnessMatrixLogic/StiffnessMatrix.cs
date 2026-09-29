@@ -4,7 +4,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 public sealed class StiffnessMatrix
 {
-    private readonly Dictionary<IElementNode, int> _nodes =
+    private readonly Dictionary<IElementNode, int> _nodeToIndex =
         new(ReferenceEqualityComparer.Instance);
 
     private readonly List<IElementNode> _indexToNode = [];
@@ -15,7 +15,7 @@ public sealed class StiffnessMatrix
 
     public int NoneZeroElementCount => _matrixData.Count;
 
-    public int NodeCount => _nodes.Count;
+    public int NodeCount => _nodeToIndex.Count;
 
     /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;
@@ -24,8 +24,8 @@ public sealed class StiffnessMatrix
     {
         get
         {
-            if (!_nodes.TryGetValue(firstElement, out var a) ||
-                !_nodes.TryGetValue(secondElement, out var b))
+            if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
+                !_nodeToIndex.TryGetValue(secondElement, out var b))
             {
                 return DefaultValue;
             }
@@ -35,8 +35,8 @@ public sealed class StiffnessMatrix
         {
             if (value == DefaultValue)
             {
-                if (!_nodes.TryGetValue(firstElement, out var a) ||
-                    !_nodes.TryGetValue(secondElement, out var b))
+                if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
+                    !_nodeToIndex.TryGetValue(secondElement, out var b))
                 {
                     return;
                 }
@@ -52,8 +52,8 @@ public sealed class StiffnessMatrix
 
     public bool HasRelation(IElementNode i, IElementNode j)
     {
-        if (!_nodes.TryGetValue(i, out var a) ||
-            !_nodes.TryGetValue(j, out var b))
+        if (!_nodeToIndex.TryGetValue(i, out var a) ||
+            !_nodeToIndex.TryGetValue(j, out var b))
         {
             return false;
         }
@@ -83,10 +83,10 @@ public sealed class StiffnessMatrix
 
     private int GetOrAddIndex(IElementNode node)
     {
-        if (_nodes.TryGetValue(node, out var idx)) return idx;
+        if (_nodeToIndex.TryGetValue(node, out var idx)) return idx;
 
         idx = _indexToNode.Count;
-        _nodes[node] = idx;
+        _nodeToIndex[node] = idx;
         _indexToNode.Add(node);
         return idx;
     }
