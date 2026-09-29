@@ -55,7 +55,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         var freedoms = constructionModel.Freedoms;
         var elements = constructionModel.Elements;
 
-        IStiffnessMatrix globalStiffnessMatrix = new StiffnessMatrix();
+        IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew(100);
 
         foreach (var finiteElement in elements)
         {

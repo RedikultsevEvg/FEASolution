@@ -12,7 +12,7 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 {
     private IElementNode[] _nodes = [];
 
-    private StiffnessMatrix? LocalMatrix { get; set; }
+    private IStiffnessMatrix? LocalMatrix { get; set; }
 
     /// <inheritdoc/> 
     public IStiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness)
@@ -38,7 +38,8 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 
         var multiplier= thermalConductivity * thickness / (4.0 * square);
 
-        LocalMatrix = new StiffnessMatrix();
+        var matrixElementCount = 6;
+        LocalMatrix = StiffnessMatrixFactory.CreateNew(matrixElementCount);
         SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
     }
