@@ -64,16 +64,6 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
         }
     }
 
-    public bool HasRelation(IElementNode i, IElementNode j)
-    {
-        if (!_nodeToIndex.TryGetValue(i, out var a) ||
-            !_nodeToIndex.TryGetValue(j, out var b))
-        {
-            return false;
-        }
-        return _matrixData.ContainsKey(GetKey(a, b));
-    }
-
     /// <summary>
     /// Обходит ненулевые ячейки верхнего треугольника.
     /// Каждая симметричная пара (i, j) выдаётся один раз.

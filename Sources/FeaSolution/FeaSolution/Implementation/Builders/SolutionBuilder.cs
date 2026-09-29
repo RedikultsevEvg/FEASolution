@@ -2,7 +2,6 @@ using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
-using FeaSolution.Implementation.FiniteElements;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 
 namespace FeaSolution.Implementation.Builders;
@@ -13,8 +12,6 @@ namespace FeaSolution.Implementation.Builders;
 /// <param name="constructionModel">Construction model.</param>
 public class SolutionBuilder(IConstructionModel constructionModel)
 {
-    private IFiniteElementStiffnessMatrix _stiffnessMatrix = new FiniteElementStiffnessMatrix();
-
     /// <summary>
     /// Creates a construction model solution.
     /// </summary>

@@ -207,55 +207,6 @@ public class StiffnessMatrixTests
         });
     }
 
-    // ---------- HasRelation ----------
-
-    [Test]
-    public void HasRelation_ReturnsTrue_ForStoredPair()
-    {
-        _matrix[_a, _b] = 1.0;
-
-        Assert.That(_matrix.HasRelation(_a, _b), Is.True);
-    }
-
-    [Test]
-    public void HasRelation_ReturnsTrue_ForReversedPair()
-    {
-        _matrix[_a, _b] = 1.0;
-
-        Assert.That(_matrix.HasRelation(_b, _a), Is.True);
-    }
-
-    [Test]
-    public void HasRelation_ReturnsFalse_ForDifferentPair()
-    {
-        _matrix[_a, _b] = 1.0;
-
-        Assert.That(_matrix.HasRelation(_a, _c), Is.False);
-    }
-
-    [Test]
-    public void HasRelation_ReturnsFalse_ForUnknownNodes()
-    {
-        Assert.That(_matrix.HasRelation(_a, _b), Is.False);
-    }
-
-    [Test]
-    public void HasRelation_ReturnsFalse_AfterRemoval()
-    {
-        _matrix[_a, _b] = 1.0;
-        _matrix[_a, _b] = 0.0;
-
-        Assert.That(_matrix.HasRelation(_a, _b), Is.False);
-    }
-
-    [Test]
-    public void HasRelation_ReturnsTrue_ForDiagonal()
-    {
-        _matrix[_a, _a] = 1.0;
-
-        Assert.That(_matrix.HasRelation(_a, _a), Is.True);
-    }
-
     // ---------- ReferenceEqualityComparer ----------
 
     [Test]
