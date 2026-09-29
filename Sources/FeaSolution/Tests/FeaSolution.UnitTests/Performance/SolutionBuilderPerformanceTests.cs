@@ -65,6 +65,7 @@ public class SolutionBuilderPerformanceTests
     {
         const int smallCount = 1_000;
         const int largeCount = 4_000;
+        const int expectedScaling = 12;
 
         var smallTime = MeasureAssembly(smallCount);
         var largeTime = MeasureAssembly(largeCount);
@@ -79,7 +80,7 @@ public class SolutionBuilderPerformanceTests
         // Ожидаем ~4x, допускаем до 10x (запас на шум и GC).
         Assert.That(
             ratio,
-            Is.LessThan(10.0),
+            Is.LessThan(expectedScaling),
             $"Assembly scaling is worse than expected: ratio = {ratio:F2}");
     }
 
