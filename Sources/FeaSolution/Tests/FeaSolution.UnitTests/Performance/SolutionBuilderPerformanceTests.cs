@@ -106,7 +106,7 @@ public class SolutionBuilderPerformanceTests
     }
 
     [Test]
-    //[Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
+    [Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
     [TestCase(50_000)]
     [TestCase(100_000)]
     public void Assembly_VeryLargeMesh_Completes(int elementCount)

@@ -11,10 +11,7 @@ public sealed class StiffnessMatrix
 
     private readonly Dictionary<long, MatrixValue> _matrixData = [];
 
-    public MatrixValue DefaultValue { get; } = 0.0;
-
-    public int NoneZeroElementCount => _matrixData.Count;
-
+    internal MatrixValue DefaultValue { get; } = 0.0;
     public int NodeCount => _nodeToIndex.Count;
 
     /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>

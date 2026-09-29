@@ -32,12 +32,6 @@ public class StiffnessMatrixTests
     }
 
     [Test]
-    public void NewMatrix_HasZeroNonZeroElementCount()
-    {
-        Assert.That(_matrix.NoneZeroElementCount, Is.Zero);
-    }
-
-    [Test]
     public void NewMatrix_DefaultValueIsZero()
     {
         Assert.That(_matrix.DefaultValue, Is.EqualTo(0.0));
@@ -69,7 +63,6 @@ public class StiffnessMatrixTests
         {
             Assert.That(result, Is.EqualTo(0.0));
             Assert.That(_matrix.NodeCount, Is.Zero);
-            Assert.That(_matrix.NoneZeroElementCount, Is.Zero);
         });
     }
 
@@ -101,7 +94,6 @@ public class StiffnessMatrixTests
         {
             Assert.That(_matrix[_a, _b], Is.EqualTo(2.0));
             Assert.That(_matrix.NodeCount, Is.EqualTo(2));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(1));
         });
     }
 
@@ -114,7 +106,6 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix.NodeCount, Is.EqualTo(3));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(2));
         });
     }
 
@@ -137,8 +128,6 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix[_a, _b], Is.EqualTo(7.0));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(1),
-                "Обе записи должны попасть в одну ячейку.");
         });
     }
 
@@ -152,7 +141,6 @@ public class StiffnessMatrixTests
         {
             Assert.That(_matrix[_a, _b], Is.EqualTo(2.0));
             Assert.That(_matrix[_b, _a], Is.EqualTo(2.0));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(1));
         });
     }
 
@@ -167,7 +155,6 @@ public class StiffnessMatrixTests
         {
             Assert.That(_matrix[_a, _a], Is.EqualTo(4.0));
             Assert.That(_matrix.NodeCount, Is.EqualTo(1));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(1));
         });
     }
 
@@ -182,7 +169,6 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix[_a, _b], Is.EqualTo(0.0));
-            Assert.That(_matrix.NoneZeroElementCount, Is.Zero);
         });
     }
 
@@ -204,7 +190,6 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix.NodeCount, Is.Zero);
-            Assert.That(_matrix.NoneZeroElementCount, Is.Zero);
         });
     }
 
@@ -317,7 +302,6 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix.NodeCount, Is.EqualTo(3));
-            Assert.That(_matrix.NoneZeroElementCount, Is.EqualTo(6));
 
             Assert.That(_matrix[_b, _a], Is.EqualTo(2.0));
             Assert.That(_matrix[_c, _a], Is.EqualTo(3.0));
@@ -336,7 +320,6 @@ public class StiffnessMatrixTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(_matrix.NoneZeroElementCount, Is.Zero);
             Assert.That(_matrix.NodeCount, Is.EqualTo(3),
                 "Узлы остаются зарегистрированными.");
         });
