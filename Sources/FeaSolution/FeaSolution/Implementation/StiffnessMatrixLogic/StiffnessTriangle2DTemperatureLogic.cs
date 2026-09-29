@@ -38,8 +38,7 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 
         var multiplier= thermalConductivity * thickness / (4.0 * square);
 
-        var matrixElementCount = 6;
-        LocalMatrix = StiffnessMatrixFactory.CreateNew(matrixElementCount);
+        LocalMatrix = StiffnessMatrixFactory.CreateNew(_nodes);
         SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
     }

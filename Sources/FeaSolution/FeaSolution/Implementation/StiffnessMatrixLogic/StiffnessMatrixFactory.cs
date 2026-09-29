@@ -1,14 +1,14 @@
-﻿namespace FeaSolution.Implementation.StiffnessMatrixLogic;
+﻿using FeaSolution.Core.Interfaces;
+
+namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 internal static class StiffnessMatrixFactory
 {
-    private const int Treasure = 1600;
-
-    internal static IStiffnessMatrix CreateNew(int elementCount = 0)
+    internal static IStiffnessMatrix CreateNew(IReadOnlyList<IElementNode>? nodes = null)
     {
-        if (elementCount < Treasure)
+        if (nodes != null && nodes.Count <= 4)
         {
-            return new SmallStiffnessMatrix();
+            return new SmallStiffnessMatrix(nodes);
         }
 
         return new StiffnessMatrix();

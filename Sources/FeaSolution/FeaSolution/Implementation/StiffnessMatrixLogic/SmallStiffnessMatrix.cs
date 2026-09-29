@@ -4,88 +4,90 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 public sealed class SmallStiffnessMatrix : IStiffnessMatrix
 {
-    private readonly Dictionary<IElementNode, int> _nodeToIndex =
-        new(ReferenceEqualityComparer.Instance);
+    private readonly IElementNode[] _nodes;
+    
+    // packed upper triangle
+    private readonly MatrixValue[] _matrixData; 
 
-    private readonly List<IElementNode> _indexToNode = [];
-
-    private readonly Dictionary<long, MatrixValue> _matrixData = [];
+    internal int NodeCount => Nodes.Count;
 
     internal MatrixValue DefaultValue { get; } = 0.0;
 
-    public int NodeCount => _nodeToIndex.Count;
+    /// <summary>
+    /// Создаёт маленькую симметричную матрицу фиксированного размера.
+    /// </summary>
+    /// <param name="nodes">Узлы в порядке индексации.</param>
+    public SmallStiffnessMatrix(IReadOnlyList<IElementNode> nodes)
+    {
+        ArgumentNullException.ThrowIfNull(nodes);
+        if (nodes.Count == 0)
+            throw new ArgumentException("Nodes cannot be empty.", nameof(nodes));
 
-    /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
-    public IReadOnlyList<IElementNode> Nodes => _indexToNode;
+        _nodes = [.. nodes];
+        var n = _nodes.Length;
+        _matrixData = new MatrixValue[n * (n + 1) / 2];
+    }
+
+    public IReadOnlyList<IElementNode> Nodes => _nodes;
 
     public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
     {
         get
         {
-            if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
-                !_nodeToIndex.TryGetValue(secondElement, out var b))
-            {
+            var a = IndexOf(firstElement);
+            var b = IndexOf(secondElement);
+
+            if (a < 0 || b < 0) 
                 return DefaultValue;
-            }
-            return _matrixData.GetValueOrDefault(GetKey(a, b), DefaultValue);
+
+            return _matrixData[PackIndex(a, b)];
         }
         set
         {
-            if (value == DefaultValue)
-            {
-                if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
-                    !_nodeToIndex.TryGetValue(secondElement, out var b))
-                {
-                    return;
-                }
-                _matrixData.Remove(GetKey(a, b));
+            var a = IndexOf(firstElement);
+            var b = IndexOf(secondElement);
+
+            if (a < 0 || b < 0) 
                 return;
-            }
 
-            int ia = GetOrAddIndex(firstElement);
-            int ib = GetOrAddIndex(secondElement);
-            _matrixData[GetKey(ia, ib)] = value;
+            _matrixData[PackIndex(a, b)] = value;
         }
-    }
-
-    public bool HasRelation(IElementNode i, IElementNode j)
-    {
-        if (!_nodeToIndex.TryGetValue(i, out var a) ||
-            !_nodeToIndex.TryGetValue(j, out var b))
-        {
-            return false;
-        }
-        return _matrixData.ContainsKey(GetKey(a, b));
     }
 
     /// <summary>
-    /// Обходит ненулевые ячейки верхнего треугольника.
-    /// Каждая симметричная пара (i, j) выдаётся один раз.
+    /// Обходит ненулевые ячейки верхнего треугольника без аллокаций.
     /// </summary>
     public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements()
     {
-        foreach (var (key, value) in _matrixData)
+        var n = _nodes.Length;
+
+        for (var i = 0; i < n; i++)
+            for (var j = i; j < n; j++)
+            {
+                var value = _matrixData[PackIndex(i, j)];
+                if (value != DefaultValue)
+                    yield return (_nodes[i], _nodes[j], value);
+            }
+    }
+
+    /// <summary>
+    /// Индекс в упакованном верхнем треугольнике: i <= j.
+    /// </summary>
+    private int PackIndex(int i, int j)
+    {
+        if (i > j) (i, j) = (j, i);
+        // packed upper triangle, row-major
+        return i * _nodes.Length - i * (i - 1) / 2 + (j - i);
+    }
+
+    private int IndexOf(IElementNode node)
+    {
+        // Линейный поиск: для n <= 12 это быстрее словаря.
+        var span = _nodes.AsSpan();
+        for (var k = 0; k < span.Length; k++)
         {
-            var a = (int)(key >> 32);
-            var b = (int)(key & 0xFFFFFFFF);
-
-            yield return (_indexToNode[a], _indexToNode[b], value);
+            if (ReferenceEquals(span[k], node)) return k;
         }
-    }
-
-    private static long GetKey(int a, int b)
-    {
-        if (a > b) (a, b) = (b, a);
-        return ((long)a << 32) | (uint)b;
-    }
-
-    private int GetOrAddIndex(IElementNode node)
-    {
-        if (_nodeToIndex.TryGetValue(node, out var idx)) return idx;
-
-        idx = _indexToNode.Count;
-        _nodeToIndex[node] = idx;
-        _indexToNode.Add(node);
-        return idx;
+        return -1;
     }
 }
