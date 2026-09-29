@@ -11,7 +11,7 @@ internal static class StiffnessMatrixExtensions
 
         foreach (var (nodeI, nodeJ, value) in localMatrix.NonZeroElements())
         {
-            globalStiffnessMatrix[nodeI, nodeJ] += value;
+            globalStiffnessMatrix.AddValue(nodeI, nodeJ, value);
         }
     }
 

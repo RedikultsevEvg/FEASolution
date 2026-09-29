@@ -108,9 +108,9 @@ public class SolutionBuilderPerformanceTests
 
     [Test]
     //[Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
-    [TestCase(50_000)]
-    [TestCase(100_000)]
-    public void Assembly_VeryLargeMesh_Completes(int elementCount)
+    [TestCase(50_000, 2_000)]
+    [TestCase(100_000, 5_000)]
+    public void Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)
     {
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
@@ -122,7 +122,7 @@ public class SolutionBuilderPerformanceTests
         TestContext.WriteLine(
             $"elements={elementCount}, time={sw.ElapsedMilliseconds} ms");
 
-        Assert.That(sw.ElapsedMilliseconds, Is.LessThan(7_000));
+        Assert.That(sw.ElapsedMilliseconds, Is.LessThan(expectedMaxMiliSeconds));
     }
 
     private static long MeasureAssembly(int elementCount)

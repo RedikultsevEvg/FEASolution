@@ -1,4 +1,5 @@
 ﻿using FeaSolution.Core.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
@@ -17,6 +18,21 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
 
     /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;
+
+    public void AddValue(IElementNode firstElement, IElementNode secondElement, MatrixValue valueToAdd)
+    {
+        if (valueToAdd == 0.0) return;
+
+        var ia = GetOrAddIndex(firstElement);
+        var ib = GetOrAddIndex(secondElement);
+        var key = GetKey(ia, ib);
+
+        ref var matrixValue = ref CollectionsMarshal.GetValueRefOrAddDefault(_matrixData, key, out _);
+        matrixValue += valueToAdd;
+
+        if (matrixValue == 0.0)
+            _matrixData.Remove(key);
+    }
 
     public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
     {

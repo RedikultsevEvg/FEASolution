@@ -13,4 +13,6 @@ public interface IStiffnessMatrix
     IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements();
 
     IReadOnlyList<IElementNode> Nodes { get; }
+
+    void AddValue(IElementNode firstElement, IElementNode secondElement, MatrixValue valueToAdd);
 }

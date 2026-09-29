@@ -29,6 +29,10 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
     }
 
     public IReadOnlyList<IElementNode> Nodes => _nodes;
+    public void AddValue(IElementNode firstElement, IElementNode secondElement, MatrixValue valueToAdd)
+    {
+        throw new NotImplementedException();
+    }
 
     public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
     {
