@@ -81,7 +81,7 @@ public class StiffnessTriangle2DTemperatureLogicTests
 
     // ---------- Helpers ----------
 
-    private static void AssertMatrixIsValid(StiffnessMatrix matrix)
+    private static void AssertMatrixIsValid(IStiffnessMatrix matrix)
     {
         Assert.Multiple(() =>
         {
@@ -94,7 +94,7 @@ public class StiffnessTriangle2DTemperatureLogicTests
 
     private static void AssertMatrixMatchesExpected(
         IFiniteElement element,
-        StiffnessMatrix matrix,
+        IStiffnessMatrix matrix,
         double[,] expected)
     {
         var nodes = element.Nodes.ToArray();

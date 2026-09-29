@@ -10,5 +10,5 @@ public interface IStiffnessMatrixLogic
     /// <param name="element"></param>
     /// <param name="thermalConductivity">Коэффициент теплопроводности, W/(m·K)</param>
     /// <param name="thickness">Толщина, м</param>
-    StiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness);
+    IStiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness);
 }

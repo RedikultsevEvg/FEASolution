@@ -2,7 +2,7 @@
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
-public sealed class StiffnessMatrix
+public sealed class StiffnessMatrix : IStiffnessMatrix
 {
     private readonly Dictionary<IElementNode, int> _nodeToIndex =
         new(ReferenceEqualityComparer.Instance);

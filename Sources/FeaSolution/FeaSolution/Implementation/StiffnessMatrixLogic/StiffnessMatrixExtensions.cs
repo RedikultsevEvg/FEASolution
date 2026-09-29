@@ -3,8 +3,8 @@
 internal static class StiffnessMatrixExtensions
 {
     public static void AddMatrix(
-        this StiffnessMatrix globalStiffnessMatrix,
-        StiffnessMatrix localMatrix)
+        this IStiffnessMatrix globalStiffnessMatrix,
+        IStiffnessMatrix localMatrix)
     {
         ArgumentNullException.ThrowIfNull(globalStiffnessMatrix);
         ArgumentNullException.ThrowIfNull(localMatrix);
@@ -15,7 +15,7 @@ internal static class StiffnessMatrixExtensions
         }
     }
 
-    public static bool ValidateMatrixIsSymmetric(this StiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
+    public static bool ValidateMatrixIsSymmetric(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);
 
@@ -33,7 +33,7 @@ internal static class StiffnessMatrixExtensions
         return true;
     }
 
-    public static bool ValidateMatrixHasZeroRowSums(this StiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
+    public static bool ValidateMatrixHasZeroRowSums(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);
         var nodes = matrix.Nodes;

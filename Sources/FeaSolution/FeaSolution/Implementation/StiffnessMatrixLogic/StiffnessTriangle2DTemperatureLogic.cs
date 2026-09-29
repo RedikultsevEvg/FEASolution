@@ -15,7 +15,7 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
     private StiffnessMatrix? LocalMatrix { get; set; }
 
     /// <inheritdoc/> 
-    public StiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness)
+    public IStiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness)
     {
         FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
             $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
