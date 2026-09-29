@@ -3,10 +3,17 @@
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 /// <summary>
-/// Stiffness matrix strategy.
+/// Stiffness matrix logic selector.
 /// </summary>
-public static class StiffnessMatrixStrategy
+public static class StiffnessMatrixLogicSelector
 {
+    /// <summary>
+    /// Gets the relevant logic.
+    /// </summary>
+    /// <param name="freedoms"></param>
+    /// <param name="dimensional"></param>
+    /// <param name="nodeCount"></param>
+    /// <returns></returns>
     public static IStiffnessMatrixLogic GetLogic(
         ICollection<Freedom> freedoms, 
         Dimensional dimensional, 
