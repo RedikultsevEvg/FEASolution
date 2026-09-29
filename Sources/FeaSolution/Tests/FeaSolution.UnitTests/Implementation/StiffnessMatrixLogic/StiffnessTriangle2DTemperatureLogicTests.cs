@@ -45,7 +45,7 @@ public class StiffnessTriangle2DTemperatureLogicTests
         var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
 
         // Assert
-        AssertMatrixIsValid(_logic);
+        AssertMatrixIsValid(matrix);
         AssertMatrixMatchesExpected(element, matrix, expectedValues);
     }
 
@@ -75,19 +75,19 @@ public class StiffnessTriangle2DTemperatureLogicTests
         var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
 
         // Assert
-        AssertMatrixIsValid(_logic);
+        AssertMatrixIsValid(matrix);
         AssertMatrixMatchesExpected(element, matrix, expectedValues);
     }
 
     // ---------- Helpers ----------
 
-    private static void AssertMatrixIsValid(StiffnessTriangle2DTemperatureLogic logic)
+    private static void AssertMatrixIsValid(StiffnessMatrix matrix)
     {
         Assert.Multiple(() =>
         {
-            Assert.That(logic.ValidateMatrixIsSymmetric(), Is.True,
+            Assert.That(matrix.ValidateMatrixIsSymmetric(), Is.True,
                 "Stiffness matrix must be symmetric.");
-            Assert.That(logic.ValidateMatrixHasZeroRowSums(), Is.True,
+            Assert.That(matrix.ValidateMatrixHasZeroRowSums(), Is.True,
                 "Stiffness matrix rows must sum to zero.");
         });
     }

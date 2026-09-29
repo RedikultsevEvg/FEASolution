@@ -10,7 +10,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 /// </summary>
 public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 {
-    private IElementNode[] _nodes;
+    private IElementNode[] _nodes = [];
 
     private StiffnessMatrix? LocalMatrix { get; set; }
 
@@ -57,36 +57,6 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
                 LocalMatrix[nodeI, nodeJ] = multiplier * (vectorB[i] * vectorB[j] + vectorC[i] * vectorC[j]);
             }
         }
-    }
-
-    public bool ValidateMatrixIsSymmetric(MatrixValue tolerance = 1e-12)
-    {
-        ArgumentNullException.ThrowIfNull(LocalMatrix);
-
-        for (var i = 0; i < 3; i++)
-        for (var j = i + 1; j < 3; j++)
-        {
-            var nodeI = _nodes[i];
-            var nodeJ = _nodes[j];
-
-            if (Math.Abs(LocalMatrix[nodeI, nodeJ] - LocalMatrix[nodeJ, nodeI]) > tolerance)
-                return false;
-        }
-        return true;
-    }
-
-    public bool ValidateMatrixHasZeroRowSums(MatrixValue tolerance = 1e-12)
-    {
-        ArgumentNullException.ThrowIfNull(LocalMatrix);
-
-        for (var i = 0; i < 3; i++)
-        {
-            var nodeI = _nodes[i];
-
-            var sum = LocalMatrix[nodeI, _nodes[0]] + LocalMatrix[nodeI, _nodes[1]] + LocalMatrix[nodeI, _nodes[2]];
-            if (Math.Abs(sum) > tolerance) return false;
-        }
-        return true;
     }
 
     private static MatrixValue GetElementSquare(
