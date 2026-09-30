@@ -15,10 +15,16 @@ public static class StiffnessMatrixLogicSelector
     /// <param name="nodeCount"></param>
     /// <returns></returns>
     public static IStiffnessMatrixLogic GetLogic(
-        ICollection<Freedom> freedoms, 
-        Dimensional dimensional, 
+        ICollection<Freedom> freedoms,
+        Dimensional dimensional,
         int nodeCount)
     {
-        return new StiffnessTriangle2DTemperatureLogic();
+        if (freedoms.Count == 1 
+            && freedoms.ElementAt(0) == Freedom.Temperature
+            && dimensional == Dimensional.TwoDimensional
+            && nodeCount == 3
+            ) return new StiffnessTriangle2DTemperatureLogic();
+
+        throw new NotSupportedException("The logic for element is not supported");
     }
 }
