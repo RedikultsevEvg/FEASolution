@@ -44,24 +44,45 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// Calculate construction model stiffness matrix.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder Assembly()
+    public async Task<SolutionBuilder> AssemblyAsync(
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(constructionModel.Elements);
-        
+
         var freedoms = constructionModel.Freedoms;
         var elements = constructionModel.Elements;
 
-        IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew();
+        var localMatrices = new IStiffnessMatrix[elements.Count];
 
-        foreach (var finiteElement in elements)
+        var options = new ParallelOptions
         {
-            var logic = StiffnessMatrixLogicSelector.GetLogic(freedoms, finiteElement.Type.NodeType.Dimension,
-                finiteElement.Nodes.Count);
+            CancellationToken = cancellationToken
+        };
 
-            // todo: Здесь нужно передавать опции (материал и геометрические параметры)
-            var localMatrix  = logic.GetMatrix(finiteElement, 4.0, 2.0);
+        await Parallel.ForAsync(
+            fromInclusive: 0,
+            toExclusive: elements.Count,
+            options,
+            (i, _) =>
+            {
+                options.CancellationToken.ThrowIfCancellationRequested();
 
+                var finiteElement = elements.ElementAt(i);
+                var logic = StiffnessMatrixLogicSelector.GetLogic(
+                    freedoms,
+                    finiteElement.Type.NodeType.Dimension,
+                    finiteElement.Nodes.Count);
+
+                // todo: Здесь нужно передавать опции (материал и геометрические параметры)
+                localMatrices[i] = logic.GetMatrix(finiteElement, 4.0, 2.0);
+                return ValueTask.CompletedTask;
+            });
+        
+        IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew();
+        foreach (var localMatrix in localMatrices)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             globalStiffnessMatrix.AddMatrix(localMatrix);
         }
 

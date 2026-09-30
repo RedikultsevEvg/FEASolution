@@ -12,13 +12,13 @@ namespace FeaSolution.UnitTests.Performance;
 public class SolutionBuilderPerformanceTests
 {
     /// <summary>
-    /// Прогрев JIT: первый вызов Assembly() компилирует методы и инициализирует
+    /// Прогрев JIT: первый вызов AssemblyAsync() компилирует методы и инициализирует
     /// статические поля — это может исказить замер.
     /// </summary>
     [OneTimeSetUp]
     public void WarmUp()
     {
-        _ = new SolutionBuilder(TriangularMeshFactory.Create(100)).Assembly();
+        _ = new SolutionBuilder(TriangularMeshFactory.Create(100)).AssemblyAsync();
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class SolutionBuilderPerformanceTests
     [TestCase(2_500)]
     [TestCase(5_000)]
     [TestCase(10_000)]
-    public void Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount)
+    public async Task Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount)
     {
         // Arrange
         var model = TriangularMeshFactory.Create(elementCount);
@@ -40,7 +40,7 @@ public class SolutionBuilderPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        builder.Assembly();
+        await builder.AssemblyAsync();
         sw.Stop();
 
         // Assert + диагностика
@@ -61,14 +61,14 @@ public class SolutionBuilderPerformanceTests
     /// при увеличении числа элементов в 4 раза.
     /// </summary>
     [Test]
-    public void Assembly_ScalesRoughlyLinearly_WithElementCount()
+    public async Task Assembly_ScalesRoughlyLinearly_WithElementCount()
     {
         const int smallCount = 1_000;
         const int largeCount = 4_000;
-        const int expectedScaling = 12;
+        const int expectedScaling = 8;
 
-        var smallTime = MeasureAssembly(smallCount);
-        var largeTime = MeasureAssembly(largeCount);
+        var smallTime = await MeasureAssemblyAsync(smallCount);
+        var largeTime = await MeasureAssemblyAsync(largeCount);
 
         var ratio = largeTime / (double)Math.Max(smallTime, 1);
 
@@ -77,7 +77,7 @@ public class SolutionBuilderPerformanceTests
             $"large({largeCount})={largeTime} ms, " +
             $"ratio={ratio:F2} (elements ratio = {largeCount / (double)smallCount})");
 
-        // Ожидаем ~4x, допускаем до 10x (запас на шум и GC).
+        // Ожидаем ~4x, допускаем до 8x (запас на шум и GC).
         Assert.That(
             ratio,
             Is.LessThan(expectedScaling),
@@ -99,7 +99,7 @@ public class SolutionBuilderPerformanceTests
         var builder = new SolutionBuilder(model);
 
         var sw = Stopwatch.StartNew();
-        Assert.DoesNotThrow(() => builder.Assembly());
+        Assert.DoesNotThrowAsync(() => builder.AssemblyAsync());
         sw.Stop();
 
         TestContext.WriteLine(
@@ -109,14 +109,14 @@ public class SolutionBuilderPerformanceTests
     [Test]
     //[Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
     [TestCase(50_000, 2_000)]
-    [TestCase(100_000, 5_000)]
-    public void Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)
+    [TestCase(100_000, 4_000)]
+    public async Task Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)
     {
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
 
         var sw = Stopwatch.StartNew();
-        builder.Assembly();
+        await builder.AssemblyAsync();
         sw.Stop();
 
         TestContext.WriteLine(
@@ -125,17 +125,17 @@ public class SolutionBuilderPerformanceTests
         Assert.That(sw.ElapsedMilliseconds, Is.LessThan(expectedMaxMiliSeconds));
     }
 
-    private static long MeasureAssembly(int elementCount)
+    private static async Task<long> MeasureAssemblyAsync(int elementCount)
     {
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
 
         // Прогрев на маленькой модели
         _ = new SolutionBuilder(TriangularMeshFactory.Create(50))
-            .Assembly();
+            .AssemblyAsync();
 
         var sw = Stopwatch.StartNew();
-        builder.Assembly();
+        await builder.AssemblyAsync();
         sw.Stop();
         return sw.ElapsedMilliseconds;
     }

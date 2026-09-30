@@ -32,7 +32,8 @@ internal static class Model2DTwoTriangles
             .Build();
 
         var solution = new SolutionBuilder(model)
-            .Assembly()
+            .AssemblyAsync()
+            .Result
             .ValidateForCountOfElement()
             .ValidateForCommonElements()
             .ValidateForQualityOfElements()
