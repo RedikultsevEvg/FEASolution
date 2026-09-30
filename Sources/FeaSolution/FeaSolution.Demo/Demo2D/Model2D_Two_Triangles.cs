@@ -13,7 +13,7 @@ internal static class Model2DTwoTriangles
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
-                Thickness = 0.06,
+                Thickness = 4.4,
             })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
@@ -26,7 +26,7 @@ internal static class Model2DTwoTriangles
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
-                Thickness = 0.06,
+                Thickness = 5.6,
             })
             .AddNode(2.0, 2.0)
             .AddNode(2.0, 0)

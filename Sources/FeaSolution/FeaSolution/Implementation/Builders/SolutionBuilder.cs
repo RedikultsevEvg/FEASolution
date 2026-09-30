@@ -40,6 +40,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         };
     }
 
+    // todo: вернуть синхронный метод
     /// <summary>
     /// Calculate construction model stiffness matrix.
     /// </summary>
