@@ -256,22 +256,6 @@ public class FiniteElementBuilderTests
         Assert.That(element.Type.NodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
     }
 
-    [Test]
-    public void Build_ShouldSetStiffnessMatrixCalculationMethodToNull()
-    {
-        // Arrange
-        _builder
-            .SetFreedoms(Freedom.Temperature)
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
-            .AddNode(1.3, 2.4);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element.Type.StiffnessMatrixCalculationMethod, Is.Null);
-    }
-
     #endregion
 
     #region SetNodesType

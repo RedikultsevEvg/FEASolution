@@ -16,6 +16,4 @@ public class FiniteElementType
     /// Finite element node type.
     /// </summary>
     public required ElementNodeType NodeType { get; init; }
-
-    public required Action<MatrixValue> StiffnessMatrixCalculationMethod { get; init; }
 }

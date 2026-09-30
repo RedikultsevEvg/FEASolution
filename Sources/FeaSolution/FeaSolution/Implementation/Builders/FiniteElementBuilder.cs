@@ -34,7 +34,6 @@ public class FiniteElementBuilder
         {
             NodeType = NodeType,
             Freedoms = elementTypeFreedoms,
-            StiffnessMatrixCalculationMethod = null!
         };
 
         var newElement = new FiniteElement

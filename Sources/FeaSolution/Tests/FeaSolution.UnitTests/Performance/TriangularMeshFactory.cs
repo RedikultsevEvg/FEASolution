@@ -68,7 +68,6 @@ internal static class TriangularMeshFactory
             {
                 NodeType = ElementNodeType.Type2D,
                 Freedoms = [ Freedom.Temperature ],
-                StiffnessMatrixCalculationMethod = null!
             }
         };
     }
