@@ -1,22 +1,16 @@
-﻿using FeaSolution.Core.Types;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo3D;
 
 internal static class Model3DExamples
 {
-    public static void Build_Empty_Model()
-    {
-        var modelBuilder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3D);
-
-        modelBuilder.Build();
-    }
-
     public static void Build_Model_From_Element()
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(3.4, 35.9, 5)
             .AddNode(5.7, 22, 7)
             .AddNode(2.5, 3.8, 2)
@@ -32,6 +26,7 @@ internal static class Model3DExamples
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(3.4, 35.9, 5)
             .AddNode(5.7, 22, 7)
             .AddNode(2.5, 3.8, 2)
@@ -39,6 +34,7 @@ internal static class Model3DExamples
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(2.444, 1, 3.6)
             .AddNode(504.7f, 2, 7.5)
             .AddNode(254.54, 34, 3.9)
@@ -46,6 +42,7 @@ internal static class Model3DExamples
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(2.444, 1, 3.6)
             .AddNode(504.7f, 2, 7.5)
             .AddNode(254.54, 34, 3.9)
@@ -61,6 +58,7 @@ internal static class Model3DExamples
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(3.4, 35.9, 5)
             .AddNode(5.7, 22, 7)
             .AddNode(2.5, 3.8, 2)
@@ -68,6 +66,7 @@ internal static class Model3DExamples
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(2.444, 1, 3.6)
             .AddNode(504.7f, 2, 7.5)
             .AddNode(254.54, 34, 3.9)
@@ -75,6 +74,7 @@ internal static class Model3DExamples
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type3D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(2.444, 1, 3.6)
             .AddNode(504.7f, 2, 7.5)
             .AddNode(254.54, 34, 3.9)

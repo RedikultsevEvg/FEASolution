@@ -1,22 +1,16 @@
-﻿using FeaSolution.Core.Types;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo1D;
 
 internal static class Model1DExamples
 {
-    public static void Build_Empty_ConstructionModel()
-    {
-        var modelBuilder = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type1D);
-
-        modelBuilder.Build();
-    }
-
     public static void Build_Model_From_Element()
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
@@ -32,6 +26,7 @@ internal static class Model1DExamples
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
@@ -42,12 +37,14 @@ internal static class Model1DExamples
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
+            .SetFreedoms(Freedom.Temperature)
             .Build();
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(254.54)
             .Build();
 
@@ -64,11 +61,13 @@ internal static class Model1DExamples
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
+            .SetFreedoms(Freedom.Temperature)
             .Build();
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(504.7f)
             .AddNode(254.54)
             .Build();
@@ -77,6 +76,7 @@ internal static class Model1DExamples
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
+            .SetFreedoms(Freedom.Temperature)
             .AddNode(254.54)
             .Build();
 
