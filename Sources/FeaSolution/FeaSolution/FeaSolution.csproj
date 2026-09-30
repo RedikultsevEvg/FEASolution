@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Entities\" />
+    <Compile Remove="Core\Entities\**" />
+    <EmbeddedResource Remove="Core\Entities\**" />
+    <None Remove="Core\Entities\**" />
   </ItemGroup>
 
 </Project>
