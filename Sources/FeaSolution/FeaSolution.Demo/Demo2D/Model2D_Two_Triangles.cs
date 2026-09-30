@@ -10,7 +10,11 @@ internal static class Model2DTwoTriangles
     public static void Get_Solution_For_Two_Triangles_Example()
     {
         var element1 = new FiniteElementBuilder()
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
             .AddNode(2.0, 2.0)
@@ -19,7 +23,11 @@ internal static class Model2DTwoTriangles
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type2D)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .AddNode(2.0, 2.0)
             .AddNode(2.0, 0)
             .AddNode(4.0, 1.0)

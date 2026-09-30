@@ -10,7 +10,11 @@ internal static class Model1DExamples
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 3.5,
+                Thickness = 2.8,
+            })
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
@@ -26,7 +30,11 @@ internal static class Model1DExamples
     {
         var element1 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 3.5, 
+                Thickness = 2.8,
+            })
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
@@ -37,14 +45,22 @@ internal static class Model1DExamples
             .AddNode(2.444)
             .AddNode(504.7f)
             .AddNode(254.54)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 4,
+                Thickness = 0.5,
+            })
             .Build();
 
         var element3 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .AddNode(254.54)
             .Build();
 
@@ -61,13 +77,21 @@ internal static class Model1DExamples
             .AddNode(3.4)
             .AddNode(5.7)
             .AddNode(2.5)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .Build();
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .AddNode(504.7f)
             .AddNode(254.54)
             .Build();
@@ -76,7 +100,11 @@ internal static class Model1DExamples
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(2.444)
             .AddNode(504.7f)
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 0.67,
+                Thickness = 0.06,
+            })
             .AddNode(254.54)
             .Build();
 

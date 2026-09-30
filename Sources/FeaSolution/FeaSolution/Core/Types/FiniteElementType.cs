@@ -1,4 +1,5 @@
 using FeaSolution.Core.Enums;
+using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Core.Types;
 
@@ -8,9 +9,9 @@ namespace FeaSolution.Core.Types;
 public class FiniteElementType
 {
     /// <summary>
-    /// Collection of degree of freedom.
+    /// Collection of pairs: freedom and options.
     /// </summary>
-    public required ICollection<Freedom> Freedoms { get; init; }
+    public required ICollection<(Freedom, IElementOptions)> Freedoms { get; init; }
 
     /// <summary>
     /// Finite element node type.

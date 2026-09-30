@@ -182,9 +182,9 @@ public class ConstructionModelBuilderTests
         var model = builder.Build();
 
         // Assert
-        Assert.That(model.Freedoms, Is.Not.Null);
-        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(model.Freedoms, Has.Count.EqualTo(1));
+        Assert.That(model.CommonFreedoms, Is.Not.Null);
+        Assert.That(model.CommonFreedoms.ElementAt(0), Is.EqualTo(Freedom.Temperature));
+        Assert.That(model.CommonFreedoms, Has.Count.EqualTo(1));
     }
 
     [Test]
@@ -201,9 +201,9 @@ public class ConstructionModelBuilderTests
         var model = builder.Build();
 
         // Assert
-        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(model.Freedoms, Does.Contain(Freedom.AnotherFreedom));
-        Assert.That(model.Freedoms, Has.Count.EqualTo(2));
+        Assert.That(model.CommonFreedoms.ElementAt(0), Is.EqualTo(Freedom.Temperature));
+        Assert.That(model.CommonFreedoms.ElementAt(1), Is.EqualTo(Freedom.AnotherFreedom));
+        Assert.That(model.CommonFreedoms, Has.Count.EqualTo(2));
     }
 
     [Test]
@@ -266,9 +266,9 @@ public class ConstructionModelBuilderTests
         var model = builder.Build();
 
         // Assert
-        Assert.That(model.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(model.Freedoms, Does.Contain(Freedom.AnotherFreedom));
-        Assert.That(model.Freedoms, Has.Count.EqualTo(2));
+        Assert.That(model.CommonFreedoms.ElementAt(0), Is.EqualTo(Freedom.Temperature));
+        Assert.That(model.CommonFreedoms.ElementAt(1), Is.EqualTo(Freedom.AnotherFreedom));
+        Assert.That(model.CommonFreedoms, Has.Count.EqualTo(2));
     }
 
     #endregion
@@ -512,8 +512,16 @@ public class ConstructionModelBuilderTests
     private static IFiniteElement CreateTestElement(Dimensional dimension, params Freedom[] freedoms)
     {
         var builder = new FiniteElementBuilder()
-            .SetFreedoms(freedoms)
             .SetNodesType(GetNodeType(dimension));
+
+        foreach (var freedom in freedoms)
+        {
+            builder.AddFreedom(freedom, new TemperatureElementOptions
+            {
+                ThermalConductivity = 1,
+                Thickness = 1
+            });
+        }
 
         switch (dimension)
         {

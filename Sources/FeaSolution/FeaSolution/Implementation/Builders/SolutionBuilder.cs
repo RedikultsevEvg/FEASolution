@@ -50,7 +50,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(constructionModel.Elements);
 
-        var freedoms = constructionModel.Freedoms;
+        var freedoms = constructionModel.CommonFreedoms;
         var elements = constructionModel.Elements;
 
         var localMatrices = new IStiffnessMatrix[elements.Count];
@@ -75,7 +75,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                     finiteElement.Nodes.Count);
 
                 // todo: Здесь нужно передавать опции (материал и геометрические параметры)
-                localMatrices[i] = logic.GetMatrix(finiteElement, 4.0, 2.0);
+                localMatrices[i] = logic.GetMatrix(finiteElement);
                 return ValueTask.CompletedTask;
             });
         

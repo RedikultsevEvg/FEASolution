@@ -13,7 +13,7 @@ public class ConstructionModel : IConstructionModel
     /// <inheritdoc/>
     public ICollection<IFiniteElement> Elements { get; init; } = (List<IFiniteElement>)[];
 
-    public ICollection<Freedom> Freedoms { get; init; } = [];
+    public ICollection<Freedom> CommonFreedoms { get; init; } = [];
 
 
     public ICollection<IElementNode> GetNodes()

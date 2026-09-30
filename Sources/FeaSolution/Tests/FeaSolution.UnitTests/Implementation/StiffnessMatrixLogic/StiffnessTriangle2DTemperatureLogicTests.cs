@@ -32,9 +32,13 @@ public class StiffnessTriangle2DTemperatureLogicTests
             { -1.000,  2.500, -1.500 },
             { -1.000, -1.500,  2.500 }
         };
-
+        
         var element = new FiniteElementBuilder()
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                Thickness = thickness,
+                ThermalConductivity = thermalConductivity
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
             .AddNode(2.0, 2.0)
@@ -42,7 +46,7 @@ public class StiffnessTriangle2DTemperatureLogicTests
             .Build("The test triangle");
 
         // Act
-        var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
+        var matrix = _logic.GetMatrix(element);
 
         // Assert
         AssertMatrixIsValid(matrix);
@@ -64,7 +68,11 @@ public class StiffnessTriangle2DTemperatureLogicTests
         };
 
         var element = new FiniteElementBuilder()
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                Thickness = thickness,
+                ThermalConductivity = thermalConductivity
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(2.0, 2.0)
             .AddNode(4.0, 1.0)
@@ -72,7 +80,7 @@ public class StiffnessTriangle2DTemperatureLogicTests
             .Build("The test triangle");
 
         // Act
-        var matrix = _logic.GetMatrix(element, thermalConductivity, thickness);
+        var matrix = _logic.GetMatrix(element);
 
         // Assert
         AssertMatrixIsValid(matrix);

@@ -27,7 +27,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4);
 
@@ -44,7 +48,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4);
 
@@ -61,7 +69,11 @@ public class FiniteElementBuilderTests
         // Arrange
         const string userId = "user-123";
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4);
 
@@ -79,7 +91,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4);
 
@@ -96,7 +112,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type1D)
             .AddNode(1.3);
 
@@ -113,7 +133,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4);
 
@@ -130,7 +154,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(ElementNodeType.Type2D)
             .AddNode(1.3, 2.4)
             .AddNode(2.3, 3.4)
@@ -148,7 +176,12 @@ public class FiniteElementBuilderTests
     public void Build_WithEmptyNodes_ShouldThrowWithExpectedMessage()
     {
         // Arrange
-        _builder.SetFreedoms(Freedom.Temperature);
+        _builder
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            });
 
         // Act
         var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.Build());
@@ -171,7 +204,7 @@ public class FiniteElementBuilderTests
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(
-            "Can't build element with empty freedom collection. Use 'SetFreedoms' to add freedoms."));
+            "Can't build element with empty freedom collection. Use 'AddFreedom' to add freedoms."));
     }
 
     [Test]
@@ -189,7 +222,16 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature, Freedom.AnotherFreedom)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
+            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
             .AddNode(1.3, 2.4);
 
@@ -198,8 +240,8 @@ public class FiniteElementBuilderTests
 
         // Assert
         Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
-        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(element.Type.Freedoms.ElementAt(0).Item1, Is.EqualTo(Freedom.Temperature));
+        Assert.That(element.Type.Freedoms.ElementAt(1).Item1, Is.EqualTo(Freedom.AnotherFreedom));
     }
 
     [Test]
@@ -207,7 +249,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
             .AddNode(1.1, 2.2)
             .AddNode(3.3, 4.4);
@@ -228,7 +274,11 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
             .AddNode(1.3, 2.4);
 
@@ -245,7 +295,11 @@ public class FiniteElementBuilderTests
         // Arrange
         var nodeType = CreateNodeType(Dimensional.ThreeDimensional);
         _builder
-            .SetFreedoms(Freedom.Temperature)
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
             .SetNodesType(nodeType)
             .AddNode(1.0, 2.0, 3.0);
 
@@ -354,7 +408,12 @@ public class FiniteElementBuilderTests
     public void SetFreedoms_WithValidFreedoms_ShouldReturnSameBuilderInstance()
     {
         // Act
-        var result = _builder.SetFreedoms(Freedom.Temperature);
+        var result = _builder
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            });
 
         // Assert
         Assert.That(result, Is.SameAs(_builder));
@@ -369,7 +428,22 @@ public class FiniteElementBuilderTests
             .AddNode(1.3, 2.4);
 
         // Act
-        _builder.SetFreedoms(Freedom.Temperature, Freedom.AnotherFreedom, Freedom.AnotherFreedom);
+        _builder
+            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
+            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            })
+            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            });
         var element = _builder.Build();
 
         // Assert
@@ -385,32 +459,31 @@ public class FiniteElementBuilderTests
             .AddNode(1.3, 2.4);
 
         // Act
-        _builder.SetFreedoms(Freedom.Temperature);
-        _builder.SetFreedoms(Freedom.AnotherFreedom);
+        _builder.AddFreedom(Freedom.Temperature, new TemperatureElementOptions
+        {
+            ThermalConductivity = 2,
+            Thickness = 1
+        });
+        _builder
+            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
+            {
+                ThermalConductivity = 2,
+                Thickness = 1
+            });
         var element = _builder.Build();
 
         // Assert
         Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
-        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.Temperature));
-        Assert.That(element.Type.Freedoms, Does.Contain(Freedom.AnotherFreedom));
+        Assert.That(element.Type.Freedoms.ElementAt(0).Item1, Is.EqualTo(Freedom.Temperature));
+        Assert.That(element.Type.Freedoms.ElementAt(1).Item1, Is.EqualTo(Freedom.AnotherFreedom));
     }
 
     [Test]
     public void SetFreedoms_WithNull_ShouldThrowArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => _builder.SetFreedoms(null!));
-    }
-
-    [Test]
-    public void SetFreedoms_WithEmptyCollection_ShouldThrowWithExpectedMessage()
-    {
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(
-            () => _builder.SetFreedoms(Array.Empty<Freedom>()));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("Can't add empty freedom collection."));
+        Assert.Throws<FeaElementBuilderException>(() => _builder
+            .AddFreedom(Freedom.Temperature, null!));
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
+using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
@@ -14,14 +15,31 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 
     private IStiffnessMatrix? LocalMatrix { get; set; }
 
+    // todo: здесь надо учесть что в элементе могут быть разные свободы
     /// <inheritdoc/> 
-    public IStiffnessMatrix GetMatrix(IFiniteElement element, MatrixValue thermalConductivity, MatrixValue thickness)
+    public IStiffnessMatrix GetMatrix(IFiniteElement element)
     {
         FeaCommonException.ThrowIfTrue(element.Type.NodeType.Dimension != Dimensional.TwoDimensional,
             $"Accepted only TwoDimensional element. Current element dimention is '{element.Type.NodeType.Dimension.ToString()}'");
 
         FeaCommonException.ThrowIfTrue(element.Nodes.Count != 3,
             $"Accepted only Triangle element (node count is 3). Current node count is '{element.Nodes.Count}'");
+
+        FeaCommonException.ThrowIfTrue(element.Type.Freedoms.Count != 1, 
+            $"Accepted only element with one Freedom. Current freedom count is '{element.Type.Freedoms.Count}'");
+
+        FeaCommonException.ThrowIfTrue(element.Type.Freedoms.ElementAt(0).Item1 != Freedom.Temperature, 
+            $"Accepted one element with '{nameof(Freedom.Temperature)}'. Current element freedom is '{element.Type.Freedoms.ElementAt(0).Item1}'");
+
+        if (element.Type.Freedoms.ElementAt(0).Item2 is not TemperatureElementOptions elementOption)
+        {
+            throw new FeaCommonException(
+                $"Options must be of type '{nameof(TemperatureElementOptions)}'. " +
+                $"Current options type is '{element.Type.Freedoms.ElementAt(0).Item2.GetType().Name}'");
+        }
+
+        var thermalConductivity = elementOption!.ThermalConductivity;
+        var thickness = elementOption.Thickness;
 
         _nodes = [.. element.Nodes];
 

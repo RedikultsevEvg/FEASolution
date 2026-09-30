@@ -1,6 +1,7 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
+using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.ConstructionModels;
 using FeaSolution.Implementation.ElementNodes;
 using FeaSolution.Implementation.FiniteElements;
@@ -50,24 +51,32 @@ internal static class TriangularMeshFactory
                 elements.Add(CreateTriangle(n00, n11, n01));
             }
 
+        // todo: use builder
         return new ConstructionModel
         {
             AllowedNodeType = ElementNodeType.Type2D,
             Elements = elements,
-            Freedoms = [Freedom.Temperature]
+            CommonFreedoms = [Freedom.Temperature]
         };
     }
 
     private static IFiniteElement CreateTriangle(
         IElementNode a, IElementNode b, IElementNode c)
     {
+        var option = new TemperatureElementOptions
+        {
+            ThermalConductivity = 4,
+            Thickness = 2
+        };
+
+        // todo: use builder
         return new FiniteElement
         {
             Nodes = [a, b, c],
             Type = new FiniteElementType
             {
                 NodeType = ElementNodeType.Type2D,
-                Freedoms = [ Freedom.Temperature ],
+                Freedoms = [ (Freedom.Temperature, option) ],
             }
         };
     }

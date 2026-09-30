@@ -14,7 +14,7 @@ public class FiniteElementBuilder
 
     private ICollection<IElementNode> Nodes { get; } = [];
 
-    private List<Freedom> Freedoms { get; } = new();
+    private List<(Freedom, IElementOptions)> Freedoms { get; } = [];
 
     /// <summary>
     /// Creates a new finite element.
@@ -25,9 +25,9 @@ public class FiniteElementBuilder
         ArgumentNullException.ThrowIfNull(NodeType);
         ArgumentNullException.ThrowIfNull(Nodes);
         FeaElementBuilderException.ThrowIfTrue(Nodes.Count == 0, $"Can't build element with empty node collection. Use '{nameof(AddNode)}' to add nodes.");
-        FeaElementBuilderException.ThrowIfTrue(Freedoms.Count == 0, $"Can't build element with empty freedom collection. Use '{nameof(SetFreedoms)}' to add freedoms.");
+        FeaElementBuilderException.ThrowIfTrue(Freedoms.Count == 0, $"Can't build element with empty freedom collection. Use '{nameof(AddFreedom)}' to add freedoms.");
 
-        var elementTypeFreedoms = new List<Freedom>();
+        var elementTypeFreedoms = new List<(Freedom, IElementOptions)>();
         elementTypeFreedoms.AddRange(Freedoms);
 
         var elementType = new FiniteElementType
@@ -132,16 +132,15 @@ public class FiniteElementBuilder
     }
 
     /// <summary>
-    /// Sets the collection of freedom.
+    /// Adds freedom and options to element.
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public FiniteElementBuilder SetFreedoms(params ICollection<Freedom> freedoms)
+    /// <param name="freedom"></param>
+    /// <param name="options"></param>
+    /// <returns>The reference to the current builder.</returns>
+    public FiniteElementBuilder AddFreedom(Freedom freedom, IElementOptions options)
     {
-        ArgumentNullException.ThrowIfNull(freedoms);
-        FeaElementBuilderException.ThrowIfTrue(freedoms.Count == 0, "Can't add empty freedom collection.");
-
-        Freedoms.AddRange(freedoms);
+        FeaElementBuilderException.ThrowIfTrue(options == null!, "Can't add null options.");
+        Freedoms.Add((freedom,options)!);
         return this;
     }
 }

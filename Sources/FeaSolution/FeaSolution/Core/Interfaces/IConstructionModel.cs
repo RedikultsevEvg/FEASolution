@@ -21,5 +21,5 @@ public interface IConstructionModel
     /// <summary>
     /// Collection of degree of freedom.
     /// </summary>
-    ICollection<Freedom> Freedoms { get; init; }
+    ICollection<Freedom> CommonFreedoms { get; init; }
 }

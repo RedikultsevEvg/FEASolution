@@ -32,7 +32,7 @@ public class ConstructionModelBuilder
             $"Can't build the model with empty element collection. Use '{nameof(AddElements)}' to add elements.");
 
         var freedomsIntersection = Elements
-            .Select(e => e.Type.Freedoms.AsEnumerable())
+            .Select(e => e.Type.Freedoms.Select(f => f.Item1))
             .Aggregate((current, next) => current.Intersect(next))
             .ToArray();
 
@@ -44,7 +44,7 @@ public class ConstructionModelBuilder
         {
             AllowedNodeType = NodeType,
             Elements = Elements,
-            Freedoms = freedomsIntersection
+            CommonFreedoms = freedomsIntersection
         };
     }
 
