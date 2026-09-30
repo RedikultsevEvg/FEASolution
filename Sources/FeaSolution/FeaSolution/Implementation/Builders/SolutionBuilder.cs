@@ -53,7 +53,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         var freedoms = constructionModel.Freedoms;
         var elements = constructionModel.Elements;
 
-        var localMatrices = new IStiffnessMatrix[elements.Count];
+        IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew();
 
         var options = new ParallelOptions
         {
@@ -75,16 +75,11 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                     finiteElement.Nodes.Count);
 
                 // todo: Здесь нужно передавать опции (материал и геометрические параметры)
-                localMatrices[i] = logic.GetMatrix(finiteElement, 4.0, 2.0);
+                var localMatrix = logic.GetMatrix(finiteElement, 4.0, 2.0);
+                globalStiffnessMatrix.AddMatrix(localMatrix);
+
                 return ValueTask.CompletedTask;
             });
-        
-        IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew();
-        foreach (var localMatrix in localMatrices)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            globalStiffnessMatrix.AddMatrix(localMatrix);
-        }
 
         return this;
     }
