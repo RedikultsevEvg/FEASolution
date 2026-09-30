@@ -12,8 +12,6 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
 
     private readonly Dictionary<long, MatrixValue> _matrixData = [];
 
-    private readonly Lock _addValue = new();
-
     internal MatrixValue DefaultValue { get; } = 0.0;
 
     public int NodeCount => _nodeToIndex.Count;
@@ -25,19 +23,15 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
     {
         if (valueToAdd == 0.0) return;
 
-        lock (_addValue)
-        {
-            var ia = GetOrAddIndex(firstElement);
-            var ib = GetOrAddIndex(secondElement);
-            var key = GetKey(ia, ib);
+        var ia = GetOrAddIndex(firstElement);
+        var ib = GetOrAddIndex(secondElement);
+        var key = GetKey(ia, ib);
 
-            ref var matrixValue = ref CollectionsMarshal.GetValueRefOrAddDefault(_matrixData, key, out _);
+        ref var matrixValue = ref CollectionsMarshal.GetValueRefOrAddDefault(_matrixData, key, out _);
+        matrixValue += valueToAdd;
 
-            matrixValue += valueToAdd;
-
-            if (matrixValue == 0.0)
-                _matrixData.Remove(key);
-        }
+        if (matrixValue == 0.0)
+            _matrixData.Remove(key);
     }
 
     public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
