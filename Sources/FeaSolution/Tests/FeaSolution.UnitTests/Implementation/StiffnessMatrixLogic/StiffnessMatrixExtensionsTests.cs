@@ -22,7 +22,7 @@ public class StiffnessMatrixExtensionsTests
         var nodes = new[] { node1, node2, node3, node4 };
 
         // Локальная матрица E1 (соответствует узлам 1, 2, 3).
-        var k1 = new StiffnessMatrix
+        var k1 = new SmallStiffnessMatrix([node1, node2, node3])
         {
             [node1, node1] = 0.500,
             [node1, node2] = -0.250,
@@ -33,7 +33,7 @@ public class StiffnessMatrixExtensionsTests
         };
 
         // Локальная матрица E2 (соответствует узлам 2, 4, 3).
-        var k2 = new StiffnessMatrix
+        var k2 = new SmallStiffnessMatrix([node2, node4, node3])
         {
             [node2, node2] = 0.625,
             [node2, node4] = -0.250,
@@ -86,7 +86,7 @@ public class StiffnessMatrixExtensionsTests
 
         var nodes = new[] { node1, node2, node3, node4 };
 
-        var k1 = new StiffnessMatrix
+        var k1 = new SmallStiffnessMatrix([node1, node2, node3])
         {
             [node1, node1] = 0.500,
             [node1, node2] = -0.250,
@@ -96,7 +96,7 @@ public class StiffnessMatrixExtensionsTests
             [node3, node3] = 0.625,
         };
 
-        var k2 = new StiffnessMatrix
+        var k2 = new SmallStiffnessMatrix([node4, node3, node2])
         {
             [node2, node2] = 0.625,
             [node2, node4] = -0.250,
@@ -137,7 +137,7 @@ public class StiffnessMatrixExtensionsTests
 
         var nodes = new[] { node1, node2, node3, node4 };
 
-        var k1 = new StiffnessMatrix
+        var k1 = new SmallStiffnessMatrix([node1, node2, node3])
         {
             [node1, node1] = 0.500,
             [node1, node2] = -0.250,
@@ -147,7 +147,7 @@ public class StiffnessMatrixExtensionsTests
             [node3, node3] = 0.625,
         };
 
-        var k2 = new StiffnessMatrix
+        var k2 = new SmallStiffnessMatrix([node2, node3, node4])
         {
             [node2, node2] = 0.625,
             [node2, node4] = -0.250,
