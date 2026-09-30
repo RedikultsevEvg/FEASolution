@@ -19,12 +19,12 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
     /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;
 
-    public void AddValue(IElementNode firstElement, IElementNode secondElement, MatrixValue valueToAdd)
+    public void AddValue(IElementNode firstNode, IElementNode secondNode, MatrixValue valueToAdd)
     {
         if (valueToAdd == 0.0) return;
 
-        var ia = GetOrAddIndex(firstElement);
-        var ib = GetOrAddIndex(secondElement);
+        var ia = GetOrAddIndex(firstNode);
+        var ib = GetOrAddIndex(secondNode);
         var key = GetKey(ia, ib);
 
         ref var matrixValue = ref CollectionsMarshal.GetValueRefOrAddDefault(_matrixData, key, out _);

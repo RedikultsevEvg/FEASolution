@@ -14,5 +14,5 @@ public interface IStiffnessMatrix
 
     IReadOnlyList<IElementNode> Nodes { get; }
 
-    void AddValue(IElementNode firstElement, IElementNode secondElement, MatrixValue valueToAdd);
+    void AddValue(IElementNode firstNode, IElementNode secondNode, MatrixValue valueToAdd);
 }
