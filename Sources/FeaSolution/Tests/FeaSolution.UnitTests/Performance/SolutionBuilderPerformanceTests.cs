@@ -115,12 +115,21 @@ public class SolutionBuilderPerformanceTests
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
 
+        var nodeCount = model.Elements.Sum(e => e.Nodes.Count);
+        var uniqueNodeCount = model.Elements
+            .SelectMany(e => e.Nodes)
+            .Distinct(ReferenceEqualityComparer.Instance)
+            .Count();
+
         var sw = Stopwatch.StartNew();
         await builder.AssemblyAsync();
         sw.Stop();
 
         TestContext.WriteLine(
-            $"elements={elementCount}, time={sw.ElapsedMilliseconds} ms");
+            $"Elements: {elementCount}, " +
+            $"Node refs: {nodeCount}, " +
+            $"Unique nodes: {uniqueNodeCount}, " +
+            $"Elapsed: {sw.ElapsedMilliseconds} ms");
 
         Assert.That(sw.ElapsedMilliseconds, Is.LessThan(expectedMaxMiliSeconds));
     }
