@@ -1,4 +1,5 @@
-﻿using FeaSolution.Core.Interfaces;
+﻿using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
 
 namespace FeaSolution.Implementation.StiffnessMatrixs;
 
@@ -7,6 +8,8 @@ namespace FeaSolution.Implementation.StiffnessMatrixs;
 /// </summary>
 public sealed class SmallStiffnessMatrix : IStiffnessMatrix
 {
+    private const int MaxNodeCount = 12;
+
     private readonly IElementNode[] _nodes;
     
     // packed upper triangle
@@ -23,8 +26,8 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
     public SmallStiffnessMatrix(IReadOnlyList<IElementNode> nodes)
     {
         ArgumentNullException.ThrowIfNull(nodes);
-        if (nodes.Count == 0)
-            throw new ArgumentException("Nodes cannot be empty.", nameof(nodes));
+        FeaCommonException.ThrowIfTrue(nodes.Count == 0, "Nodes cannot be empty.");
+        FeaCommonException.ThrowIfTrue(nodes.Count > MaxNodeCount, $"{nameof(SmallStiffnessMatrix)} supports at most {MaxNodeCount} nodes.");
 
         _nodes = [.. nodes];
         var n = _nodes.Length;

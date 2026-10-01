@@ -1,4 +1,5 @@
-﻿using FeaSolution.Core.Interfaces;
+﻿using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Implementation.StiffnessMatrixs;
 using Moq;
 using Throws = NUnit.Framework.Throws;
@@ -33,23 +34,70 @@ public class SmallStiffnessMatrixTests
         IReadOnlyList<IElementNode>? nodes = null;
 
         // Act
-        SmallStiffnessMatrix Act() => new(nodes!);
+        var act = () => new SmallStiffnessMatrix(nodes!);
 
         // Assert
-        Assert.That(((Func<SmallStiffnessMatrix>?)Act)!, Throws.TypeOf<ArgumentNullException>());
+        var ex = Assert.Throws<ArgumentNullException>(() => act());
+        Assert.That(ex!.ParamName, Is.EqualTo("nodes"));
     }
 
     [Test]
-    public void Constructor_WithEmptyNodes_ThrowsArgumentException()
+    public void Constructor_WithEmptyNodes_ThrowsFeaCommonException_WithExpectedMessage()
     {
         // Arrange
         var nodes = Array.Empty<IElementNode>();
 
         // Act
-        SmallStiffnessMatrix Func() => new(nodes);
+        var act = () => new SmallStiffnessMatrix(nodes);
 
         // Assert
-        Assert.That((Func<SmallStiffnessMatrix>?)Func!, Throws.TypeOf<ArgumentException>());
+        var ex = Assert.Throws<FeaCommonException>(() => act());
+        Assert.That(ex!.Message, Is.EqualTo("Nodes cannot be empty."));
+    }
+
+    [Test]
+    public void Constructor_WithThirteenNodes_ThrowsFeaCommonException_WithExpectedMessage()
+    {
+        // Arrange — на один узел больше задокументированного лимита
+        var nodes = Enumerable.Range(0, 13)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+
+        // Act
+        var act = () => new SmallStiffnessMatrix(nodes);
+
+        // Assert
+        var ex = Assert.Throws<FeaCommonException>(() => act());
+        Assert.That(ex!.Message,
+            Is.EqualTo("SmallStiffnessMatrix supports at most 12 nodes."));
+    }
+
+    [Test]
+    public void Constructor_WithThirteenDuplicateNodes_StillThrows()
+    {
+        // Arrange — 13 ссылок на один и тот же узел
+        var nodes = Enumerable.Repeat(_nodeA, 13).ToArray();
+
+        // Act
+        var act = () => new SmallStiffnessMatrix(nodes);
+
+        // Assert — лимит проверяется по Count, а не по количеству уникальных ссылок
+        Assert.Throws<FeaCommonException>(() => act());
+    }
+
+    [Test]
+    public void Constructor_WithMaxNodes_DoesNotThrow()
+    {
+        // Arrange — ровно 12 узлов, граница включительная
+        var nodes = Enumerable.Range(0, 12)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+
+        // Act
+        var matrix = new SmallStiffnessMatrix(nodes);
+
+        // Assert
+        Assert.That(matrix.Nodes, Has.Count.EqualTo(12));
     }
 
     [Test]
