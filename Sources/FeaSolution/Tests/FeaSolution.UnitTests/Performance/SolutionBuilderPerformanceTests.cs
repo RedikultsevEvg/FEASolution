@@ -22,11 +22,11 @@ public class SolutionBuilderPerformanceTests
     }
 
     [Test]
-    [TestCase(1_000)]
-    [TestCase(2_500)]
-    [TestCase(5_000)]
-    [TestCase(10_000)]
-    public async Task Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount)
+    [TestCase(1_000, 10)]
+    [TestCase(2_500, 50)]
+    [TestCase(5_000, 100)]
+    [TestCase(10_000, 500)]
+    public async Task Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount, int expectedMaxMiliSeconds)
     {
         // Arrange
         var model = TriangularMeshFactory.Create(elementCount);
@@ -52,7 +52,7 @@ public class SolutionBuilderPerformanceTests
 
         Assert.That(
             sw.ElapsedMilliseconds,
-            Is.LessThan(10_000),
+            Is.LessThan(expectedMaxMiliSeconds),
             $"Assembly took too long: {sw.ElapsedMilliseconds} ms for {elementCount} elements");
     }
 

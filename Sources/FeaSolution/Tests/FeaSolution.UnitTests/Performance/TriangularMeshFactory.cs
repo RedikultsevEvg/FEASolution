@@ -52,7 +52,8 @@ internal static class TriangularMeshFactory
 
         var builder = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
-            .AddElements(elements);
+            .AddElements(elements)
+            .Merge();
 
         return builder
             .Build();
