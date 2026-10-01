@@ -28,19 +28,22 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         _matrixData = new MatrixValue[n * (n + 1) / 2];
     }
 
+    /// <inheritdoc/>
     public IReadOnlyList<IElementNode> Nodes => _nodes;
 
+    /// <inheritdoc/>
     public void AddValue(IElementNode firstNode, IElementNode secondNode, MatrixValue valueToAdd)
     {
         throw new NotImplementedException();
     }
 
-    public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
+    /// <inheritdoc/>
+    public MatrixValue this[IElementNode firstNode, IElementNode secondNode]
     {
         get
         {
-            var a = IndexOf(firstElement);
-            var b = IndexOf(secondElement);
+            var a = IndexOf(firstNode);
+            var b = IndexOf(secondNode);
 
             if (a < 0 || b < 0) 
                 return DefaultValue;
@@ -49,8 +52,8 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
         set
         {
-            var a = IndexOf(firstElement);
-            var b = IndexOf(secondElement);
+            var a = IndexOf(firstNode);
+            var b = IndexOf(secondNode);
 
             if (a < 0 || b < 0) 
                 return;
@@ -59,6 +62,7 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
     }
 
+    // todo: в целях ускорения переделать в возврат без использования yield
     /// <summary>
     /// Обходит ненулевые ячейки верхнего треугольника без аллокаций.
     /// </summary>

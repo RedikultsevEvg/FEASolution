@@ -34,12 +34,12 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
             _matrixData.Remove(key);
     }
 
-    public MatrixValue this[IElementNode firstElement, IElementNode secondElement]
+    public MatrixValue this[IElementNode firstNode, IElementNode secondNode]
     {
         get
         {
-            if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
-                !_nodeToIndex.TryGetValue(secondElement, out var b))
+            if (!_nodeToIndex.TryGetValue(firstNode, out var a) ||
+                !_nodeToIndex.TryGetValue(secondNode, out var b))
             {
                 return DefaultValue;
             }
@@ -49,8 +49,8 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
         {
             if (value == DefaultValue)
             {
-                if (!_nodeToIndex.TryGetValue(firstElement, out var a) ||
-                    !_nodeToIndex.TryGetValue(secondElement, out var b))
+                if (!_nodeToIndex.TryGetValue(firstNode, out var a) ||
+                    !_nodeToIndex.TryGetValue(secondNode, out var b))
                 {
                     return;
                 }
@@ -58,8 +58,8 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
                 return;
             }
 
-            int ia = GetOrAddIndex(firstElement);
-            int ib = GetOrAddIndex(secondElement);
+            int ia = GetOrAddIndex(firstNode);
+            int ib = GetOrAddIndex(secondNode);
             _matrixData[GetKey(ia, ib)] = value;
         }
     }

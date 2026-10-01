@@ -18,7 +18,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// <returns>The new construction model solution.</returns>
     public ConstructionModelSolution Build()
     {
-        // Demo data should be replaced later with production code.
+        // todo: Demo data should be replaced later with production code.
         ArgumentNullException.ThrowIfNull(constructionModel);
 
         var degree = new DegreeOfFreedom

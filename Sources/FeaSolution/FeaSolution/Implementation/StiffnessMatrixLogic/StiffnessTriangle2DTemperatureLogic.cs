@@ -15,7 +15,7 @@ public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 
     private IStiffnessMatrix? LocalMatrix { get; set; }
 
-    // todo: здесь надо учесть что в элементе могут быть разные свободы
+    // todo: здесь надо учесть что в одно элементе могут быть дополнительные свободы (для других расчетов)
     /// <inheritdoc/> 
     public IStiffnessMatrix GetMatrix(IFiniteElement element)
     {

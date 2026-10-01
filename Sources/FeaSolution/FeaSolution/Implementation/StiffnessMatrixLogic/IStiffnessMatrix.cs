@@ -4,7 +4,7 @@ namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 public interface IStiffnessMatrix
 {
-    MatrixValue this[IElementNode firstElement, IElementNode secondElement] { get; set; }
+    MatrixValue this[IElementNode firstNode, IElementNode secondNode] { get; set; }
 
     /// <summary>
     /// Обходит ненулевые ячейки верхнего треугольника.
