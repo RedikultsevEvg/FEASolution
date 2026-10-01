@@ -1,4 +1,6 @@
-﻿namespace FeaSolution.Implementation.StiffnessMatrixs;
+﻿using FeaSolution.Core.Interfaces;
+
+namespace FeaSolution.Implementation.StiffnessMatrixs;
 
 internal static class StiffnessMatrixExtensions
 {
@@ -15,6 +17,7 @@ internal static class StiffnessMatrixExtensions
         }
     }
 
+    // todo: reimplement
     public static bool ValidateMatrixIsSymmetric(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);
@@ -33,6 +36,7 @@ internal static class StiffnessMatrixExtensions
         return true;
     }
 
+    // todo: reimplement
     public static bool ValidateMatrixHasZeroRowSums(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);

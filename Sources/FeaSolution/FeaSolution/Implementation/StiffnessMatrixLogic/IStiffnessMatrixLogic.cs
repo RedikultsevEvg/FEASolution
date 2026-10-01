@@ -1,5 +1,4 @@
 ﻿using FeaSolution.Core.Interfaces;
-using FeaSolution.Implementation.StiffnessMatrixs;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
