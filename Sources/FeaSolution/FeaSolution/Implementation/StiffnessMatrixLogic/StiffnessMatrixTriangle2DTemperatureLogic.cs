@@ -14,7 +14,7 @@ public sealed class StiffnessMatrixTriangle2DTemperatureLogic : IStiffnessMatrix
 {
     private IElementNode[] _nodes = [];
 
-    private IStiffnessMatrix? LocalMatrix { get; set; }
+    private SmallStiffnessMatrix? LocalMatrix { get; set; }
 
     // todo: здесь надо учесть что в одно элементе могут быть дополнительные свободы (для других расчетов)
     /// <inheritdoc/> 
@@ -57,8 +57,7 @@ public sealed class StiffnessMatrixTriangle2DTemperatureLogic : IStiffnessMatrix
 
         var multiplier= thermalConductivity * thickness / (4.0 * square);
 
-        // todo: в целях повышения производительности можно создавать маленькую матрицу сразу и возможно тогда будет быстрее доступ по индексу
-        LocalMatrix = StiffnessMatrixFactory.CreateNew(_nodes);
+        LocalMatrix = new SmallStiffnessMatrix(_nodes);
         SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
     }
@@ -69,12 +68,10 @@ public sealed class StiffnessMatrixTriangle2DTemperatureLogic : IStiffnessMatrix
 
         for (var i = 0; i < 3; i++)
         {
-            // start with new value due to symmetrix matrix.
             for (var j = i; j < 3; j++)
             {
-                var nodeI = _nodes[i];
-                var nodeJ = _nodes[j];
-                LocalMatrix[nodeI, nodeJ] = multiplier * (vectorB[i] * vectorB[j] + vectorC[i] * vectorC[j]);
+                var value = multiplier * (vectorB[i] * vectorB[j] + vectorC[i] * vectorC[j]);
+                LocalMatrix.SetValue(i, j, value);
             }
         }
     }

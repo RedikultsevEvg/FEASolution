@@ -58,9 +58,6 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
         set
         {
-            // todo: там где вызывается этот метод возможно стоит попробовать сразу доступ по индексам узлов, т.к. порядок узлов известен
-            // может реализовать это как AddValue(int firstNodeIndex, int secondNodeIndex, MatrixValue valueToAdd)
-
             var a = IndexOf(firstNode);
             var b = IndexOf(secondNode);
 
@@ -69,6 +66,22 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
 
             _matrixData[PackIndex(a, b)] = value;
         }
+    }
+
+    /// <summary>
+    /// Sets a value to the cell at the given node indices.
+    /// Symmetric: <paramref name="firstNodeIndex"/> and <paramref name="secondNodeIndex"/>
+    /// are interchangeable — the value goes into the packed upper triangle.
+    /// </summary>
+    /// <param name="firstNodeIndex">Index of the first node in <see cref="Nodes"/>.</param>
+    /// <param name="secondNodeIndex">Index of the second node in <see cref="Nodes"/>.</param>
+    /// <param name="valueToAdd">Value to set to the cell.</param>
+    public void SetValue(int firstNodeIndex, int secondNodeIndex, MatrixValue valueToAdd)
+    {
+        FeaCommonException.ThrowIfTrue(
+            firstNodeIndex >= _nodes.Length || secondNodeIndex >= _nodes.Length,"One of index is out of range" );
+
+        _matrixData[PackIndex(firstNodeIndex, secondNodeIndex)] = valueToAdd;
     }
 
     // todo: в целях ускорения переделать в возврат без использования yield

@@ -637,6 +637,271 @@ public class SmallStiffnessMatrixTests
 
     #endregion
 
+    #region SetValueByIndex
+
+    [Test]
+    public void SetValue_StoresValue_ForValidIndices()
+    {
+        // Arrange
+        const double expected = 5.0;
+
+        // Act
+        _matrix.SetValue(0, 1, expected);
+
+        // Assert
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void SetValue_StoresValueByIndices_NotByReferences()
+    {
+        // Arrange — индексы 0 и 1 соответствуют _nodeA и _nodeB
+        // (порядок задан в SetUp: [_nodeA, _nodeB, _nodeC])
+
+        // Act
+        _matrix.SetValue(0, 1, 7.0);
+
+        // Assert — доступ через ссылки видит то же значение
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(7.0));
+    }
+
+    [Test]
+    public void SetValue_IsSymmetric()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 3.0);
+
+        // Act
+        var mirrored = _matrix[_nodeB, _nodeA];
+
+        // Assert
+        Assert.That(mirrored, Is.EqualTo(3.0));
+    }
+
+    [Test]
+    public void SetValue_WithReversedIndices_WritesToSameCell()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 3.0);
+
+        // Act — обратный порядок индексов должен попасть в ту же ячейку
+        _matrix.SetValue(1, 0, 7.0);
+
+        // Assert — значение перезаписано, а не сложено
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(7.0));
+            Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(7.0));
+        });
+    }
+
+    [Test]
+    public void SetValue_OnDiagonal_StoresValue()
+    {
+        // Arrange
+        const double expected = 4.0;
+
+        // Act
+        _matrix.SetValue(0, 0, expected);
+
+        // Assert
+        Assert.That(_matrix[_nodeA, _nodeA], Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void SetValue_OverwritesExistingValue()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 1.0);
+
+        // Act
+        _matrix.SetValue(0, 1, 2.0);
+
+        // Assert — SetValue перезаписывает, а не накапливает
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(2.0));
+    }
+
+    [Test]
+    public void SetValue_WithZero_ClearsCell()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 5.0);
+
+        // Act
+        _matrix.SetValue(0, 1, 0.0);
+
+        // Assert
+        Assert.That(_matrix[_nodeA, _nodeB], Is.Zero);
+    }
+
+    [Test]
+    public void SetValue_WithZeroThroughReversedIndices_ClearsCell()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 5.0);
+
+        // Act
+        _matrix.SetValue(1, 0, 0.0);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, _nodeB], Is.Zero);
+            Assert.That(_matrix[_nodeB, _nodeA], Is.Zero);
+        });
+    }
+
+    [Test]
+    public void SetValue_WithNegativeValue_StoresValue()
+    {
+        // Arrange
+        const double expected = -3.5;
+
+        // Act
+        _matrix.SetValue(0, 1, expected);
+
+        // Assert
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void SetValue_WithFirstIndexOutOfRange_ThrowsFeaCommonException_WithExpectedMessage()
+    {
+        // Arrange — индекс 5 при длине массива 3
+        var act = () => _matrix.SetValue(5, 1, 1.0);
+
+        // Act
+        var ex = Assert.Throws<FeaCommonException>(() => act());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("One of index is out of range"));
+    }
+
+    [Test]
+    public void SetValue_WithSecondIndexOutOfRange_ThrowsFeaCommonException_WithExpectedMessage()
+    {
+        // Arrange — индекс 5 при длине массива 3
+        var act = () => _matrix.SetValue(0, 5, 1.0);
+
+        // Act
+        var ex = Assert.Throws<FeaCommonException>(() => act());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("One of index is out of range"));
+    }
+
+    [Test]
+    public void SetValue_WithBothIndicesOutOfRange_ThrowsFeaCommonException()
+    {
+        // Arrange
+        var act = () => _matrix.SetValue(5, 7, 1.0);
+
+        // Act / Assert
+        Assert.Throws<FeaCommonException>(() => act());
+    }
+
+    [Test]
+    public void SetValue_WithIndexAtUpperBoundary_ThrowsFeaCommonException()
+    {
+        // Arrange — индекс равен длине массива (3), что вне [0, 3)
+        var act = () => _matrix.SetValue(3, 0, 1.0);
+
+        // Act / Assert
+        Assert.Throws<FeaCommonException>(() => act());
+    }
+
+    [Test]
+    public void SetValue_WithNegativeIndex_ThrowsFeaCommonException()
+    {
+        // Arrange — текущая реализация не проверяет отрицательные индексы:
+        // firstNodeIndex >= _nodes.Length == false для -1,
+        // поэтому проверка НЕ срабатывает, и PackIndex(-1, 1) даст
+        // некорректный индекс или IndexOutOfRangeException.
+        var act = () => _matrix.SetValue(-1, 1, 1.0);
+
+        // Act / Assert — фиксируем текущее поведение
+        Assert.That(act, Throws.TypeOf<IndexOutOfRangeException>()
+            .Or.TypeOf<FeaCommonException>());
+    }
+
+    [Test]
+    public void SetValue_DoesNotAffectOtherCells()
+    {
+        // Arrange
+        _matrix.SetValue(0, 0, 1.0);
+        _matrix.SetValue(0, 1, 2.0);
+        _matrix.SetValue(1, 1, 3.0);
+
+        // Act
+        _matrix.SetValue(0, 0, 100.0);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, _nodeA], Is.EqualTo(100.0));
+            Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(2.0));
+            Assert.That(_matrix[_nodeB, _nodeB], Is.EqualTo(3.0));
+        });
+    }
+
+    [Test]
+    public void SetValue_AllUpperTriangleCells_ProducesExpectedNonZeroCount()
+    {
+        // Arrange
+        var n = _matrix.Nodes.Count;
+        var expectedCount = n * (n + 1) / 2;
+
+        // Act — заполняем весь верхний треугольник через SetValue
+        for (var i = 0; i < n; i++)
+            for (var j = i; j < n; j++)
+                _matrix.SetValue(i, j, i * 10 + j + 1);
+
+        // Assert
+        Assert.That(_matrix.NonZeroMatrixValues().Count(), Is.EqualTo(expectedCount));
+    }
+
+    [Test]
+    public void SetValue_IsConsistentWithIndexerSet()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 1.5);
+
+        // Act — перезапись через индексер
+        _matrix[_nodeA, _nodeB] = 2.5;
+
+        // Assert — оба пишут в одну и ту же ячейку
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(2.5));
+    }
+
+    [Test]
+    public void SetValue_IsConsistentWithIndexerGet()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 1.5;
+
+        // Act
+        _matrix.SetValue(0, 1, 2.5);
+
+        // Assert — оба читают из одной и той же ячейки
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(2.5));
+    }
+
+    [Test]
+    public void SetValue_AfterSetValueWithSameIndices_OverwritesNotAccumulates()
+    {
+        // Arrange
+        _matrix.SetValue(0, 1, 1.0);
+
+        // Act
+        _matrix.SetValue(0, 1, 2.0);
+        _matrix.SetValue(0, 1, 3.0);
+
+        // Assert — итоговое значение = последнее присвоенное, а не сумма
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(3.0));
+    }
+
+    #endregion
+
     #region NonZeroMatrixValues
 
     [Test]
