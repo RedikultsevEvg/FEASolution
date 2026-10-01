@@ -18,7 +18,7 @@ public interface IStiffnessMatrix
     /// Returns non-zero values.
     /// Every symmetric pair (i, j) exist one time in result.
     /// </summary>
-    IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements();
+    IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroMatrixValues();
 
     // Returns registered nodes.
     IReadOnlyList<IElementNode> Nodes { get; }

@@ -70,7 +70,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
     }
 
     /// <inheritdoc/>>
-    public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements()
+    public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroMatrixValues()
     {
         foreach (var (key, value) in _matrixData)
         {

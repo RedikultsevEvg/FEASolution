@@ -66,7 +66,7 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
     /// <summary>
     /// Обходит ненулевые ячейки верхнего треугольника без аллокаций.
     /// </summary>
-    public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements()
+    public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroMatrixValues()
     {
         var n = _nodes.Length;
 

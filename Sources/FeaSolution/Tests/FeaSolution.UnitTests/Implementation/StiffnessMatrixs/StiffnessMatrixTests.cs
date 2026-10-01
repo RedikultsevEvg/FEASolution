@@ -377,7 +377,7 @@ public class StiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix[nodes[3], nodes[7]], Is.EqualTo(2.0).Within(Tolerance));
-            Assert.That(_matrix.NonZeroElements().Count(), Is.EqualTo(1));
+            Assert.That(_matrix.NonZeroMatrixValues().Count(), Is.EqualTo(1));
         });
     }
 
@@ -584,7 +584,7 @@ public class StiffnessMatrixTests
         _matrix.AddValue(_b, _c, 1.0);
 
         // Act
-        var nonZero = _matrix.NonZeroElements().ToList();
+        var nonZero = _matrix.NonZeroMatrixValues().ToList();
 
         // Assert
         Assert.That(nonZero, Has.Count.EqualTo(1));
@@ -615,7 +615,7 @@ public class StiffnessMatrixTests
         _matrix.AddValue(_a, _b, 0.0);
 
         // Assert
-        Assert.That(_matrix.NonZeroElements(), Is.Empty);
+        Assert.That(_matrix.NonZeroMatrixValues(), Is.Empty);
     }
 
     [Test]
@@ -697,7 +697,7 @@ public class StiffnessMatrixTests
 
     #endregion
 
-    #region NonZeroElements
+    #region NonZeroMatrixValues
 
     [Test]
     public void NonZeroElements_OnEmptyMatrix_IsEmpty()
@@ -706,7 +706,7 @@ public class StiffnessMatrixTests
         // (matrix пуста)
 
         // Act
-        var result = _matrix.NonZeroElements();
+        var result = _matrix.NonZeroMatrixValues();
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -722,7 +722,7 @@ public class StiffnessMatrixTests
         _matrix[_a, _c] = 0.0;            // удалено
 
         // Act
-        var result = _matrix.NonZeroElements().ToList();
+        var result = _matrix.NonZeroMatrixValues().ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
@@ -737,7 +737,7 @@ public class StiffnessMatrixTests
         _matrix[_a, _a] = 3.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToList();
+        var result = _matrix.NonZeroMatrixValues().ToList();
 
         // Assert
         foreach (var (i, j, value) in result)
@@ -752,7 +752,7 @@ public class StiffnessMatrixTests
         _matrix[_b, _b] = 5.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToList();
+        var result = _matrix.NonZeroMatrixValues().ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(2));
@@ -766,7 +766,7 @@ public class StiffnessMatrixTests
         _matrix[_a, _b] = 1.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToList();
+        var result = _matrix.NonZeroMatrixValues().ToList();
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(1),
@@ -786,7 +786,7 @@ public class StiffnessMatrixTests
         _matrix[_a, _b] = 1.0;
 
         // Act
-        var (i, j, _) = _matrix.NonZeroElements().Single();
+        var (i, j, _) = _matrix.NonZeroMatrixValues().Single();
 
         // Assert
         Assert.Multiple(() =>
@@ -803,7 +803,7 @@ public class StiffnessMatrixTests
         _matrix[_a, _b] = 1.0;
 
         // Act
-        var enumerable = _matrix.NonZeroElements();
+        var enumerable = _matrix.NonZeroMatrixValues();
         _matrix[_b, _c] = 2.0;            // добавляем до перечисления
 
         // Assert

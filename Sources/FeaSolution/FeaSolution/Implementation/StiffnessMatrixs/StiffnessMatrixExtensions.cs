@@ -11,7 +11,7 @@ internal static class StiffnessMatrixExtensions
         ArgumentNullException.ThrowIfNull(globalStiffnessMatrix);
         ArgumentNullException.ThrowIfNull(localMatrix);
 
-        foreach (var (nodeI, nodeJ, value) in localMatrix.NonZeroElements())
+        foreach (var (nodeI, nodeJ, value) in localMatrix.NonZeroMatrixValues())
         {
             globalStiffnessMatrix.AddValue(nodeI, nodeJ, value);
         }

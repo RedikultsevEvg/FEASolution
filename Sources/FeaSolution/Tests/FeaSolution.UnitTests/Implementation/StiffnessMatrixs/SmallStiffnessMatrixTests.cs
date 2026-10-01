@@ -380,7 +380,7 @@ public class SmallStiffnessMatrixTests
     public void NonZeroElements_OnEmptyMatrix_IsEmpty()
     {
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert
         Assert.That(result, Is.Empty);
@@ -395,7 +395,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeA, _nodeC] = 2.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert
         Assert.That(result, Has.Length.EqualTo(2));
@@ -410,7 +410,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeC, _nodeC] = 3.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert
         Assert.Multiple(() =>
@@ -427,7 +427,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeA, _nodeB] = 1.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert
         Assert.That(result, Has.Length.EqualTo(1));
@@ -445,7 +445,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeC, _nodeC] = 6.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert
         Assert.That(result, Has.Length.EqualTo(6));
@@ -458,7 +458,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeA, _nodeB] = 1.0;
 
         // Act
-        var result = _matrix.NonZeroElements().Single();
+        var result = _matrix.NonZeroMatrixValues().Single();
 
         // Assert
         Assert.Multiple(() =>
@@ -481,7 +481,7 @@ public class SmallStiffnessMatrixTests
         _matrix[_nodeC, _nodeC] = 6.0;
 
         // Act
-        var result = _matrix.NonZeroElements().ToArray();
+        var result = _matrix.NonZeroMatrixValues().ToArray();
 
         // Assert: ожидаем (A,A), (A,B), (A,C), (B,B), (B,C), (C,C)
         var expected = new[]
@@ -553,7 +553,7 @@ public class SmallStiffnessMatrixTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(matrix.NonZeroElements().Count(), Is.EqualTo(3));
+            Assert.That(matrix.NonZeroMatrixValues().Count(), Is.EqualTo(3));
             Assert.That(matrix[_nodeB, _nodeA], Is.EqualTo(2.0));
         });
     }
@@ -579,7 +579,7 @@ public class SmallStiffnessMatrixTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(matrix.NonZeroElements().Count(), Is.EqualTo(expectedCount));
+            Assert.That(matrix.NonZeroMatrixValues().Count(), Is.EqualTo(expectedCount));
             Assert.That(matrix[nodes[5], nodes[0]], Is.EqualTo(6));
             Assert.That(matrix[nodes[0], nodes[5]], Is.EqualTo(6));
         });
@@ -624,7 +624,7 @@ public class SmallStiffnessMatrixTests
         Assert.Multiple(() =>
         {
             Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
-            Assert.That(_matrix.NonZeroElements(), Is.Empty);
+            Assert.That(_matrix.NonZeroMatrixValues(), Is.Empty);
         });
     }
 
