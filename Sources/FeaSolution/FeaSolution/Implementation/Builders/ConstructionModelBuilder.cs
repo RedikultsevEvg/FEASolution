@@ -32,8 +32,15 @@ public class ConstructionModelBuilder
             $"Can't build the model with empty element collection. Use '{nameof(AddElements)}' to add elements.");
 
         var freedomsIntersection = Elements
-            .Select(e => e.Type.Freedoms.Select(f => f.Item1))
-            .Aggregate((current, next) => current.Intersect(next))
+            .Select(e => e.Type
+                .Freedoms
+                .Select(f => f.Item1)
+                .ToHashSet())
+            .Aggregate((current, next) =>
+            {
+                current.IntersectWith(next); 
+                return current;
+            })
             .ToArray();
 
         FeaModelBuilderException.ThrowIfTrue(
@@ -88,8 +95,8 @@ public class ConstructionModelBuilder
         {
             Elements.Add(element);
         }
-        return this;
 
+        return this;
     }
 
     /// <summary>

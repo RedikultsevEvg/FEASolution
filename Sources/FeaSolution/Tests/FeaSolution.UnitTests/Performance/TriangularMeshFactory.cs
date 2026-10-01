@@ -2,7 +2,6 @@
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
-using FeaSolution.Implementation.ConstructionModels;
 using FeaSolution.Implementation.ElementNodes;
 using FeaSolution.Implementation.FiniteElements;
 
@@ -51,13 +50,12 @@ internal static class TriangularMeshFactory
                 elements.Add(CreateTriangle(n00, n11, n01));
             }
 
-        // todo: use builder
-        return new ConstructionModel
-        {
-            AllowedNodeType = ElementNodeType.Type2D,
-            Elements = elements,
-            CommonFreedoms = [Freedom.Temperature]
-        };
+        var builder = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddElements(elements);
+
+        return builder
+            .Build();
     }
 
     private static IFiniteElement CreateTriangle(
