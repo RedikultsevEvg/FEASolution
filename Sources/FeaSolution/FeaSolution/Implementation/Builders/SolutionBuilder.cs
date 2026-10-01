@@ -3,6 +3,7 @@ using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
+using FeaSolution.Implementation.StiffnessMatrixs;
 
 namespace FeaSolution.Implementation.Builders;
 

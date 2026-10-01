@@ -1,4 +1,4 @@
-﻿namespace FeaSolution.Implementation.StiffnessMatrixLogic;
+﻿namespace FeaSolution.Implementation.StiffnessMatrixs;
 
 internal static class StiffnessMatrixExtensions
 {

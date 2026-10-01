@@ -1,9 +1,9 @@
 ﻿using FeaSolution.Core.Interfaces;
-using FeaSolution.Implementation.StiffnessMatrixLogic;
+using FeaSolution.Implementation.StiffnessMatrixs;
 using Moq;
 using Throws = NUnit.Framework.Throws;
 
-namespace FeaSolution.UnitTests.Implementation.StiffnessMatrixLogic;
+namespace FeaSolution.UnitTests.Implementation.StiffnessMatrixs;
 
 [TestFixture]
 [TestOf(typeof(SmallStiffnessMatrix))]

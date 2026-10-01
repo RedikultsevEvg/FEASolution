@@ -1,12 +1,16 @@
 ﻿using FeaSolution.Core.Interfaces;
+using FeaSolution.Implementation.StiffnessMatrixs;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
+/// <summary>
+/// Stiffness matrix calculation logic.
+/// </summary>
 public interface IStiffnessMatrixLogic
 {
     /// <summary>
-    /// Полный алгоритм получения матрицы жесткости элемента.
+    /// Gets the stiffness matrix.
     /// </summary>
-    /// <param name="element"></param>
+    /// <param name="element">The finite element.</param>
     IStiffnessMatrix GetMatrix(IFiniteElement element);
 }

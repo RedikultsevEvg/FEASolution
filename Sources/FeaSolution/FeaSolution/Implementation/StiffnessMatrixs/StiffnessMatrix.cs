@@ -1,7 +1,7 @@
 ﻿using FeaSolution.Core.Interfaces;
 using System.Runtime.InteropServices;
 
-namespace FeaSolution.Implementation.StiffnessMatrixLogic;
+namespace FeaSolution.Implementation.StiffnessMatrixs;
 
 public sealed class StiffnessMatrix : IStiffnessMatrix
 {

@@ -2,6 +2,7 @@
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Implementation.Builders;
+using FeaSolution.Implementation.StiffnessMatrixs;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
