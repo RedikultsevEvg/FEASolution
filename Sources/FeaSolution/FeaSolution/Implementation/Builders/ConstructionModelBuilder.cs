@@ -5,6 +5,9 @@ using FeaSolution.Implementation.ConstructionModels;
 
 namespace FeaSolution.Implementation.Builders;
 
+/// <summary>
+/// Construction model builder.
+/// </summary>
 public class ConstructionModelBuilder
 {
     private const CoordinateValue DeltaDefaultValue = 0.0001;
@@ -13,7 +16,8 @@ public class ConstructionModelBuilder
 
     private ICollection<IFiniteElement> Elements { get; } = [];
 
-    private const string NodeTypeNullExceptionMessage = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
+    private const string NodeTypeNullExceptionMessage 
+        = $"Use method '{nameof(SetNodesType)}' to set the model node type.";
 
     /// <summary>
     /// Creates construction model.
@@ -22,10 +26,7 @@ public class ConstructionModelBuilder
     /// <exception cref="ArgumentNullException"></exception>
     public ConstructionModel Build()
     {
-        if (NodeType == null)
-        {
-            throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
-        }
+        FeaModelBuilderException.ThrowIfTrue(NodeType == null, NodeTypeNullExceptionMessage);
 
         FeaModelBuilderException.ThrowIfTrue(
             !Elements.Any(), 
@@ -49,7 +50,7 @@ public class ConstructionModelBuilder
 
         return new ConstructionModel
         {
-            AllowedNodeType = NodeType,
+            AllowedNodeType = NodeType!,
             Elements = Elements,
             CommonFreedoms = freedomsIntersection
         };
@@ -81,15 +82,9 @@ public class ConstructionModelBuilder
     public ConstructionModelBuilder AddElements(params ICollection<IFiniteElement> elements)
     {
         ArgumentNullException.ThrowIfNull(elements);
-        if (NodeType == null!)
-        {
-            throw new FeaModelBuilderException(NodeTypeNullExceptionMessage);
-        }
-
-        if (elements.Any(element => element.Type.NodeType.Dimension != NodeType.Dimension))
-        {
-            throw new FeaModelBuilderException($"Dimensional of all elements should be equal to {NodeType.Dimension.ToString()}.");
-        }
+        FeaModelBuilderException.ThrowIfTrue(NodeType == null, NodeTypeNullExceptionMessage);
+        FeaModelBuilderException.ThrowIfTrue(elements.Any(element => element.Type.NodeType.Dimension != NodeType!.Dimension),
+            $"Dimensional of all elements should be equal to {NodeType!.Dimension.ToString()}.");
 
         foreach (var element in elements)
         {
