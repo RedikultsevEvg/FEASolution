@@ -2,6 +2,9 @@
 
 namespace FeaSolution.Implementation.StiffnessMatrixs;
 
+/// <summary>
+/// Stiffness matrix for a small packed symmetric matrix.
+/// </summary>
 public sealed class SmallStiffnessMatrix : IStiffnessMatrix
 {
     private readonly IElementNode[] _nodes;
@@ -14,9 +17,9 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
     internal MatrixValue DefaultValue { get; } = 0.0;
 
     /// <summary>
-    /// Создаёт маленькую симметричную матрицу фиксированного размера.
+    /// Creates a small fixed-size symmetric matrix.
     /// </summary>
-    /// <param name="nodes">Узлы в порядке индексации.</param>
+    /// <param name="nodes">Nodes in indexing order.</param>
     public SmallStiffnessMatrix(IReadOnlyList<IElementNode> nodes)
     {
         ArgumentNullException.ThrowIfNull(nodes);
@@ -52,6 +55,9 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
         set
         {
+            // todo: там где вызывается этот метод возможно стоит попробовать сразу доступ по индексам узлов, т.к. порядок узлов известен
+            // может реализовать это как AddValue(int firstNodeIndex, int secondNodeIndex, MatrixValue valueToAdd)
+
             var a = IndexOf(firstNode);
             var b = IndexOf(secondNode);
 

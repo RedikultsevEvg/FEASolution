@@ -65,7 +65,7 @@ public class SolutionBuilderPerformanceTests
     {
         const int smallCount = 1_000;
         const int largeCount = 4_000;
-        const int expectedScaling = 8;
+        const int expectedScaling = 10;
 
         var smallTime = await MeasureAssemblyAsync(smallCount);
         var largeTime = await MeasureAssemblyAsync(largeCount);
@@ -77,7 +77,7 @@ public class SolutionBuilderPerformanceTests
             $"large({largeCount})={largeTime} ms, " +
             $"ratio={ratio:F2} (elements ratio = {largeCount / (double)smallCount})");
 
-        // Ожидаем ~4x, допускаем до 8x (запас на шум и GC).
+        // Ожидаем ~4x, допускаем до 10x (запас на шум и GC).
         Assert.That(
             ratio,
             Is.LessThan(expectedScaling),

@@ -24,7 +24,7 @@ public class SmallStiffnessMatrixTests
         _matrix = new SmallStiffnessMatrix([_nodeA, _nodeB, _nodeC]);
     }
 
-    #region Конструктор
+    #region Constructor
 
     [Test]
     public void Constructor_WithNullNodes_ThrowsArgumentNullException()
@@ -38,7 +38,7 @@ public class SmallStiffnessMatrixTests
         // Assert
         Assert.That(((Func<SmallStiffnessMatrix>?)Act)!, Throws.TypeOf<ArgumentNullException>());
     }
-    
+
     [Test]
     public void Constructor_WithEmptyNodes_ThrowsArgumentException()
     {
@@ -73,6 +73,55 @@ public class SmallStiffnessMatrixTests
 
         // Assert
         Assert.That(matrix.Nodes, Has.Count.EqualTo(1));
+    }
+
+    [Test]
+    public void Constructor_WithDuplicateNodes_FixesBehavior()
+    {
+        // Arrange — один и тот же объект дважды
+        var nodes = new[] { _nodeA, _nodeA, _nodeB };
+
+        // Act
+        var matrix = new SmallStiffnessMatrix(nodes);
+
+        // Assert — фиксируем текущее поведение: дубликаты допускаются,
+        // IndexOf возвращает первый индекс.
+        Assert.Multiple(() =>
+        {
+            Assert.That(matrix.Nodes, Has.Count.EqualTo(3));
+            matrix[_nodeA, _nodeB] = 1.0;
+            Assert.That(matrix[_nodeA, _nodeB], Is.EqualTo(1.0));
+        });
+    }
+
+    [Test]
+    public void Constructor_WithTwelveNodes_CreatesMatrix()
+    {
+        // Arrange — верхняя граница дизайна
+        var nodes = Enumerable.Range(0, 12)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+
+        // Act
+        var matrix = new SmallStiffnessMatrix(nodes);
+
+        // Assert
+        Assert.That(matrix.Nodes, Has.Count.EqualTo(12));
+    }
+
+    [Test]
+    public void Constructor_CopiesSourceList_NotOnlyOnClear()
+    {
+        // Arrange
+        var source = new List<IElementNode> { _nodeA, _nodeB, _nodeC };
+        var matrix = new SmallStiffnessMatrix(source);
+        var stranger = Mock.Of<IElementNode>();
+
+        // Act — подменяем элемент в исходном списке
+        source[0] = stranger;
+
+        // Assert — матрица сохранила исходный узел
+        Assert.That(matrix.Nodes[0], Is.SameAs(_nodeA));
     }
 
     #endregion
@@ -119,9 +168,40 @@ public class SmallStiffnessMatrixTests
         Assert.That(matrix.Nodes, Has.Count.EqualTo(2));
     }
 
+    [Test]
+    public void Nodes_ReturnsSameInstance_OnRepeatedCalls()
+    {
+        // Arrange
+        // (_matrix создана в SetUp)
+
+        // Act
+        var first = _matrix.Nodes;
+        var second = _matrix.Nodes;
+
+        // Assert — без аллокаций на каждый вызов
+        Assert.That(first, Is.SameAs(second));
+    }
+
     #endregion
 
-    #region Индексатор — чтение
+    #region DefaultValue
+
+    [Test]
+    public void DefaultValue_IsZero()
+    {
+        // Arrange
+        // (_matrix создана в SetUp)
+
+        // Act
+        var defaultValue = _matrix.DefaultValue;
+
+        // Assert
+        Assert.That(defaultValue, Is.Zero);
+    }
+
+    #endregion
+
+    #region Indexer.Get
 
     [Test]
     public void Indexer_GetOnEmptyMatrix_ReturnsZero()
@@ -173,9 +253,72 @@ public class SmallStiffnessMatrixTests
         Assert.That(value, Is.Zero);
     }
 
+    [Test]
+    public void Indexer_GetDiagonalOnEmptyMatrix_ReturnsZero()
+    {
+        // Arrange
+        // (_matrix создана в SetUp)
+
+        // Act
+        var value = _matrix[_nodeA, _nodeA];
+
+        // Assert
+        Assert.That(value, Is.Zero);
+    }
+
+    [Test]
+    public void Indexer_Get_IsSymmetric_WhenWritingUpperTriangle()
+    {
+        // Arrange & Act
+        _matrix[_nodeA, _nodeB] = 7.0;
+
+        // Assert
+        Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(7.0));
+    }
+
+    [Test]
+    public void Indexer_Get_IsSymmetric_WhenWritingLowerTriangle()
+    {
+        // Arrange & Act
+        _matrix[_nodeB, _nodeA] = 7.0;
+
+        // Assert
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(7.0));
+    }
+
+    [Test]
+    public void Indexer_Get_AllPairsInThreeByThree_AreSymmetric()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 1.0;
+        _matrix[_nodeA, _nodeC] = 2.0;
+        _matrix[_nodeB, _nodeC] = 3.0;
+
+        // Act & Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(1.0));
+            Assert.That(_matrix[_nodeC, _nodeA], Is.EqualTo(2.0));
+            Assert.That(_matrix[_nodeC, _nodeB], Is.EqualTo(3.0));
+        });
+    }
+
+    [Test]
+    public void Indexer_Get_Diagonal_IsIdempotentForMirroredAccess()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeA] = 4.0;
+
+        // Act
+        var value = _matrix[_nodeA, _nodeA];
+
+        // Assert
+        Assert.That(value, Is.EqualTo(4.0));
+    }
+
     #endregion
 
-    #region Индексатор — запись
+    #region Indexer.Set
 
     [Test]
     public void Indexer_Set_StoresValue()
@@ -236,32 +379,47 @@ public class SmallStiffnessMatrixTests
         Assert.That(_matrix.Nodes, Has.Count.EqualTo(beforeCount));
     }
 
-    #endregion
-
-    #region Симметрия
-
     [Test]
-    public void Indexer_IsSymmetric_WhenWritingUpperTriangle()
+    public void Indexer_SetNegativeValue_StoresValue()
     {
-        // Arrange & Act
-        _matrix[_nodeA, _nodeB] = 7.0;
+        // Arrange
+        const double expected = -3.5;
+
+        // Act
+        _matrix[_nodeA, _nodeB] = expected;
 
         // Assert
-        Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(7.0));
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(expected));
     }
 
     [Test]
-    public void Indexer_IsSymmetric_WhenWritingLowerTriangle()
+    public void Indexer_SetNegativeZero_RemovesCell()
     {
-        // Arrange & Act
-        _matrix[_nodeB, _nodeA] = 7.0;
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 5.0;
+
+        // Act — в C# -0.0 == 0.0, значит ячейка должна обнулиться
+        _matrix[_nodeA, _nodeB] = -0.0;
 
         // Assert
-        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(7.0));
+        Assert.That(_matrix[_nodeA, _nodeB], Is.Zero);
     }
 
     [Test]
-    public void Indexer_WritingMirroredPair_OverwritesValue()
+    public void Indexer_SetTinyNonZeroValue_StoresValue()
+    {
+        // Arrange
+        const double tiny = 1e-300;
+
+        // Act
+        _matrix[_nodeA, _nodeB] = tiny;
+
+        // Assert — сравнение с DefaultValue точное, не по epsilon
+        Assert.That(_matrix[_nodeA, _nodeB], Is.EqualTo(tiny));
+    }
+
+    [Test]
+    public void Indexer_Set_WritingMirroredPair_OverwritesValue()
     {
         // Arrange
         _matrix[_nodeA, _nodeB] = 1.0;
@@ -278,28 +436,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void Indexer_AllPairsInThreeByThree_AreSymmetric()
-    {
-        // Arrange
-        _matrix[_nodeA, _nodeB] = 1.0;
-        _matrix[_nodeA, _nodeC] = 2.0;
-        _matrix[_nodeB, _nodeC] = 3.0;
-
-        // Act & Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(1.0));
-            Assert.That(_matrix[_nodeC, _nodeA], Is.EqualTo(2.0));
-            Assert.That(_matrix[_nodeC, _nodeB], Is.EqualTo(3.0));
-        });
-    }
-
-    #endregion
-
-    #region Диагональ
-
-    [Test]
-    public void Indexer_Diagonal_StoresValue()
+    public void Indexer_Set_Diagonal_StoresValue()
     {
         // Arrange
         const double expected = 4.0;
@@ -312,21 +449,28 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void Indexer_Diagonal_IsIdempotentForMirroredAccess()
+    public void Indexer_Set_FullThreeByThree_FillsUpperTriangleSymmetrically()
     {
         // Arrange
-        _matrix[_nodeA, _nodeA] = 4.0;
+        _matrix[_nodeA, _nodeA] = 1.0;
+        _matrix[_nodeA, _nodeB] = 2.0;
+        _matrix[_nodeA, _nodeC] = 3.0;
+        _matrix[_nodeB, _nodeB] = 4.0;
+        _matrix[_nodeB, _nodeC] = 5.0;
+        _matrix[_nodeC, _nodeC] = 6.0;
 
-        // Act
-        var value = _matrix[_nodeA, _nodeA];
-
-        // Assert
-        Assert.That(value, Is.EqualTo(4.0));
+        // Act & Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(2.0));
+            Assert.That(_matrix[_nodeC, _nodeA], Is.EqualTo(3.0));
+            Assert.That(_matrix[_nodeC, _nodeB], Is.EqualTo(5.0));
+        });
     }
 
     #endregion
 
-    #region Обнуление (запись DefaultValue)
+    #region Indexer.SetDefault
 
     [Test]
     public void Indexer_SetZero_ClearsExistingValue()
@@ -372,12 +516,83 @@ public class SmallStiffnessMatrixTests
         Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
     }
 
-    #endregion
+    [Test]
+    public void Indexer_SetZeroOnAlreadyZero_DoesNothing()
+    {
+        // Arrange — ячейка уже нулевая
 
-    #region NonZeroElements
+        // Act
+        _matrix[_nodeA, _nodeB] = 0.0;
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, _nodeB], Is.Zero);
+            Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
+        });
+    }
 
     [Test]
-    public void NonZeroElements_OnEmptyMatrix_IsEmpty()
+    public void Indexer_SetZeroWithUnknownNode_DoesNothing()
+    {
+        // Arrange
+        var stranger = Mock.Of<IElementNode>();
+
+        // Act
+        _matrix[_nodeA, stranger] = 0.0;
+        _matrix[stranger, _nodeA] = 0.0;
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, stranger], Is.Zero);
+            Assert.That(_matrix[stranger, _nodeA], Is.Zero);
+            Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
+        });
+    }
+
+    [Test]
+    public void Indexer_SetZeroThroughMirroredPair_ClearsCell()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 5.0;
+
+        // Act
+        _matrix[_nodeB, _nodeA] = 0.0;
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix[_nodeA, _nodeB], Is.Zero);
+            Assert.That(_matrix[_nodeB, _nodeA], Is.Zero);
+        });
+    }
+
+    [Test]
+    public void Indexer_SetZero_ClearingAllElements_KeepsNodesAndNonZeroMatrixValuesEmpty()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 1.0;
+        _matrix[_nodeB, _nodeC] = 2.0;
+
+        // Act
+        _matrix[_nodeA, _nodeB] = 0.0;
+        _matrix[_nodeB, _nodeC] = 0.0;
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
+            Assert.That(_matrix.NonZeroMatrixValues(), Is.Empty);
+        });
+    }
+
+    #endregion
+
+    #region NonZeroMatrixValues
+
+    [Test]
+    public void NonZeroMatrixValues_OnEmptyMatrix_IsEmpty()
     {
         // Act
         var result = _matrix.NonZeroMatrixValues().ToArray();
@@ -387,7 +602,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_SkipsZeroCells()
+    public void NonZeroMatrixValues_SkipsZeroCells()
     {
         // Arrange
         _matrix[_nodeA, _nodeB] = 1.0;
@@ -402,7 +617,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_ReturnsOnlyDiagonal_WhenOnlyDiagonalSet()
+    public void NonZeroMatrixValues_ReturnsOnlyDiagonal_WhenOnlyDiagonalSet()
     {
         // Arrange
         _matrix[_nodeA, _nodeA] = 1.0;
@@ -421,7 +636,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_DoesNotYieldDuplicateSymmetricPairs()
+    public void NonZeroMatrixValues_DoesNotYieldDuplicateSymmetricPairs()
     {
         // Arrange
         _matrix[_nodeA, _nodeB] = 1.0;
@@ -434,7 +649,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_ReturnsUpperTriangleOnly()
+    public void NonZeroMatrixValues_ReturnsUpperTriangleOnly()
     {
         // Arrange
         _matrix[_nodeA, _nodeA] = 1.0;
@@ -452,7 +667,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_ReturnsNodesFromMatrixInstance()
+    public void NonZeroMatrixValues_ReturnsNodesFromMatrixInstance()
     {
         // Arrange
         _matrix[_nodeA, _nodeB] = 1.0;
@@ -470,7 +685,7 @@ public class SmallStiffnessMatrixTests
     }
 
     [Test]
-    public void NonZeroElements_YieldsPairsInUpperTriangleOrder()
+    public void NonZeroMatrixValues_YieldsPairsInUpperTriangleOrder()
     {
         // Arrange: заполним все 6 ячеек верхнего треугольника
         _matrix[_nodeA, _nodeA] = 1.0;
@@ -497,9 +712,49 @@ public class SmallStiffnessMatrixTests
         Assert.That(result, Is.EqualTo(expected));
     }
 
+    [Test]
+    public void NonZeroMatrixValues_IsLazy_ReflectsLaterChanges()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeB] = 1.0;
+
+        // Act
+        var enumerable = _matrix.NonZeroMatrixValues();
+        _matrix[_nodeB, _nodeC] = 2.0;
+
+        // Assert — при перечислении видим оба значения
+        Assert.That(enumerable.Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public void NonZeroMatrixValues_PreservesRowMajorOrder_AfterPartialClearing()
+    {
+        // Arrange
+        _matrix[_nodeA, _nodeA] = 1.0;
+        _matrix[_nodeA, _nodeB] = 2.0;
+        _matrix[_nodeA, _nodeC] = 3.0;
+        _matrix[_nodeB, _nodeB] = 4.0;
+        _matrix[_nodeB, _nodeC] = 5.0;
+        _matrix[_nodeC, _nodeC] = 6.0;
+
+        // Act — обнуляем середину
+        _matrix[_nodeA, _nodeB] = 0.0;
+        _matrix[_nodeB, _nodeC] = 0.0;
+
+        // Assert — порядок оставшихся: (A,A), (A,C), (B,B), (C,C)
+        var result = _matrix.NonZeroMatrixValues().ToArray();
+        Assert.That(result.Select(e => (e.I, e.J, e.Value)), Is.EqualTo(new[]
+        {
+            (_nodeA, _nodeA, 1.0),
+            (_nodeA, _nodeC, 3.0),
+            (_nodeB, _nodeB, 4.0),
+            (_nodeC, _nodeC, 6.0),
+        }));
+    }
+
     #endregion
 
-    #region ReferenceEqualityComparer
+    #region IndexOf
 
     [Test]
     public void IndexOf_UsesReferenceEquality_NotEquals()
@@ -520,6 +775,99 @@ public class SmallStiffnessMatrixTests
             Assert.That(matrix[node1, node2], Is.EqualTo(10.0));
             Assert.That(matrix[node2, node1], Is.EqualTo(10.0));
         });
+    }
+
+    [Test]
+    public void IndexOf_IgnoresEquals_WhenNodesAreEqualByValue()
+    {
+        // Arrange — моки, у которых Equals настроен возвращать true
+        var node1 = new Mock<IElementNode>();
+        var node2 = new Mock<IElementNode>();
+        node1.Setup(x => x.Equals(node2.Object)).Returns(true);
+        node2.Setup(x => x.Equals(node1.Object)).Returns(true);
+
+        var matrix = new SmallStiffnessMatrix([node1.Object]);
+
+        // Act — node2 не находится, несмотря на Equals == true
+        matrix[node2.Object, node2.Object] = 5.0;
+
+        // Assert — запись проигнорирована, потому что IndexOf вернул -1
+        Assert.That(matrix[node2.Object, node2.Object], Is.Zero);
+    }
+
+    [Test]
+    public void IndexOf_ReturnsFirstMatch_WhenDuplicateNodes()
+    {
+        // Arrange — один и тот же объект дважды в разных позициях
+        var nodes = new[] { _nodeA, _nodeB, _nodeA };
+        var matrix = new SmallStiffnessMatrix(nodes);
+
+        // Act — запись идёт по первому вхождению _nodeA (индекс 0)
+        matrix[_nodeA, _nodeB] = 1.0;
+
+        // Assert — читается через то же самое первое вхождение
+        Assert.That(matrix[_nodeA, _nodeB], Is.EqualTo(1.0));
+    }
+
+    #endregion
+
+    #region PackIndex
+
+    [Test]
+    public void PackIndex_IsInvolutive_ForAllPairs_InMaxSizeMatrix()
+    {
+        // Arrange
+        var nodes = Enumerable.Range(0, 12)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+        var matrix = new SmallStiffnessMatrix(nodes);
+
+        // Act & Assert — пишем в (i,j), читаем из (j,i) для всех пар
+        for (var i = 0; i < nodes.Length; i++)
+            for (var j = i; j < nodes.Length; j++)
+            {
+                var value = i * 100 + j + 1;
+                matrix[nodes[i], nodes[j]] = value;
+                Assert.That(matrix[nodes[j], nodes[i]], Is.EqualTo(value),
+                    $"Symmetry broken at ({i},{j}).");
+            }
+    }
+
+    [Test]
+    public void PackIndex_ProducesUniqueIndices_ForAllUpperTrianglePairs()
+    {
+        // Arrange
+        var nodes = Enumerable.Range(0, 12)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+        var matrix = new SmallStiffnessMatrix(nodes);
+        var n = nodes.Length;
+        var expectedCellCount = n * (n + 1) / 2;
+
+        // Act — заполняем все ячейки верхнего треугольника
+        for (var i = 0; i < n; i++)
+            for (var j = i; j < n; j++)
+                matrix[nodes[i], nodes[j]] = i * 100 + j + 1;
+
+        // Assert — ровно n(n+1)/2 ненулевых ячеек, никаких коллизий
+        Assert.That(matrix.NonZeroMatrixValues().Count(), Is.EqualTo(expectedCellCount));
+    }
+
+    #endregion
+
+    #region AddValue
+
+    [Test]
+    public void AddValue_ThrowsNotImplementedException()
+    {
+        // Arrange
+        // (_matrix создана в SetUp)
+
+        // Act
+        var act = () => _matrix.AddValue(_nodeA, _nodeB, 1.0);
+
+        // Assert
+        Assert.Throws<NotImplementedException>(() => act());
     }
 
     #endregion
@@ -585,46 +933,28 @@ public class SmallStiffnessMatrixTests
         });
     }
 
-    #endregion
-
-    #region Комбинации
-
     [Test]
-    public void FullThreeByThree_FillsUpperTriangleSymmetrically()
+    public void TwelveByTwelveMatrix_HandlesAllUpperTriangleCells()
     {
         // Arrange
-        _matrix[_nodeA, _nodeA] = 1.0;
-        _matrix[_nodeA, _nodeB] = 2.0;
-        _matrix[_nodeA, _nodeC] = 3.0;
-        _matrix[_nodeB, _nodeB] = 4.0;
-        _matrix[_nodeB, _nodeC] = 5.0;
-        _matrix[_nodeC, _nodeC] = 6.0;
-
-        // Act & Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(_matrix[_nodeB, _nodeA], Is.EqualTo(2.0));
-            Assert.That(_matrix[_nodeC, _nodeA], Is.EqualTo(3.0));
-            Assert.That(_matrix[_nodeC, _nodeB], Is.EqualTo(5.0));
-        });
-    }
-
-    [Test]
-    public void ClearingAllElements_KeepsNodesAndNonZeroElementsEmpty()
-    {
-        // Arrange
-        _matrix[_nodeA, _nodeB] = 1.0;
-        _matrix[_nodeB, _nodeC] = 2.0;
+        var nodes = Enumerable.Range(0, 12)
+            .Select(_ => Mock.Of<IElementNode>())
+            .ToArray();
+        var matrix = new SmallStiffnessMatrix(nodes);
+        var n = nodes.Length;
+        var expectedCount = n * (n + 1) / 2;
 
         // Act
-        _matrix[_nodeA, _nodeB] = 0.0;
-        _matrix[_nodeB, _nodeC] = 0.0;
+        for (var i = 0; i < n; i++)
+            for (var j = i; j < n; j++)
+                matrix[nodes[i], nodes[j]] = i * 100 + j + 1;
 
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(_matrix.Nodes, Has.Count.EqualTo(3));
-            Assert.That(_matrix.NonZeroMatrixValues(), Is.Empty);
+            Assert.That(matrix.NonZeroMatrixValues().Count(), Is.EqualTo(expectedCount));
+            Assert.That(matrix[nodes[11], nodes[0]], Is.EqualTo(12));
+            Assert.That(matrix[nodes[0], nodes[11]], Is.EqualTo(12));
         });
     }
 

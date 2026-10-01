@@ -76,7 +76,6 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                     finiteElement.Type.NodeType.Dimension,
                     finiteElement.Nodes.Count);
 
-                // todo: Здесь нужно передавать опции (материал и геометрические параметры)
                 localMatrices[i] = logic.GetMatrix(finiteElement);
                 return ValueTask.CompletedTask;
             });

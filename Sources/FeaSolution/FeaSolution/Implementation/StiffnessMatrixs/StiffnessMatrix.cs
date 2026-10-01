@@ -17,7 +17,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
 
     internal MatrixValue DefaultValue { get; } = 0.0;
 
-    public int NodeCount => _nodeToIndex.Count;
+    internal int NodeCount => _nodeToIndex.Count;
 
     /// <inheritdoc/>>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;
@@ -52,6 +52,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
         }
         set
         {
+            // todo: убрать реализацию - для глобальной используется только AddValue
             if (value == DefaultValue)
             {
                 if (!_nodeToIndex.TryGetValue(firstNode, out var a) ||

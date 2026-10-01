@@ -57,6 +57,7 @@ public sealed class StiffnessMatrixTriangle2DTemperatureLogic : IStiffnessMatrix
 
         var multiplier= thermalConductivity * thickness / (4.0 * square);
 
+        // todo: в целях повышения производительности можно создавать маленькую матрицу сразу и возможно тогда будет быстрее доступ по индексу
         LocalMatrix = StiffnessMatrixFactory.CreateNew(_nodes);
         SetUpMatrix(multiplier, vectorB, vectorC);
         return LocalMatrix;
