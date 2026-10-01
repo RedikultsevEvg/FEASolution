@@ -6,10 +6,10 @@ using FeaSolution.Implementation.Builders;
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 
 /// <summary>
-/// Линейный треугольный конечный элемент для задачи стационарной
-/// теплопроводности: -div(λ ∇T) = 0.
+/// Stiffness matrix calculation logic for a linear triangular finite element
+/// for the steady-state heat conduction problem: -div(λ ∇T) = 0.
 /// </summary>
-public sealed class StiffnessTriangle2DTemperatureLogic : IStiffnessMatrixLogic
+public sealed class StiffnessMatrixTriangle2DTemperatureLogic : IStiffnessMatrixLogic
 {
     private IElementNode[] _nodes = [];
 

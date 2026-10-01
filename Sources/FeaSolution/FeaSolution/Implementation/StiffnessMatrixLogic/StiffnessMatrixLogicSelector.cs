@@ -23,7 +23,7 @@ public static class StiffnessMatrixLogicSelector
             && freedoms.ElementAt(0) == Freedom.Temperature
             && dimensional == Dimensional.TwoDimensional
             && nodeCount == 3
-            ) return new StiffnessTriangle2DTemperatureLogic();
+            ) return new StiffnessMatrixTriangle2DTemperatureLogic();
 
         throw new NotSupportedException("The logic for element is not supported");
     }
