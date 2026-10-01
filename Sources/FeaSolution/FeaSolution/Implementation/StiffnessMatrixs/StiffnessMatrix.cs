@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace FeaSolution.Implementation.StiffnessMatrixs;
 
+/// <summary>
+/// Stiffness matrix for a large sparse symmetric matrix.
+/// </summary>
 public sealed class StiffnessMatrix : IStiffnessMatrix
 {
     private readonly Dictionary<IElementNode, int> _nodeToIndex =
@@ -16,9 +19,10 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
 
     public int NodeCount => _nodeToIndex.Count;
 
-    /// <summary>Зарегистрированные узлы в порядке регистрации.</summary>
+    /// <inheritdoc/>>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;
 
+    /// <inheritdoc/>>
     public void AddValue(IElementNode firstNode, IElementNode secondNode, MatrixValue valueToAdd)
     {
         if (valueToAdd == 0.0) return;
@@ -34,6 +38,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
             _matrixData.Remove(key);
     }
 
+    /// <inheritdoc/>>
     public MatrixValue this[IElementNode firstNode, IElementNode secondNode]
     {
         get
@@ -64,10 +69,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
         }
     }
 
-    /// <summary>
-    /// Обходит ненулевые ячейки верхнего треугольника.
-    /// Каждая симметричная пара (i, j) выдаётся один раз.
-    /// </summary>
+    /// <inheritdoc/>>
     public IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroElements()
     {
         foreach (var (key, value) in _matrixData)
