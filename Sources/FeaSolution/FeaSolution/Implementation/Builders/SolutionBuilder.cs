@@ -13,6 +13,8 @@ namespace FeaSolution.Implementation.Builders;
 /// <param name="constructionModel">Construction model.</param>
 public class SolutionBuilder(IConstructionModel constructionModel)
 {
+    public IStiffnessMatrix? GlobalStiffnessMatrix { get; private set; }
+
     /// <summary>
     /// Creates a construction model solution.
     /// </summary>
@@ -86,6 +88,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
             cancellationToken.ThrowIfCancellationRequested();
             globalStiffnessMatrix.AddMatrix(localMatrix);
         }
+
+        GlobalStiffnessMatrix = globalStiffnessMatrix;
 
         return this;
     }
