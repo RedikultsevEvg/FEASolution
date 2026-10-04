@@ -15,7 +15,8 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
     // packed upper triangle
     private readonly MatrixValue[] _matrixData; 
 
-    internal int NodeCount => Nodes.Count;
+    /// <inheritdoc/>
+    public int NodeCount => Nodes.Count;
 
     internal MatrixValue DefaultValue { get; } = 0.0;
 
@@ -58,6 +59,7 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
         set
         {
+            // todo: этот метод можно убрать, он не используется
             var a = IndexOf(firstNode);
             var b = IndexOf(secondNode);
 

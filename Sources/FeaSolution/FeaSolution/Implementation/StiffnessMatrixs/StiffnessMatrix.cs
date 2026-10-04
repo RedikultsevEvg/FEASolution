@@ -17,7 +17,20 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
 
     internal MatrixValue DefaultValue { get; } = 0.0;
 
-    internal int NodeCount => _nodeToIndex.Count;
+    public int NodeCount => _nodeToIndex.Count;
+
+    /// <inheritdoc/>>
+    public IEnumerable<(int indexOfNodeI, int indexOfNodeJ, MatrixValue Value)> NonZeroMatrixValuesWithIndexes()
+    {
+        return _matrixData.Select(mdPair =>
+        {
+            var a = (int)(mdPair.Key >> 32);
+            var b = (int)(mdPair.Key & 0xFFFFFFFF);
+            var value = mdPair.Value;
+
+            return (a, b, value);
+        });
+    }
 
     /// <inheritdoc/>>
     public IReadOnlyList<IElementNode> Nodes => _indexToNode;

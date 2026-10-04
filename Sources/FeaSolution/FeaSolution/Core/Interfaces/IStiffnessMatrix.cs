@@ -20,8 +20,21 @@ public interface IStiffnessMatrix
     /// </summary>
     IEnumerable<(IElementNode I, IElementNode J, MatrixValue Value)> NonZeroMatrixValues();
 
-    // Returns registered nodes.
+    /// <summary>
+    /// Returns non-zero values.
+    /// Every symmetric pair (i, j) exist one time in result.
+    /// </summary>
+    IEnumerable<(int indexOfNodeI, int indexOfNodeJ, MatrixValue Value)> NonZeroMatrixValuesWithIndexes();
+
+    /// <summary>
+    /// Returns registered nodes.
+    /// </summary>
     IReadOnlyList<IElementNode> Nodes { get; }
+
+    /// <summary>
+    /// Returns the size of matrix.
+    /// </summary>
+    int NodeCount { get; }
 
     /// <summary>
     /// Add value to existing matrix value by pair of nodes.
