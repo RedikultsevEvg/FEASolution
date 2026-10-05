@@ -1,4 +1,4 @@
-using FeaSolution.Core.Types;
+using FeaSolution.Core.Enums;
 
 namespace FeaSolution.Core.Interfaces;
 
@@ -10,5 +10,5 @@ public interface IConstructionModelSolution
     /// <summary>
     /// Gets solution item.
     /// </summary>
-    SolutionValue GetSolutionValue(IElementNode node, DegreeOfFreedom degreeOfFreedom);
+    SolutionValue GetSolutionValue(IElementNode node, Freedom freedom);
 }

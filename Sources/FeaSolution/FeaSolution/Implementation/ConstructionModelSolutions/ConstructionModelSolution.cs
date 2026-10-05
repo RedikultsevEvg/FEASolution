@@ -1,3 +1,4 @@
+using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
@@ -8,13 +9,13 @@ public class ConstructionModelSolution : IConstructionModelSolution
 {
 
     /// <inheritdoc />
-    public SolutionValue GetSolutionValue(IElementNode node, DegreeOfFreedom dof)
+    public SolutionValue GetSolutionValue(IElementNode node, Freedom freedom)
     {
         var item = Items.FirstOrDefault(x =>
-            x.Node == node && x.DegreeOfFreedom == dof);
+            x.Node == node && x.Freedom == freedom);
 
         return item?.Value ?? throw new InvalidOperationException(
-            $"No solution for node {node} and DOF {dof}");
+            $"No solution for node {node} and DOF {freedom}");
     }
 
     public required ICollection<SolutionItem> Items { get; init; }

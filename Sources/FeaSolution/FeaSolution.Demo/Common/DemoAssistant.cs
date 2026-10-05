@@ -6,14 +6,14 @@ internal static class DemoAssistant
 {
     public static void ConsoleWriteExampleResults(string methodName, ConstructionModelSolution solution)
     {
-        var solutionItemsGroupedByFreedom = solution.Items.GroupBy(i => i.DegreeOfFreedom);
+        var solutionItemsGroupedByFreedom = solution.Items.GroupBy(i => i.Freedom);
 
         Console.WriteLine("=========================================");
         Console.WriteLine($"Demo of {methodName}");
         foreach (var group in solutionItemsGroupedByFreedom)
         {
             Console.WriteLine();
-            Console.WriteLine("Next solution values for degree of freedom = '{0}'", group.Key.Freedom.ToString());
+            Console.WriteLine("Next solution values for degree of freedom = '{0}'", group.Key.ToString());
 
             foreach (var solutionItem in group)
             {

@@ -35,6 +35,11 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         _matrixData = new MatrixValue[n * (n + 1) / 2];
     }
 
+    public IEnumerable<(int indexOfNodeI, int indexOfNodeJ, MatrixValue Value)> NonZeroMatrixValuesWithIndexes()
+    {
+        throw new NotImplementedException();
+    }
+
     /// <inheritdoc/>
     public IReadOnlyList<IElementNode> Nodes => _nodes;
 

@@ -64,7 +64,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
             {
                 //Node = freedoms[i].Node,
                 Node = constructionModel.Elements.FirstOrDefault().Nodes.FirstOrDefault(),
-                DegreeOfFreedom = constructionModel.CommonFreedoms.FirstOrDefault(),
+                Freedom = constructionModel.CommonFreedoms.FirstOrDefault(),
                 //Value = new SolutionValue(T[i])
                 Value = 100
             });

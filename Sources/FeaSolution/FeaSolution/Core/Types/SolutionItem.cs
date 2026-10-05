@@ -7,7 +7,7 @@ public class SolutionItem
 {
     public IElementNode Node { get; init; }
 
-    public Freedom DegreeOfFreedom { get; init; }
+    public Freedom Freedom { get; init; }
 
     public SolutionValue Value { get; init; }
 }
