@@ -48,4 +48,7 @@ public class ElementNode(ElementNodeType type) : IElementNode
             };
         }
     }
+
+    /// <inheritdoc />
+    public string UserId { get; init; } = string.Empty;
 }

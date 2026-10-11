@@ -1,9 +1,11 @@
+using FeaSolution.Core.Enums;
+using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
-using FeaSolution.Implementation.ElementNodes;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
+using FeaSolution.SlaCalculation;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -15,6 +17,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
 {
     public IStiffnessMatrix? GlobalStiffnessMatrix { get; private set; }
 
+    private ICollection<DirichleCondition> DirichleConditions { get; set; } = [];
+
     /// <summary>
     /// Creates a construction model solution.
     /// </summary>
@@ -24,31 +28,32 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         ArgumentNullException.ThrowIfNull(constructionModel);
         if (GlobalStiffnessMatrix is null)
             throw new InvalidOperationException(
-                "Global stiffness matrix is not assembled. Call AssemblyAsync first.");
+                $"Global stiffness matrix is not assembled. Call {nameof(AssemblyAsync)} first.");
 
-        int n = GlobalStiffnessMatrix.NodeCount;
+        int size = GlobalStiffnessMatrix.NodeCount;
+
+        // 3. Формируем правую часть. В тесте F = 0.
+        MatrixValue[] vectorF = new MatrixValue[size];
+
+        // 4. Применяем условия Дирихле (модификация K и F).
+        ISleLogic sleLogic = null!;
+
+        sleLogic.ApplyDirichlet(GlobalStiffnessMatrix, DirichleConditions);
+
+        return new ConstructionModelSolution
+        {
+            Items = []
+        };
 
         // 2. Конвертируем глобальную матрицу жёсткости в формат CSparse (CSC).
         var cscMatrix = ConvertToCSparse(GlobalStiffnessMatrix);
 
-        // 3. Формируем правую часть. В тесте F = 0.
-        double[] F = new double[n];
-
-        // 4. Применяем условия Дирихле (модификация K и F).
-        //var dirichlet = CollectDirichletConditions(constructionModel, freedoms);
-
-        /*
-        foreach (var (i, Ti) in dirichlet)
-        {
-            ApplyDirichlet(cscMatrix, F, i, Ti);
-        }
-        */
 
         // 5. Решаем K·T = F через CSparse.
         double[] T = new double[GlobalStiffnessMatrix.NodeCount];
         double[] results = new double[GlobalStiffnessMatrix.NodeCount];
 
-        Array.Copy(F, T, n);
+        Array.Copy(vectorF, T, size);
         var order = CSparse.ColumnOrdering.MinimumDegreeAtPlusA;
         var chol = CSparse.Double.Factorization.SparseCholesky.Create(cscMatrix, order);
 
@@ -56,9 +61,9 @@ public class SolutionBuilder(IConstructionModel constructionModel)
 
         // 6. УПАКОВКА: превращаем double[] в список SolutionItem.
         //    Привязка чисел к узлам и DOF через freedoms.
-        var items = new List<SolutionItem>(n);
+        var items = new List<SolutionItem>(size);
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < size; i++)
         {
             items.Add(new SolutionItem
             {
@@ -145,6 +150,31 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         return this;
     }
 
+    /// <summary>
+    /// Adds Direchle condition.
+    /// </summary>
+    /// <param name="noteId">Node id.</param>
+    /// <param name="freedom">Freedom.</param>
+    /// <param name="conditionValue">Condition value.</param>
+    /// <returns>The reference to the current builder.</returns>
+    public SolutionBuilder AddDirichle(string noteId, Freedom freedom, MatrixValue conditionValue)
+    {
+        FeaCommonException.ThrowIfTrue(constructionModel == null!, "Can't validate the condition - the construction model is null.");
+        FeaCommonException.ThrowIfTrue(constructionModel?.Elements == null || constructionModel?.Elements.Count == 0 , "Can't validate the condition - the construction model is empty (element collection is null or empty).");
+
+        var nodes = constructionModel?.Elements.SelectMany(e => e.Nodes);
+        var node = nodes?.FirstOrDefault(n => n.UserId == noteId);
+        FeaCommonException.ThrowIfTrue(node == null, $"Can't find the node with id: '{noteId}' in construction model.");
+
+        DirichleConditions.Add(new DirichleCondition
+        {
+            Node = node!,
+            Freedom = freedom,
+            Value = conditionValue
+        });
+
+        return this;
+    }
 
     /// <summary>
     /// Validates for the minimum count of element. The minimum is 2.

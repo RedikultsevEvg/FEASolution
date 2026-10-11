@@ -26,4 +26,9 @@ public interface IElementNode
     /// Z coordinate. Equals 0 if the node type is OneDimensional or TwoDimensional.
     /// </summary>
     CoordinateValue Z { get; set; }
+
+    /// <summary>
+    /// Unique user-defined node identifier.
+    /// </summary>
+    string UserId { get; init; }
 }

@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SlaCalculation\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CSparse" Version="4.4.1" />
   </ItemGroup>
 
