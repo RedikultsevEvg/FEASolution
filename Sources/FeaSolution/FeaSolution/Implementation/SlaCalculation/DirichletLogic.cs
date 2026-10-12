@@ -11,7 +11,8 @@ internal class DirichletLogic : IDirichletLogic
 {
     /// <inheritdoc/>
     public void ApplyDirichlet(IStiffnessMatrix matrixK,
-        ICollection<DirichleCondition> dirichleConditions, SolutionItem[] vectorF)
+        SolutionItem[] vectorF,
+        ICollection<DirichleCondition> dirichleConditions)
     {
         ArgumentNullException.ThrowIfNull(matrixK);
         ArgumentNullException.ThrowIfNull(dirichleConditions);
@@ -23,21 +24,21 @@ internal class DirichletLogic : IDirichletLogic
         }
     }
 
-    internal void ApplyDirichletOnce(IStiffnessMatrix globalStiffnessMatrix,
+    internal void ApplyDirichletOnce(IStiffnessMatrix matrixK,
            SolutionItem[] vectorF, DirichleCondition condition)
     {
-        ArgumentNullException.ThrowIfNull(globalStiffnessMatrix);
+        ArgumentNullException.ThrowIfNull(matrixK);
         ArgumentNullException.ThrowIfNull(vectorF);
         ArgumentNullException.ThrowIfNull(condition);
 
-        var nodes = globalStiffnessMatrix.Nodes;
+        var nodes = matrixK.Nodes;
         var constrainedNode = condition.Node;
         var prescribedValue = condition.Value;
 
         // Находим индекс заданного узла в матрице.
         // В StiffnessMatrix порядок Nodes совпадает с порядком добавления,
         // и vectorF ожидается в том же порядке.
-        var nodeIndex = FindNodeIndex(globalStiffnessMatrix, constrainedNode);
+        var nodeIndex = FindNodeIndex(matrixK, constrainedNode);
         FeaCommonException.ThrowIfTrue(nodeIndex < 0, "The constrained node was not found in the stiffness matrix.");
         FeaCommonException.ThrowIfTrue(nodeIndex >= vectorF.Length, "The vector F is smaller than the matrix size.");
 
@@ -49,7 +50,7 @@ internal class DirichletLogic : IDirichletLogic
         {
             if (j == nodeIndex) continue;
 
-            var kji = globalStiffnessMatrix[nodes[j], constrainedNode];
+            var kji = matrixK[nodes[j], constrainedNode];
             if (kji == 0.0) continue;
 
             vectorF[j].Value -= kji * prescribedValue;
@@ -62,7 +63,7 @@ internal class DirichletLogic : IDirichletLogic
         {
             if (j == nodeIndex) continue;
 
-            globalStiffnessMatrix[nodes[j], constrainedNode] = 0.0;
+            matrixK[nodes[j], constrainedNode] = 0.0;
         }
 
         // -----------------------------------------------------------------
@@ -72,13 +73,13 @@ internal class DirichletLogic : IDirichletLogic
         {
             if (j == nodeIndex) continue;
 
-            globalStiffnessMatrix[constrainedNode, nodes[j]] = 0.0;
+            matrixK[constrainedNode, nodes[j]] = 0.0;
         }
 
         // -----------------------------------------------------------------
         // Шаг 4. K[i,i] = 1
         // -----------------------------------------------------------------
-        globalStiffnessMatrix[constrainedNode, constrainedNode] = 1.0;
+        matrixK[constrainedNode, constrainedNode] = 1.0;
 
         // -----------------------------------------------------------------
         // Шаг 5. F[i] = T

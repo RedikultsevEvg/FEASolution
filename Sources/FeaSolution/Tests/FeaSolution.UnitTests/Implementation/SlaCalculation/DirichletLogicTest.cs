@@ -390,7 +390,7 @@ public class DirichletLogicTest
             () => _dirichletLogic.ApplyDirichletOnce(null!, f, condition));
 
         // Assert
-        Assert.That(ex!.ParamName, Is.EqualTo("globalStiffnessMatrix"));
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'matrixK')"));
     }
 
     [Test]
@@ -405,7 +405,7 @@ public class DirichletLogicTest
             () => _dirichletLogic.ApplyDirichletOnce(k, null!, condition));
 
         // Assert
-        Assert.That(ex!.ParamName, Is.EqualTo("vectorF"));
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'vectorF')"));
     }
 
     [Test]
@@ -420,7 +420,7 @@ public class DirichletLogicTest
             () => _dirichletLogic.ApplyDirichletOnce(k, f, null!));
 
         // Assert
-        Assert.That(ex!.ParamName, Is.EqualTo("condition"));
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'condition')"));
     }
     
     /// <summary>

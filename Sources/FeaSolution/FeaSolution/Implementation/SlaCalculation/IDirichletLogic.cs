@@ -13,8 +13,8 @@ internal interface IDirichletLogic
     /// K * T = F
     /// </summary>
     /// <param name="matrixK">Matrix K.</param>
-    /// <param name="dirichleConditions">Collection of Direchle conditions.</param>
     /// <param name="vectorF">Vector F.</param>
-    void ApplyDirichlet(IStiffnessMatrix matrixK, ICollection<DirichleCondition> dirichleConditions,
-        SolutionItem[] vectorF);
+    /// <param name="dirichleConditions">Collection of Direchle conditions.</param>
+    void ApplyDirichlet(IStiffnessMatrix matrixK,
+        SolutionItem[] vectorF, ICollection<DirichleCondition> dirichleConditions);
 }

@@ -38,7 +38,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         // 4. Применяем условия Дирихле (модификация K и F).
         IDirichletLogic dirichletLogic = null!;
 
-        dirichletLogic.ApplyDirichlet(GlobalStiffnessMatrix, DirichleConditions, vectorF);
+        dirichletLogic.ApplyDirichlet(GlobalStiffnessMatrix, vectorF, DirichleConditions);
 
         return new ConstructionModelSolution
         {
