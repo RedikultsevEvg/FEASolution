@@ -3,9 +3,9 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
+using FeaSolution.Implementation.SlaCalculation;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
-using FeaSolution.SlaCalculation;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -33,12 +33,12 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         int size = GlobalStiffnessMatrix.NodeCount;
 
         // 3. Формируем правую часть. В тесте F = 0.
-        MatrixValue[] vectorF = new MatrixValue[size];
+        var vectorF = new SolutionItem[size];
 
         // 4. Применяем условия Дирихле (модификация K и F).
-        ISleLogic sleLogic = null!;
+        IDirichletLogic dirichletLogic = null!;
 
-        sleLogic.ApplyDirichlet(GlobalStiffnessMatrix, DirichleConditions);
+        dirichletLogic.ApplyDirichlet(GlobalStiffnessMatrix, DirichleConditions, vectorF);
 
         return new ConstructionModelSolution
         {

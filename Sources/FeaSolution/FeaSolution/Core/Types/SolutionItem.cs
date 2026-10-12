@@ -9,5 +9,5 @@ public class SolutionItem
 
     public Freedom Freedom { get; init; }
 
-    public SolutionValue Value { get; init; }
+    public SolutionValue Value { get; set; }
 }

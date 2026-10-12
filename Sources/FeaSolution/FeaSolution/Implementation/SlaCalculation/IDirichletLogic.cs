@@ -1,0 +1,20 @@
+﻿using FeaSolution.Core.Interfaces;
+using FeaSolution.Core.Types;
+
+namespace FeaSolution.Implementation.SlaCalculation;
+
+/// <summary>
+/// System of linear equations logic.
+/// </summary>
+internal interface IDirichletLogic
+{
+    /// <summary>
+    /// Applies the Dirichle condition to matrix K and vector F. <br/>
+    /// K * T = F
+    /// </summary>
+    /// <param name="matrixK">Matrix K.</param>
+    /// <param name="dirichleConditions">Collection of Direchle conditions.</param>
+    /// <param name="vectorF">Vector F.</param>
+    void ApplyDirichlet(IStiffnessMatrix matrixK, ICollection<DirichleCondition> dirichleConditions,
+        SolutionItem[] vectorF);
+}
