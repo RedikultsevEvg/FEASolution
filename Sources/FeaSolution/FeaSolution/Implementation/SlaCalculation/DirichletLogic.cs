@@ -14,6 +14,7 @@ internal class DirichletLogic : IDirichletLogic
         SolutionItem[] vectorF,
         ICollection<DirichleCondition> dirichleConditions)
     {
+        ArgumentNullException.ThrowIfNull(vectorF);
         ArgumentNullException.ThrowIfNull(matrixK);
         ArgumentNullException.ThrowIfNull(dirichleConditions);
         FeaCommonException.ThrowIfTrue(dirichleConditions.Count == 0, "The collection of Dirichle condition is empty.");

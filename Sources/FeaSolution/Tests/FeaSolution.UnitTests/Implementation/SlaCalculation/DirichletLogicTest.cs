@@ -1,4 +1,5 @@
 ﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.SlaCalculation;
@@ -119,8 +120,8 @@ public class DirichletLogicTest
     public void ApplyDirichletOnce_AnyCondition_DoesNotTouchOtherRowsAndColumns(string nodeKey)
     {
         // Arrange
-        var kActual = CreateMatrixK();   
-        var kExpected = CreateMatrixK(); 
+        var kActual = CreateMatrixK();
+        var kExpected = CreateMatrixK();
         var f = CreateZeroVectorF();
         var node = ResolveNode(nodeKey);
         var condition = MakeCondition(node, 20.0);
@@ -421,6 +422,280 @@ public class DirichletLogicTest
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'condition')"));
+    }
+
+    [Test]
+    public void ApplyDirichlet_SingleCondition_ModifiesMatrixAndVector()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(k, f, conditions);
+
+        // Assert 
+        Assert.Multiple(() =>
+        {
+            Assert.That(k[_node1, _node1], Is.EqualTo(1.000).Within(1e-10));
+            Assert.That(k[_node1, _node2], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node1, _node3], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node1, _node4], Is.EqualTo(0.000).Within(1e-10));
+
+            Assert.That(k[_node2, _node1], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node3, _node1], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node4, _node1], Is.EqualTo(0.000).Within(1e-10));
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(f[0].Value, Is.EqualTo(20.0).Within(1e-10));
+            Assert.That(f[1].Value, Is.EqualTo(5.0).Within(1e-10));
+            Assert.That(f[2].Value, Is.EqualTo(5.0).Within(1e-10));
+            Assert.That(f[3].Value, Is.EqualTo(0.0).Within(1e-10));
+        });
+    }
+    
+    [Test]
+    public void ApplyDirichlet_TwoConditions_ProducesExpectedMatrix()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0),
+            MakeCondition(_node4, 100.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(k, f, conditions);
+
+        // Assert 
+        Assert.Multiple(() =>
+        {
+            Assert.That(k[_node1, _node1], Is.EqualTo(1.000).Within(1e-10));
+            Assert.That(k[_node1, _node2], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node1, _node3], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node1, _node4], Is.EqualTo(0.000).Within(1e-10));
+
+            Assert.That(k[_node2, _node1], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node2, _node2], Is.EqualTo(1.250).Within(1e-10));
+            Assert.That(k[_node2, _node3], Is.EqualTo(-0.750).Within(1e-10));
+            Assert.That(k[_node2, _node4], Is.EqualTo(0.000).Within(1e-10));
+
+            Assert.That(k[_node3, _node1], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node3, _node2], Is.EqualTo(-0.750).Within(1e-10));
+            Assert.That(k[_node3, _node3], Is.EqualTo(1.250).Within(1e-10));
+            Assert.That(k[_node3, _node4], Is.EqualTo(0.000).Within(1e-10));
+
+            Assert.That(k[_node4, _node1], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node4, _node2], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node4, _node3], Is.EqualTo(0.000).Within(1e-10));
+            Assert.That(k[_node4, _node4], Is.EqualTo(1.000).Within(1e-10));
+        });
+    }
+
+    [Test]
+    public void ApplyDirichlet_TwoConditions_ProducesExpectedRhs()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0),
+            MakeCondition(_node4, 100.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(k, f, conditions);
+
+        // Assert — F_D = [20, 30, 30, 100]
+        // После T1=20: F = [20, 5, 5, 0]
+        // После T4=100: F2 = 5 - (-0.250)*100 = 30, F3 = 5 - (-0.250)*100 = 30
+        Assert.Multiple(() =>
+        {
+            Assert.That(f[0].Value, Is.EqualTo(20.0).Within(1e-10));
+            Assert.That(f[1].Value, Is.EqualTo(30.0).Within(1e-10));
+            Assert.That(f[2].Value, Is.EqualTo(30.0).Within(1e-10));
+            Assert.That(f[3].Value, Is.EqualTo(100.0).Within(1e-10));
+        });
+    }
+
+    [Test]
+    public void ApplyDirichlet_TwoConditions_ConditionOrderDoesNotMatter()
+    {
+        // Arrange
+        var kFirst = CreateMatrixK();
+        var fFirst = CreateZeroVectorF();
+        var conditionsFirst = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0),
+            MakeCondition(_node4, 100.0)
+        };
+
+        var kSecond = CreateMatrixK();
+        var fSecond = CreateZeroVectorF();
+        var conditionsSecond = new List<DirichleCondition>
+        {
+            MakeCondition(_node4, 100.0),
+            MakeCondition(_node1, 20.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(kFirst, fFirst, conditionsFirst);
+        _dirichletLogic.ApplyDirichlet(kSecond, fSecond, conditionsSecond);
+
+        // Assert 
+        Assert.Multiple(() =>
+        {
+            foreach (var i in _nodes)
+            {
+                foreach (var j in _nodes)
+                {
+                    Assert.That(kSecond[i, j], Is.EqualTo(kFirst[i, j]).Within(1e-10),
+                        $"K[{i.UserId}, {j.UserId}] must be equal regardless of condition order.");
+                }
+            }
+
+            for (var i = 0; i < fFirst.Length; i++)
+            {
+                Assert.That(fSecond[i].Value, Is.EqualTo(fFirst[i].Value).Within(1e-10),
+                    $"F[{i}].Value must be equal regardless of condition order.");
+            }
+        });
+    }
+
+    [Test]
+    public void ApplyDirichlet_ThreeConditions_AllConstrainedNodesAreSet()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0),
+            MakeCondition(_node2, 40.0),
+            MakeCondition(_node4, 100.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(k, f, conditions);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(k[_node1, _node1], Is.EqualTo(1.000).Within(1e-10));
+            Assert.That(k[_node2, _node2], Is.EqualTo(1.000).Within(1e-10));
+            Assert.That(k[_node4, _node4], Is.EqualTo(1.000).Within(1e-10));
+
+            Assert.That(f[0].Value, Is.EqualTo(20.0).Within(1e-10));
+            Assert.That(f[1].Value, Is.EqualTo(40.0).Within(1e-10));
+            Assert.That(f[3].Value, Is.EqualTo(100.0).Within(1e-10));
+        });
+    }
+
+    [Test]
+    public void ApplyDirichlet_AllFourConditions_FullyConstrainedSystem()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>
+        {
+            MakeCondition(_node1, 20.0),
+            MakeCondition(_node2, 40.0),
+            MakeCondition(_node3, 60.0),
+            MakeCondition(_node4, 100.0)
+        };
+
+        // Act
+        _dirichletLogic.ApplyDirichlet(k, f, conditions);
+
+        // Assert — матрица стала единичной, вектор содержит заданные значения
+        Assert.Multiple(() =>
+        {
+            for (var i = 0; i < _nodes.Length; i++)
+            {
+                for (var j = 0; j < _nodes.Length; j++)
+                {
+                    var expected = i == j ? 1.0 : 0.0;
+                    Assert.That(k[_nodes[i], _nodes[j]], Is.EqualTo(expected).Within(1e-10),
+                        $"K[{_nodes[i].UserId}, {_nodes[j].UserId}] must be {(i == j ? "1" : "0")}.");
+                }
+            }
+
+            Assert.That(f[0].Value, Is.EqualTo(20.0).Within(1e-10));
+            Assert.That(f[1].Value, Is.EqualTo(40.0).Within(1e-10));
+            Assert.That(f[2].Value, Is.EqualTo(60.0).Within(1e-10));
+            Assert.That(f[3].Value, Is.EqualTo(100.0).Within(1e-10));
+        });
+    }
+
+    [Test]
+    public void ApplyDirichlet_EmptyConditions_ThrowsFeaCommonException()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition>();
+
+        // Act
+        var ex = Assert.Throws<FeaCommonException>(
+            () => _dirichletLogic.ApplyDirichlet(k, f, conditions));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("The collection of Dirichle condition is empty."));
+    }
+
+    [Test]
+    public void ApplyDirichlet_ThrowsOnNullMatrix()
+    {
+        // Arrange
+        var f = CreateZeroVectorF();
+        var conditions = new List<DirichleCondition> { MakeCondition(_node1, 20.0) };
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(
+            () => _dirichletLogic.ApplyDirichlet(null!, f, conditions));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'matrixK')"));
+    }
+
+    [Test]
+    public void ApplyDirichlet_ThrowsOnNullVectorF()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var conditions = new List<DirichleCondition> { MakeCondition(_node1, 20.0) };
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(
+            () => _dirichletLogic.ApplyDirichlet(k, null!, conditions));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'vectorF')"));
+    }
+
+    [Test]
+    public void ApplyDirichlet_ThrowsOnNullConditions()
+    {
+        // Arrange
+        var k = CreateMatrixK();
+        var f = CreateZeroVectorF();
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(
+            () => _dirichletLogic.ApplyDirichlet(k, f, null!));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("Value cannot be null. (Parameter 'dirichleConditions')"));
     }
     
     /// <summary>
