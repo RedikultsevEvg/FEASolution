@@ -1,7 +1,7 @@
 ﻿using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Implementation.SlaCalculation;
+namespace FeaSolution.Implementation.DirichletCalculation;
 
 /// <summary>
 /// System of linear equations logic.

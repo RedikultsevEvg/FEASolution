@@ -1,11 +1,11 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
-using FeaSolution.Implementation.SlaCalculation;
+using FeaSolution.Implementation.DirichletCalculation;
 using FeaSolution.Implementation.StiffnessMatrixs;
 using NSubstitute;
 
-namespace FeaSolution.UnitTests.Implementation.SlaCalculation;
+namespace FeaSolution.UnitTests.DirichletCalculation;
 
 /// <summary>
 /// Тесты с матрицей 3×3.

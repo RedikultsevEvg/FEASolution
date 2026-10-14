@@ -16,4 +16,8 @@
     <PackageReference Include="CSparse" Version="4.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Implementation\SlaCalculation\" />
+  </ItemGroup>
+
 </Project>

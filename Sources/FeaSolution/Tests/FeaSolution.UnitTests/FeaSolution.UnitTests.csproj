@@ -32,4 +32,8 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Implementation\SlaCalculation\" />
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
-using FeaSolution.Implementation.SlaCalculation;
+using FeaSolution.Implementation.DirichletCalculation;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
 
