@@ -25,6 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\FeaSolution.Core\FeaSolution.Core.csproj" />
+    <ProjectReference Include="..\..\FeaSolution.MathNet\FeaSolution.MathNet.csproj" />
     <ProjectReference Include="..\..\FeaSolution\FeaSolution.csproj" />
   </ItemGroup>
 
