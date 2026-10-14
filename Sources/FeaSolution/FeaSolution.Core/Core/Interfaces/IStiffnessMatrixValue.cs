@@ -1,6 +1,6 @@
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Interfaces;
+namespace FeaSolution.Core.Core.Interfaces;
 
 public interface IStiffnessMatrixValue
 {

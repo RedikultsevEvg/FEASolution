@@ -1,3 +1,5 @@
+using FeaSolution.Core.Core.Interfaces;
+
 namespace FeaSolution.Implementation.Builders;
 
 public class TemperatureElementOptions : IElementOptions

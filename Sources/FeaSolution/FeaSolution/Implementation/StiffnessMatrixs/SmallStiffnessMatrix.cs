@@ -1,5 +1,5 @@
-﻿using FeaSolution.Core.Exceptions;
-using FeaSolution.Core.Interfaces;
+﻿using FeaSolution.Core.Core.Interfaces;
+using FeaSolution.Core.Exceptions;
 
 namespace FeaSolution.Implementation.StiffnessMatrixs;
 

@@ -1,4 +1,4 @@
-﻿using FeaSolution.Core.Interfaces;
+﻿using FeaSolution.Core.Core.Interfaces;
 
 namespace FeaSolution.Implementation.StiffnessMatrixLogic;
 

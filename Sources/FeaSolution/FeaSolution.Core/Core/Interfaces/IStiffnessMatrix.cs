@@ -1,4 +1,4 @@
-﻿namespace FeaSolution.Core.Interfaces;
+﻿namespace FeaSolution.Core.Core.Interfaces;
 
 /// <summary>
 /// Stiffness matrix.

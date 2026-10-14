@@ -1,10 +1,10 @@
+using FeaSolution.Core.Core.Interfaces;
+using FeaSolution.Core.Core.SleCalculation;
 using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
-using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.DirichletCalculation;
-using FeaSolution.Implementation.SleCalculation;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
 
@@ -48,23 +48,6 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         {
             Items = vectorT
         };
-    }
-
-    private static CSparse.Storage.CompressedColumnStorage<double> ConvertToCSparse(IStiffnessMatrix matrix)
-    {
-        // 1. Получаем размерность из самой матрицы
-        int n = matrix.NodeCount;
-
-        var coordinateStorage = new CSparse.Storage.CoordinateStorage<double>(n, n, n * 20);
-
-        // 2. Заполняем её значениями
-        foreach (var (row, col, value) in matrix.NonZeroMatrixValuesWithIndexes())
-        {
-            coordinateStorage.At(row, col, value);
-        }
-
-        // 3. Конвертируем в CSC-формат через SparseMatrix.OfIndexed
-        return CSparse.Double.SparseMatrix.OfIndexed(coordinateStorage);
     }
 
     // todo: вернуть синхронный метод

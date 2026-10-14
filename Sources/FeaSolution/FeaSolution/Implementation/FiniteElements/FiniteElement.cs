@@ -1,4 +1,5 @@
-using FeaSolution.Core.Interfaces;
+using FeaSolution.Core.Core.Interfaces;
+using FeaSolution.Core.Core.Types;
 using FeaSolution.Core.Types;
 
 namespace FeaSolution.Implementation.FiniteElements;

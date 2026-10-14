@@ -2,6 +2,8 @@
   <Folder Name="/Tests/">
     <Project Path="Tests/FeaSolution.UnitTests/FeaSolution.UnitTests.csproj" />
   </Folder>
+  <Project Path="FeaSolution.Core/FeaSolution.Core.csproj" Id="d4003947-9f20-43c9-85d9-53f55b5d6bbb" />
   <Project Path="FeaSolution.Demo/FeaSolution.Demo.csproj" Id="335ec510-193e-442a-81cc-cbd531eebb91" />
+  <Project Path="FeaSolution.MathNet/FeaSolution.MathNet.csproj" Id="ce04b4a6-2360-4fb5-9a36-a53de32e89f2" />
   <Project Path="FeaSolution/FeaSolution.csproj" />
 </Solution>

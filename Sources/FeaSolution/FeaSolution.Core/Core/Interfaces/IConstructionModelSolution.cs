@@ -1,6 +1,6 @@
 using FeaSolution.Core.Enums;
 
-namespace FeaSolution.Core.Interfaces;
+namespace FeaSolution.Core.Core.Interfaces;
 
 /// <summary>
 /// The construction model solution.
