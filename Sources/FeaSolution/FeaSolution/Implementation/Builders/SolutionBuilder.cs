@@ -4,6 +4,7 @@ using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.DirichletCalculation;
+using FeaSolution.Implementation.SleCalculation;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
 
@@ -37,48 +38,15 @@ public class SolutionBuilder(IConstructionModel constructionModel)
 
         // 4. Применяем условия Дирихле (модификация K и F).
         IDirichletLogic dirichletLogic = null!;
-
         dirichletLogic.ApplyDirichlet(GlobalStiffnessMatrix, vectorF, DirichleConditions);
 
-        return new ConstructionModelSolution
-        {
-            Items = []
-        };
-
-        // 2. Конвертируем глобальную матрицу жёсткости в формат CSparse (CSC).
-        var cscMatrix = ConvertToCSparse(GlobalStiffnessMatrix);
-
-
         // 5. Решаем K·T = F через CSparse.
-        double[] T = new double[GlobalStiffnessMatrix.NodeCount];
-        double[] results = new double[GlobalStiffnessMatrix.NodeCount];
+        ISleCalculator sleCalculator = null!;
+        SolutionItem[] vectorT = sleCalculator.SolveSLE(GlobalStiffnessMatrix, vectorF);
 
-        Array.Copy(vectorF, T, size);
-        var order = CSparse.ColumnOrdering.MinimumDegreeAtPlusA;
-        var chol = CSparse.Double.Factorization.SparseCholesky.Create(cscMatrix, order);
-
-        chol.Solve(T, results);
-
-        // 6. УПАКОВКА: превращаем double[] в список SolutionItem.
-        //    Привязка чисел к узлам и DOF через freedoms.
-        var items = new List<SolutionItem>(size);
-
-        for (int i = 0; i < size; i++)
-        {
-            items.Add(new SolutionItem
-            {
-                //Node = freedoms[i].Node,
-                Node = constructionModel.Elements.FirstOrDefault().Nodes.FirstOrDefault(),
-                Freedom = constructionModel.CommonFreedoms.FirstOrDefault(),
-                //Value = new SolutionValue(T[i])
-                Value = 100
-            });
-        }
-
-        // 7. Возвращаем доменный объект решения.
         return new ConstructionModelSolution
         {
-            Items = items
+            Items = vectorT
         };
     }
 

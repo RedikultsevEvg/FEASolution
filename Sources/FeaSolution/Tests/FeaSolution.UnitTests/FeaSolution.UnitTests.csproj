@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Implementation\SlaCalculation\" />
+    <Folder Include="Implementation\SleCalculation\" />
   </ItemGroup>
 
 </Project>
