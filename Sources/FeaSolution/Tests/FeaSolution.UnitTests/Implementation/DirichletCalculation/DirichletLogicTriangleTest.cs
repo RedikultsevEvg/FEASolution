@@ -5,7 +5,7 @@ using FeaSolution.Implementation.DirichletCalculation;
 using FeaSolution.Implementation.StiffnessMatrixs;
 using NSubstitute;
 
-namespace FeaSolution.UnitTests.DirichletCalculation;
+namespace FeaSolution.UnitTests.Implementation.DirichletCalculation;
 
 /// <summary>
 /// Тесты с матрицей 3×3.
