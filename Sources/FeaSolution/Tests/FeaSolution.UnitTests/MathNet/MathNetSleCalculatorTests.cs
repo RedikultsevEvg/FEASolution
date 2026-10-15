@@ -20,7 +20,7 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_T3ReferenceCase_ReturnsExpectedTemperatures()
+    public void SolveSLE_WhenTheMatrixAndVectorIsCorrect_ReturnsExpectedValues()
     {
         // Arrange
         var expected = new[] { 20.0, 60.0, 60.0, 100.0 };
@@ -49,7 +49,7 @@ public class MathNetSleCalculatorTest
         var matrixKWithDirichlet = MakeMatrixMock(4, nodes, values);
 
         // F_D = [20, 30, 30, 100]
-        var f = new[]
+        var vectorF = new[]
         {
             MakeItem(n1,  20.0),
             MakeItem(n2,  30.0),
@@ -58,7 +58,7 @@ public class MathNetSleCalculatorTest
         };
 
         // Act
-        var result = _calculator.SolveSLE(matrixKWithDirichlet, f);
+        var result = _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -72,7 +72,7 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_ResultItemsReferenceCorrectNodes()
+    public void SolveSLE_WhenTheMatrixAndVectorIsCorrect_ResultItemsReferenceCorrectNodesAndFreedom()
     {
         // Arrange
         var n1 = MakeNodeMock("node1");
@@ -88,7 +88,7 @@ public class MathNetSleCalculatorTest
             (3, 3, 1.0)
         ]);
 
-        var f = new[]
+        var vectorF = new[]
         {
             MakeItem(n1, 10.0),
             MakeItem(n2, 20.0),
@@ -97,7 +97,7 @@ public class MathNetSleCalculatorTest
         };
 
         // Act
-        var result = _calculator.SolveSLE(matrixKWithDirichlet, f);
+        var result = _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
         // Assert
         Assert.That(result[0].Node, Is.SameAs(n1));
@@ -110,7 +110,7 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_DiagonalMatrix_ReturnsElementwiseDivision()
+    public void SolveSLE_WhenDiagonalMatrix_ReturnsElementwiseDivision()
     {
         // Arrange
         var n1 = MakeNodeMock("node1");
@@ -124,7 +124,7 @@ public class MathNetSleCalculatorTest
             (2, 2, 5.0)
         ]);
 
-        var f = new[]
+        var vectorF = new[]
         {
             MakeItem(n1,  6.0),   // 6 / 2 = 3
             MakeItem(n2,  8.0),   // 8 / 4 = 2
@@ -132,7 +132,7 @@ public class MathNetSleCalculatorTest
         };
 
         // Act
-        var result = _calculator.SolveSLE(matrixKWithDirichlet, f);
+        var result = _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
         // Assert
         Assert.That(result[0].Value, Is.EqualTo(3.0));
@@ -141,45 +141,52 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_IdentityMatrix_ReturnsRightHandSide()
+    public void SolveSLE_WhenIdentityMatrix_ReturnsRightHandSide()
     {
         // Arrange
-        var nodes = new[] { MakeNodeMock("node1"), MakeNodeMock("node2"), MakeNodeMock("node3") };
+        var nodes = new[]
+        {
+            MakeNodeMock("node1"), 
+            MakeNodeMock("node2"), 
+            MakeNodeMock("node3")
+        };
         var matrixKWithDirichlet = MakeMatrixMock(3, nodes, [
             (0, 0, 1.0),
             (1, 1, 1.0),
             (2, 2, 1.0)
         ]);
+        var expectedVectorT = new[] { 10.0, 20.0, 30.0 };
 
-        var t = new[] { 10.0, 20.0, 30.0 };
-        var f = nodes.Select((node, index) => MakeItem(node, t[index])).ToArray();
+        var vectorF = nodes
+            .Select((node, index) => MakeItem(node, expectedVectorT[index]))
+            .ToArray();
 
         // Act
-        var result = _calculator.SolveSLE(matrixKWithDirichlet, f);
+        var result = _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
         // Assert
-        for (var i = 0; i < t.Length; i++)
-            Assert.That(result[i].Value, Is.EqualTo(t[i]));
+        for (var i = 0; i < expectedVectorT.Length; i++)
+            Assert.That(result[i].Value, Is.EqualTo(expectedVectorT[i]));
     }
 
     [Test]
-    public void SolveSLE_ZeroSizeMatrix_ThrowsFeaCommonException()
+    public void SolveSLE_WhenZeroSizeMatrix_ThrowsFeaCommonException()
     {
         // Arrange
         var matrixKWithDirichlet = MakeMatrixMock(0, [], []);
 
-        var f = Array.Empty<SolutionItem>();
+        var vectorF = Array.Empty<SolutionItem>();
 
         // Act
         var ex = Assert.Throws<FeaCommonException>(
-            () => _calculator.SolveSLE(matrixKWithDirichlet, f));
+            () => _calculator.SolveSLE(matrixKWithDirichlet, vectorF));
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo("The size of source matrix is zero."));
     }
 
     [Test]
-    public void SolveSLE_SingularMatrix_ThrowsFeaCommonException()
+    public void SolveSLE_WhenSingularMatrix_ThrowsFeaCommonException()
     {
         // Arrange: 
         var n1 = MakeNodeMock("node1");
@@ -217,7 +224,7 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_ResultOrderMatchesNodesOrder()
+    public void SolveSLE_WhenCorrectMatrixAndVector_ResultOrderMatchesNodesOrder()
     {
         // Arrange
         var a = MakeNodeMock("100");
@@ -231,10 +238,10 @@ public class MathNetSleCalculatorTest
             (2, 2, 1.0)
         ]);
 
-        var f = nodes.Select(n => MakeItem(n, 1.0)).ToArray();
+        var vectorF = nodes.Select(n => MakeItem(n, 1.0)).ToArray();
 
         // Act
-        var result = _calculator.SolveSLE(matrixKWithDirichlet, f);
+        var result = _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
         // Assert
         Assert.That(result[0].Node, Is.SameAs(a));
@@ -243,7 +250,7 @@ public class MathNetSleCalculatorTest
     }
 
     [Test]
-    public void SolveSLE_ReadsNonZeroValuesFromMatrix()
+    public void SolveSLE__WhenCorrectMatrixAndVector_ReadsNonZeroValuesFromMatrix()
     {
         // Arrange
         var n1 = MakeNodeMock("node1");
@@ -255,16 +262,16 @@ public class MathNetSleCalculatorTest
             (1, 1, 4.0)
         ]);
 
-        var f = new[]
+        var vectorF = new[]
         {
             MakeItem(n1, 2.0),
             MakeItem(n2, 8.0),
         };
 
         // Act
-        _calculator.SolveSLE(matrixKWithDirichlet, f);
+        _calculator.SolveSLE(matrixKWithDirichlet, vectorF);
 
-        // Assert: убеждаемся, что калькулятор обратился к разреженным данным
+        // Assert
         matrixKWithDirichlet.Received(1).NonZeroMatrixValuesWithIndexes();
         _ = matrixKWithDirichlet.Received(1).Nodes;
     }
