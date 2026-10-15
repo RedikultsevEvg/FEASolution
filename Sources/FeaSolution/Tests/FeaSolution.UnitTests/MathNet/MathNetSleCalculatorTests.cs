@@ -1,5 +1,4 @@
-﻿using FeaSolution.Core.Core.Interfaces;
-using FeaSolution.Core.Enums;
+﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Types;
 using FeaSolution.MathNet.SleCalculation;
@@ -9,7 +8,7 @@ namespace FeaSolution.UnitTests.MathNet;
 
 [TestFixture]
 [TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculatorTest
+public class MathNetSleCalculatorTest : SleCalculatorTestBase
 {
     private MathNetSleCalculator _calculator = null!;
 
@@ -146,8 +145,8 @@ public class MathNetSleCalculatorTest
         // Arrange
         var nodes = new[]
         {
-            MakeNodeMock("node1"), 
-            MakeNodeMock("node2"), 
+            MakeNodeMock("node1"),
+            MakeNodeMock("node2"),
             MakeNodeMock("node3")
         };
         var matrixKWithDirichlet = MakeMatrixMock(3, nodes, [
@@ -220,7 +219,7 @@ public class MathNetSleCalculatorTest
             () => _calculator.SolveSLE(singularMatrixK, zeroVectorF));
 
         // Assert
-        Assert.That(ex!.Message, Is.EqualTo("At least one result value is NaN. Th solution can't be calculated."));
+        Assert.That(ex!.Message, Is.EqualTo("At least one result value is NaN. The solution can't be calculated."));
     }
 
     [Test]
@@ -274,36 +273,5 @@ public class MathNetSleCalculatorTest
         // Assert
         matrixKWithDirichlet.Received(1).NonZeroMatrixValuesWithIndexes();
         _ = matrixKWithDirichlet.Received(1).Nodes;
-    }
-
-    private static IElementNode MakeNodeMock(string userId)
-    {
-        var node = Substitute.For<IElementNode>();
-        node.UserId.Returns(userId);
-        return node;
-    }
-
-    private static SolutionItem MakeItem(IElementNode node, double value)
-        => new()
-        {
-            Node = node,
-            Freedom = Freedom.Temperature,
-            Value = value
-        };
-
-    private static IStiffnessMatrix MakeMatrixMock(
-        int size,
-        IReadOnlyList<IElementNode> nodes,
-        IEnumerable<(int indexI, int indexJ, double value)> values)
-    {
-        var matrix = Substitute.For<IStiffnessMatrix>();
-
-        matrix.NodeCount.Returns(size);
-        matrix.Nodes.Returns(nodes);
-
-        matrix.NonZeroMatrixValuesWithIndexes()
-            .Returns(values);
-
-        return matrix;
     }
 }

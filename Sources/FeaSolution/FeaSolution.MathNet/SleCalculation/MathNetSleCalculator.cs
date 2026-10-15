@@ -41,7 +41,8 @@ public class MathNetSleCalculator : ISleCalculator
         {
             var vectorTValue = solutionVectorT[i];
 
-            FeaCommonException.ThrowIfTrue(MatrixValue.IsNaN(vectorTValue), "At least one result value is NaN. Th solution can't be calculated.");
+            FeaCommonException.ThrowIfTrue(MatrixValue.IsNaN(vectorTValue), 
+                "At least one result value is NaN. The solution can't be calculated.");
 
             result[i] = new SolutionItem
             {
