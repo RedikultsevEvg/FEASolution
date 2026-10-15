@@ -181,15 +181,14 @@ public class MathNetSleCalculatorTest
     [Test]
     public void SolveSLE_SingularMatrix_ThrowsFeaCommonException()
     {
-        // Arrange: исходная матрица жёсткости без Дирихле — сингулярна.
-        // Соберём матрицу K из отчёта.
+        // Arrange: 
         var n1 = MakeNodeMock("node1");
         var n2 = MakeNodeMock("node2");
         var n3 = MakeNodeMock("node3");
         var n4 = MakeNodeMock("node4");
         var nodes = new[] { n1, n2, n3, n4 };
 
-        var k = MakeMatrixMock(4, nodes, [
+        var singularMatrixK = MakeMatrixMock(4, nodes, [
             (0, 0,  0.500),
             (0, 1, -0.250),
             (0, 2, -0.250),
@@ -201,7 +200,7 @@ public class MathNetSleCalculatorTest
             (3, 3,  0.500)
         ]);
 
-        var f = new[]
+        var zeroVectorF = new[]
         {
             MakeItem(n1, 0.0),
             MakeItem(n2, 0.0),
@@ -209,8 +208,12 @@ public class MathNetSleCalculatorTest
             MakeItem(n4, 0.0),
         };
 
-        // Act & Assert
-        Assert.Throws<FeaCommonException>(() => _calculator.SolveSLE(k, f));
+        // Act
+        var ex = Assert.Throws<FeaCommonException>(
+            () => _calculator.SolveSLE(singularMatrixK, zeroVectorF));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("At least one result value is NaN. Th solution can't be calculated."));
     }
 
     [Test]

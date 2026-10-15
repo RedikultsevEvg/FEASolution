@@ -12,6 +12,9 @@ public class MathNetSleCalculator : ISleCalculator
 {
     public SolutionItem[] SolveSLE(IStiffnessMatrix matrixKWithDirichlet, SolutionItem[] vectorFWithDirichlet)
     {
+        ArgumentNullException.ThrowIfNull(matrixKWithDirichlet);
+        ArgumentNullException.ThrowIfNull(vectorFWithDirichlet);
+
         // todo Проверить что порядок узлов совпадает.
         Validate(matrixKWithDirichlet, vectorFWithDirichlet);
 
@@ -34,13 +37,17 @@ public class MathNetSleCalculator : ISleCalculator
 
         var result = new SolutionItem[nodes.Count];
 
-        for (int i = 0; i < nodes.Count; i++)
+        for (var i = 0; i < nodes.Count; i++)
         {
+            var vectorTValue = solutionVectorT[i];
+
+            FeaCommonException.ThrowIfTrue(MatrixValue.IsNaN(vectorTValue), "At least one result value is NaN. Th solution can't be calculated.");
+
             result[i] = new SolutionItem
             {
                 Node = nodes[i],
                 Freedom = Freedom.Temperature,
-                Value = solutionVectorT[i]
+                Value = vectorTValue
             };
         }
 
@@ -50,14 +57,12 @@ public class MathNetSleCalculator : ISleCalculator
     internal Vector<MatrixValue> Multiplay(Matrix<MatrixValue> matrix, Vector<MatrixValue> vector)
     {
         FeaCommonException.ThrowIfTrue(
-            matrix is null,
-            "The inverted matrix is null.");
+            matrix == null!, "The inverted matrix is null.");
 
         FeaCommonException.ThrowIfTrue(
-            vector is null,
-            "The vector F is null.");
+            vector == null!, "The vector F is null.");
 
-        int rows = matrix.RowCount;
+        int rows = matrix!.RowCount;
         int cols = matrix.ColumnCount;
 
         FeaCommonException.ThrowIfTrue(
@@ -65,7 +70,7 @@ public class MathNetSleCalculator : ISleCalculator
             $"The matrix must be square. Actual size: {rows}x{cols}.");
 
         FeaCommonException.ThrowIfTrue(
-            vector.Count != cols,
+            vector!.Count != cols,
             $"Dimension mismatch: matrix is {rows}x{cols}, " +
             $"vector length is {vector.Count}.");
 
@@ -100,17 +105,21 @@ public class MathNetSleCalculator : ISleCalculator
         }
         catch (Exception ex)
         {
-            throw new FeaCommonException("Can't get the inverted matrix.", ex);
+            throw new FeaCommonException("Can't calculate the inverted matrix.", ex);
         }
 
         return inverted;
     }
     
-    private void Validate(IStiffnessMatrix matrix, SolutionItem[] vectorFWithDirichlet)
+    private void Validate(IStiffnessMatrix matrix, SolutionItem[] vectorOfMatrixSize)
     {
         int size = matrix.NodeCount;
 
         FeaCommonException.ThrowIfTrue(size == 0, "The size of source matrix is zero.");
-    }
 
+        FeaCommonException.ThrowIfTrue(
+            vectorOfMatrixSize.Length != size,
+            $"Dimension mismatch: matrix size is {size}, " +
+            $"vector length is {vectorOfMatrixSize.Length}.");
+    }
 }
