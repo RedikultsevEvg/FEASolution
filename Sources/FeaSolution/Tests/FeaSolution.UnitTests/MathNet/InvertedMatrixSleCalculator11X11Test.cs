@@ -11,17 +11,17 @@ namespace FeaSolution.UnitTests.MathNet;
 /// а также диагональные и вырожденные случаи.
 /// </summary>
 [TestFixture]
-[TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculator11X11Test : SleCalculatorTestBase
+[TestOf(typeof(InvertedMatrixSleCalculator))]
+public class InvertedMatrixSleCalculator11X11Test : SleCalculatorTestBase
 {
     private const int N = 11;
 
-    private MathNetSleCalculator _calculator = null!;
+    private InvertedMatrixSleCalculator _calculator = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
     }
 
     // ===============================================================

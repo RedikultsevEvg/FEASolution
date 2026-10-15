@@ -8,15 +8,15 @@ namespace FeaSolution.UnitTests.MathNet;
 /// Тесты для системы размерности 1×1 — граничный случай.
 /// </summary>
 [TestFixture]
-[TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculator1X1Test : SleCalculatorTestBase
+[TestOf(typeof(InvertedMatrixSleCalculator))]
+public class InvertedMatrixSleCalculator1X1Test : SleCalculatorTestBase
 {
-    private MathNetSleCalculator _calculator = null!;
+    private InvertedMatrixSleCalculator _calculator = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
     }
 
     [Test]

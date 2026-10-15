@@ -8,7 +8,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace FeaSolution.MathNet.SleCalculation;
 
-public class MathNetSleCalculator : ISleCalculator
+public class InvertedMatrixSleCalculator : ISleCalculator
 {
     public SolutionItem[] SolveSLE(IStiffnessMatrix matrixKWithDirichlet, SolutionItem[] vectorFWithDirichlet)
     {

@@ -7,15 +7,15 @@ using NSubstitute;
 namespace FeaSolution.UnitTests.MathNet;
 
 [TestFixture]
-[TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculatorTest : SleCalculatorTestBase
+[TestOf(typeof(InvertedMatrixSleCalculator))]
+public class InvertedMatrixSleCalculatorTest : SleCalculatorTestBase
 {
-    private MathNetSleCalculator _calculator = null!;
+    private InvertedMatrixSleCalculator _calculator = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
     }
 
     [Test]

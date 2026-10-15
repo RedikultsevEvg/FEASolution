@@ -7,10 +7,10 @@ using FeaSolution.MathNet.SleCalculation;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Moq;
 
-namespace FeaSolution.UnitTests.Performance;
+namespace FeaSolution.UnitTests.Performance.MathNet;
 
 /// <summary>
-/// Нагрузочные тесты <see cref="MathNetSleCalculator"/> на больших
+/// Нагрузочные тесты <see cref="InvertedMatrixSleCalculator"/> на больших
 /// плотных СЛАУ (до 1000 узлов).
 ///
 /// Внимание: SolveSLE работает с плотной матрицей, поэтому сложность
@@ -19,10 +19,10 @@ namespace FeaSolution.UnitTests.Performance;
 /// </summary>
 [TestFixture]
 [Category("Performance")]
-[TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculatorPerformanceTests
+[TestOf(typeof(InvertedMatrixSleCalculator))]
+public class InvertedMatrixSleCalculatorPerformanceTests
 {
-    private MathNetSleCalculator _calculator = null!;
+    private InvertedMatrixSleCalculator _calculator = null!;
 
     /// <summary>
     /// Прогрев JIT и инициализация статических полей до первого замера.
@@ -30,7 +30,7 @@ public class MathNetSleCalculatorPerformanceTests
     [OneTimeSetUp]
     public void WarmUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
 
         // Небольшой прогон, чтобы JIT скомпилировал горячие пути
         // (MathNet.Inverse, Vector.Build.Dense, создание SolutionItem).
@@ -44,7 +44,7 @@ public class MathNetSleCalculatorPerformanceTests
     [SetUp]
     public void SetUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
     }
 
     [Test]
@@ -227,7 +227,7 @@ public class MathNetSleCalculatorPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        var inverted = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        var inverted = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw.Stop();
 
         // Assert
@@ -261,7 +261,7 @@ public class MathNetSleCalculatorPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        var inverted = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        var inverted = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw.Stop();
 
         // Assert
@@ -307,7 +307,7 @@ public class MathNetSleCalculatorPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        var inverted = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        var inverted = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw.Stop();
 
         // Assert
@@ -369,11 +369,11 @@ public class MathNetSleCalculatorPerformanceTests
         var dense = BuildTridiagonalDense(nodeCount);
 
         // Прогрев, чтобы исключить разовые аллокации из замера
-        _ = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        _ = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
 
         // Act
         var before = GC.GetTotalAllocatedBytes(precise: true);
-        _ = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        _ = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         var after = GC.GetTotalAllocatedBytes(precise: true);
 
         var allocatedMb = (after - before) / 1024.0 / 1024.0;
@@ -406,7 +406,7 @@ public class MathNetSleCalculatorPerformanceTests
 
         // Act
         var sw1 = Stopwatch.StartNew();
-        var wrapped = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        var wrapped = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw1.Stop();
 
         var sw2 = Stopwatch.StartNew();
@@ -448,7 +448,7 @@ public class MathNetSleCalculatorPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        var inverted = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        var inverted = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw.Stop();
 
         // Assert
@@ -519,7 +519,7 @@ public class MathNetSleCalculatorPerformanceTests
 
     private static long MeasureSolveSle(int nodeCount)
     {
-        var calculator = new MathNetSleCalculator();
+        var calculator = new InvertedMatrixSleCalculator();
         var nodes = CreateNodes(nodeCount);
         var matrix = BuildTridiagonal(nodes);
         var vectorF = BuildVectorF(nodes, Enumerable.Repeat(1.0, nodeCount).ToArray());
@@ -576,10 +576,10 @@ public class MathNetSleCalculatorPerformanceTests
         var dense = BuildTridiagonalDense(nodeCount);
 
         // Прогрев
-        _ = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        _ = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
 
         var sw = Stopwatch.StartNew();
-        _ = MathNetSleCalculator.InverseMathnetDenseMatrix(dense);
+        _ = InvertedMatrixSleCalculator.InverseMathnetDenseMatrix(dense);
         sw.Stop();
 
         return sw.ElapsedMilliseconds;

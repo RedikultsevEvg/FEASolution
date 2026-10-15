@@ -10,15 +10,15 @@ namespace FeaSolution.UnitTests.MathNet;
 /// невырожденная матрица с ненулевыми внедиагональными элементами.
 /// </summary>
 [TestFixture]
-[TestOf(typeof(MathNetSleCalculator))]
-public class MathNetSleCalculator3X3Test : SleCalculatorTestBase
+[TestOf(typeof(InvertedMatrixSleCalculator))]
+public class InvertedMatrixSleCalculator3X3Test : SleCalculatorTestBase
 {
-    private MathNetSleCalculator _calculator = null!;
+    private InvertedMatrixSleCalculator _calculator = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _calculator = new MathNetSleCalculator();
+        _calculator = new InvertedMatrixSleCalculator();
     }
 
     /// <summary>
