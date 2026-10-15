@@ -99,6 +99,11 @@ public class MathNetSleCalculator : ISleCalculator
         }
 
         // 2. Считаем обратную матрицу средствами MathNet.
+        return InverseMathnetDenseMatrix(dense);
+    }
+
+    internal static Matrix<MatrixValue> InverseMathnetDenseMatrix(DenseMatrix dense)
+    {
         Matrix<MatrixValue> inverted;
         try
         {
@@ -111,7 +116,7 @@ public class MathNetSleCalculator : ISleCalculator
 
         return inverted;
     }
-    
+
     private void Validate(IStiffnessMatrix matrix, SolutionItem[] vectorOfMatrixSize)
     {
         int size = matrix.NodeCount;
