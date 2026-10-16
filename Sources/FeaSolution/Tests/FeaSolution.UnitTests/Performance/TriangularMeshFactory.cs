@@ -1,6 +1,5 @@
-﻿using FeaSolution.Core.Core.Interfaces;
-using FeaSolution.Core.Core.Types;
-using FeaSolution.Core.Enums;
+﻿using FeaSolution.Core.Enums;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.ElementNodes;

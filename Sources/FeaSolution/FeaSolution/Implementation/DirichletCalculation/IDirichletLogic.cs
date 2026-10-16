@@ -1,4 +1,4 @@
-﻿using FeaSolution.Core.Core.Interfaces;
+﻿using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
 namespace FeaSolution.Implementation.DirichletCalculation;

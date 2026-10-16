@@ -1,6 +1,6 @@
-﻿using FeaSolution.Core.Core.Interfaces;
-using FeaSolution.Core.Enums;
+﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.StiffnessMatrixLogic;

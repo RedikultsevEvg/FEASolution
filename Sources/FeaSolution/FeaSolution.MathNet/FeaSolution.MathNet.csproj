@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\FeaSolution.Core\Core\Types\MatrixValue.cs" Link="Types\MatrixValue.cs" />
+    <Compile Include="..\FeaSolution.Core\Types\MatrixValue.cs" Link="Types\MatrixValue.cs" />
   </ItemGroup>
 
   <ItemGroup>

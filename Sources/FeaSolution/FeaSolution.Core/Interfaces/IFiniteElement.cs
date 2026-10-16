@@ -1,6 +1,6 @@
-using FeaSolution.Core.Core.Types;
+using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Core.Interfaces;
+namespace FeaSolution.Core.Interfaces;
 
 public interface IFiniteElement
 {

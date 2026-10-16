@@ -1,5 +1,5 @@
-using FeaSolution.Core.Core.Interfaces;
 using FeaSolution.Core.Exceptions;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModels;
 

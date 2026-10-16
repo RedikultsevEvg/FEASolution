@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using FeaSolution.Core.Core.Interfaces;
+using FeaSolution.Core.Interfaces;
 
 namespace FeaSolution.Implementation.StiffnessMatrixs;
 

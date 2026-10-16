@@ -1,6 +1,6 @@
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Core.Interfaces;
+namespace FeaSolution.Core.Interfaces;
 
 /// <summary>
 /// Finite element node. A node can be one-dimensional, two-dimensional, or three-dimensional.

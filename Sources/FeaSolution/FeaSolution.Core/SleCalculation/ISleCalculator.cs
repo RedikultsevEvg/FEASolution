@@ -1,7 +1,7 @@
-﻿using FeaSolution.Core.Core.Interfaces;
+﻿using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Core.SleCalculation;
+namespace FeaSolution.Core.SleCalculation;
 
 public interface ISleCalculator
 {

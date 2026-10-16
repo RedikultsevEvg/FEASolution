@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\FeaSolution.Core\Core\Types\CoordinateValue.cs" Link="Implementation\Types\CoordinateValue.cs" />
-    <Compile Include="..\FeaSolution.Core\Core\Types\MatrixValue.cs" Link="Implementation\Types\MatrixValue.cs" />
-    <Compile Include="..\FeaSolution.Core\Core\Types\SolutionValue.cs" Link="Implementation\Types\SolutionValue.cs" />
+    <Compile Include="..\FeaSolution.Core\Types\CoordinateValue.cs" Link="Implementation\Types\CoordinateValue.cs" />
+    <Compile Include="..\FeaSolution.Core\Types\MatrixValue.cs" Link="Implementation\Types\MatrixValue.cs" />
+    <Compile Include="..\FeaSolution.Core\Types\SolutionValue.cs" Link="Implementation\Types\SolutionValue.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 using FeaSolution.Core.Enums;
 using FeaSolution.Core.Types;
 
-namespace FeaSolution.Core.Core.Interfaces;
+namespace FeaSolution.Core.Interfaces;
 
 /// <summary>
 /// Construction model.

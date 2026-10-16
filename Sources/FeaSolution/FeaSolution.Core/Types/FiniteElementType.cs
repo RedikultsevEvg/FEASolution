@@ -1,8 +1,7 @@
-using FeaSolution.Core.Core.Interfaces;
 using FeaSolution.Core.Enums;
-using FeaSolution.Core.Types;
+using FeaSolution.Core.Interfaces;
 
-namespace FeaSolution.Core.Core.Types;
+namespace FeaSolution.Core.Types;
 
 /// <summary>
 /// Finite element type.

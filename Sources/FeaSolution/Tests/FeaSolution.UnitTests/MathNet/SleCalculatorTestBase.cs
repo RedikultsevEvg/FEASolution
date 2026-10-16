@@ -1,5 +1,5 @@
-using FeaSolution.Core.Core.Interfaces;
 using FeaSolution.Core.Enums;
+using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using NSubstitute;
 
