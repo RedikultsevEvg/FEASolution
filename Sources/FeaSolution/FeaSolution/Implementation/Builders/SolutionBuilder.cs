@@ -1,7 +1,6 @@
 using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
-using FeaSolution.Core.SleCalculation;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.DirichletCalculation;
