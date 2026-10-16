@@ -17,7 +17,6 @@ public class InvertedMatrixSleCalculator : SleCalculatorBase, ISleCalculator
         ArgumentNullException.ThrowIfNull(matrixKWithDirichlet);
         ArgumentNullException.ThrowIfNull(vectorFWithDirichlet);
 
-        // todo Проверить что порядок узлов совпадает.
         Validate(matrixKWithDirichlet, vectorFWithDirichlet);
 
         var mathNetDenseMatrix = BuildMathNetDenseMatrix(matrixKWithDirichlet);

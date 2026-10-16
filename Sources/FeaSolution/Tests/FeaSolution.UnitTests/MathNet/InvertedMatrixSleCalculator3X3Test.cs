@@ -298,7 +298,7 @@ public class InvertedMatrixSleCalculator3X3Test : SleCalculatorTestBase
 
         // Assert
         matrixKWithDirichlet.Received(1).NonZeroMatrixValuesWithIndexes();
-        _ = matrixKWithDirichlet.Received(1).Nodes;
+        _ = matrixKWithDirichlet.Received(2).Nodes;
     }
 
     [Test]

@@ -285,7 +285,7 @@ public class InvertedMatrixSleCalculator11X11Test : SleCalculatorTestBase
 
         // Assert
         matrixK.Received(1).NonZeroMatrixValuesWithIndexes();
-        _ = matrixK.Received(1).Nodes;
+        _ = matrixK.Received(2).Nodes;
     }
 
     // ===============================================================

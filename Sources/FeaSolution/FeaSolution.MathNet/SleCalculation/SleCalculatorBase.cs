@@ -83,7 +83,7 @@ public abstract class SleCalculatorBase
     }
 
     /// <summary>
-    /// Validates the input matrix and vector dimensions.
+    /// Validates the input matrix and vector dimensions and nodes order.
     /// </summary>
     protected static void Validate(
         IStiffnessMatrix matrix,
@@ -98,5 +98,16 @@ public abstract class SleCalculatorBase
             vectorOfMatrixSize.Length != size,
             $"Dimension mismatch: matrix size is {size}, " +
             $"vector length is {vectorOfMatrixSize.Length}.");
+
+        var nodes = matrix.Nodes;
+
+        for (var i = 0; i < size; i++)
+        {
+            FeaCommonException.ThrowIfTrue(
+                !ReferenceEquals(vectorOfMatrixSize[i].Node, nodes[i]),
+                $"Node order mismatch at index {i}: " +
+                $"vector F has node '{vectorOfMatrixSize[i].Node.UserId ?? "null"}', " +
+                $"but matrix expects node '{nodes[i].UserId ?? "null"}'.");
+        }
     }
 }
