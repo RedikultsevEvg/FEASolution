@@ -10,6 +10,8 @@ namespace FeaSolution.UnitTests.MathNet;
 /// </summary>
 public abstract class SleCalculatorTestBase
 {
+    protected const double Tolerance = 1e-13;
+
     protected static IElementNode MakeNodeMock(string userId)
     {
         var node = Substitute.For<IElementNode>();
@@ -75,17 +77,17 @@ public abstract class SleCalculatorTestBase
     ///   K[i,i+1] = -1
     /// Возвращает только верхний треугольник — как хранит StiffnessMatrix.
     /// </summary>
-    protected static (int i, int j, double v)[] TridiagonalMatrix(int size)
+    protected static (int i, int j, double v)[] MakeTridiagonalMatrixValues(int size)
     {
         var values = new List<(int, int, double)>(2 * size - 1);
 
-        for (int i = 0; i < size; i++)
+        for (var i = 0; i < size; i++)
             values.Add((i, i, 2.0));
 
-        for (int i = 0; i < size - 1; i++)
+        for (var i = 0; i < size - 1; i++)
             values.Add((i, i + 1, -1.0));
 
-        return values.ToArray();
+        return [.. values];
     }
 
     /// <summary>
@@ -110,7 +112,7 @@ public abstract class SleCalculatorTestBase
     /// и умножает её на вектор t. Возвращает F = K · T.
     /// Используется для получения эталонной правой части без ручного счёта.
     /// </summary>
-    protected static double[] MultiplyDense(
+    protected static double[] MultiplyMatrixVector(
         IEnumerable<(int i, int j, double v)> values,
         double[] t,
         int size)
@@ -119,11 +121,11 @@ public abstract class SleCalculatorTestBase
             throw new ArgumentException(
                 $"Vector length ({t.Length}) != matrix size ({size})");
 
-        var dense = new double[size, size];
+        var matrix = new double[size, size];
         foreach (var (i, j, v) in values)
         {
-            dense[i, j] = v;
-            if (i != j) dense[j, i] = v;
+            matrix[i, j] = v;
+            if (i != j) matrix[j, i] = v;
         }
 
         var f = new double[size];
@@ -131,7 +133,7 @@ public abstract class SleCalculatorTestBase
         {
             double sum = 0;
             for (int j = 0; j < size; j++)
-                sum += dense[i, j] * t[j];
+                sum += matrix[i, j] * t[j];
             f[i] = sum;
         }
         return f;

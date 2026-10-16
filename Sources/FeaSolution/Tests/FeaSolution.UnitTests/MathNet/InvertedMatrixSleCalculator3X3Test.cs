@@ -76,7 +76,7 @@ public class InvertedMatrixSleCalculator3X3Test : SleCalculatorTestBase
 
         for (int i = 0; i < expected.Length; i++)
         {
-            Assert.That(result[i].Value, Is.EqualTo(expected[i]).Within(1e-12),
+            Assert.That(result[i].Value, Is.EqualTo(expected[i]).Within(Tolerance),
                 $"Несовпадение решения в узле {i + 1}");
         }
     }
