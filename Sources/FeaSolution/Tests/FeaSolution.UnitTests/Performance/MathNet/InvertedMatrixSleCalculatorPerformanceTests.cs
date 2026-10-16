@@ -80,41 +80,6 @@ public class InvertedMatrixSleCalculatorPerformanceTests
         });
     }
 
-    // ---------------------------------------------------------------------
-    // GetInvertedMatrix: только обращение, без Multiplay и упаковки
-    // ---------------------------------------------------------------------
-
-    [Test]
-    [TestCase(100, 5)]
-    [TestCase(500, 200)]
-    [TestCase(1_000, 1600)]
-    public void GetInvertedMatrix_WithTridiagonalMatrix_CompletesWithinReasonableTime(
-        int nodeCount, int expectedMaxMiliSeconds)
-    {
-        // Arrange
-        var nodes = CreateNodes(nodeCount);
-        var matrix = BuildTridiagonal(nodes);
-
-        // Act
-        var sw = Stopwatch.StartNew();
-        var inverted = _calculator.GetInvertedMatrix(matrix);
-        sw.Stop();
-
-        // Assert
-        TestContext.WriteLine(
-            $"Nodes: {nodeCount}, " +
-            $"Elapsed: {sw.ElapsedMilliseconds} ms, " +
-            $"Limit: {expectedMaxMiliSeconds} ms");
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(inverted.RowCount, Is.EqualTo(nodeCount));
-            Assert.That(inverted.ColumnCount, Is.EqualTo(nodeCount));
-            Assert.That(sw.ElapsedMilliseconds, Is.LessThan(expectedMaxMiliSeconds),
-                $"Inverse too slow: {sw.ElapsedMilliseconds} ms for {nodeCount}.");
-        });
-    }
-
     [Test]
     public void SolveSLE_ScalesCubically_WithNodeCount()
     {

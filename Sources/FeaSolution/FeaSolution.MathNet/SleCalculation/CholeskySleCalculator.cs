@@ -1,5 +1,4 @@
-﻿using FeaSolution.Core.Enums;
-using FeaSolution.Core.Exceptions;
+﻿using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using MathNet.Numerics.LinearAlgebra;
@@ -8,13 +7,14 @@ using MathNet.Numerics.LinearAlgebra.Double;
 namespace FeaSolution.MathNet.SleCalculation;
 
 /// <summary>
-/// Решатель СЛАУ на основе разложения Холецкого.
-/// Требует, чтобы матрица K после учёта условий Дирихле была
-/// симметричной положительно определённой (SPD) — что типично
-/// для задач теплопроводности и упругости в МКЭ.
+/// SLE solver based on Cholesky decomposition.
+/// Requires that the matrix K, after applying Dirichlet conditions,
+/// be symmetric positive definite (SPD) — which is typical
+/// for heat conduction and elasticity problems in FEM.
 /// </summary>
-public class CholeskySleCalculator : ISleCalculator
+public class CholeskySleCalculator : SleCalculatorBase, ISleCalculator
 {
+    /// <inheritdoc/>
     public SolutionItem[] SolveSLE(
         IStiffnessMatrix matrixKWithDirichlet,
         SolutionItem[] vectorFWithDirichlet)
@@ -25,26 +25,16 @@ public class CholeskySleCalculator : ISleCalculator
         // todo Проверить что порядок узлов совпадает.
         Validate(matrixKWithDirichlet, vectorFWithDirichlet);
 
-        // 1. Собираем плотную матрицу K.
-        var denseK = BuildDenseMatrix(matrixKWithDirichlet);
+        var mathNetDenseMatrix = BuildMathNetDenseMatrix(matrixKWithDirichlet);
 
-        // 2. Собираем вектор F.
-        var vectorF = Vector<MatrixValue>.Build.Dense(
-            vectorFWithDirichlet.Length,
-            i => vectorFWithDirichlet[i].Value);
+        var mathNetVectorF = BuildMathNetVector(vectorFWithDirichlet);
 
-        // 3. Решаем K·T = F через разложение Холецкого.
-        var solutionVectorT = SolveWithCholesky(denseK, vectorF);
+        var solutionVectorT = SolveWithCholesky(mathNetDenseMatrix, mathNetVectorF);
 
-        // 4. Упаковываем решение обратно в SolutionItem[].
         return PackSolution(matrixKWithDirichlet.Nodes, solutionVectorT);
     }
 
-    /// <summary>
-    /// Решает систему K·T = F через разложение Холецкого.
-    /// K должна быть симметричной положительно определённой.
-    /// </summary>
-    internal static Vector<MatrixValue> SolveWithCholesky(
+    private static Vector<MatrixValue> SolveWithCholesky(
         DenseMatrix denseK,
         Vector<MatrixValue> vectorF)
     {
@@ -81,73 +71,5 @@ public class CholeskySleCalculator : ISleCalculator
         }
 
         return solution;
-    }
-
-    /// <summary>
-    /// Собирает плотную матрицу MathNet из разреженных данных IStiffnessMatrix.
-    /// Симметризует: если в хранилище лежит только верхний треугольник,
-    /// дублирует значение на позицию (j, i).
-    /// </summary>
-    internal static DenseMatrix BuildDenseMatrix(IStiffnessMatrix matrix)
-    {
-        int size = matrix.NodeCount;
-        var dense = DenseMatrix.Create(size, size, 0.0);
-
-        foreach (var (i, j, value) in matrix.NonZeroMatrixValuesWithIndexes())
-        {
-            dense[i, j] = value;
-
-            if (i != j)
-                dense[j, i] = value;
-        }
-
-        return dense;
-    }
-
-    /// <summary>
-    /// Упаковывает вектор решения в массив SolutionItem,
-    /// привязывая каждое значение к соответствующему узлу.
-    /// </summary>
-    internal static SolutionItem[] PackSolution(
-        IReadOnlyList<IElementNode> nodes,
-        Vector<MatrixValue> solutionVectorT)
-    {
-        FeaCommonException.ThrowIfTrue(
-            solutionVectorT.Count != nodes.Count,
-            $"Solution vector length ({solutionVectorT.Count}) " +
-            $"doesn't match node count ({nodes.Count}).");
-
-        var result = new SolutionItem[nodes.Count];
-
-        for (var i = 0; i < nodes.Count; i++)
-        {
-            var value = solutionVectorT[i];
-
-            FeaCommonException.ThrowIfTrue(
-                MatrixValue.IsNaN(value),
-                "At least one result value is NaN. " +
-                "The solution can't be calculated.");
-
-            result[i] = new SolutionItem
-            {
-                Node = nodes[i],
-                Freedom = Freedom.Temperature,
-                Value = value
-            };
-        }
-
-        return result;
-    }
-
-    private void Validate(IStiffnessMatrix matrix, SolutionItem[] vectorOfMatrixSize)
-    {
-        int size = matrix.NodeCount;
-
-        FeaCommonException.ThrowIfTrue(size == 0, "The size of source matrix is zero.");
-
-        FeaCommonException.ThrowIfTrue(
-            vectorOfMatrixSize.Length != size,
-            $"Dimension mismatch: matrix size is {size}, " +
-            $"vector length is {vectorOfMatrixSize.Length}.");
     }
 }
