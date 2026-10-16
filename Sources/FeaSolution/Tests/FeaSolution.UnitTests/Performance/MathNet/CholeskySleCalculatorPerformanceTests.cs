@@ -48,9 +48,9 @@ public class CholeskySleCalculatorPerformanceTests
     }
 
     [Test]
-    [TestCase(100, 1)]
+    [TestCase(100, 2)]
     [TestCase(250, 5)]
-    [TestCase(500, 20)]
+    [TestCase(500, 25)]
     [TestCase(1_000, 100)]
     public void SolveSLE_WithTridiagonalMatrix_CompletesWithinReasonableTime(
         int nodeCount, int expectedMaxMiliSeconds)

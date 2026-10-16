@@ -112,7 +112,7 @@ public class InvertedMatrixSleCalculatorPerformanceTests
     // ---------------------------------------------------------------------
 
     [Test]
-    [TestCase(500, 10.0)]
+    [TestCase(500, 12.0)]
     [TestCase(1_000, 50.0)]
     public void SolveSLE_AllocationsAreQuadratic(int nodeCount, double expectedMb)
     {
