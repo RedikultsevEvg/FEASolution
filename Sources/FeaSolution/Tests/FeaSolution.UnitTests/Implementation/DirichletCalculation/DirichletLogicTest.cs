@@ -430,7 +430,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0)
         };
@@ -466,7 +466,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0),
             MakeCondition(_node4, 100.0)
@@ -506,7 +506,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0),
             MakeCondition(_node4, 100.0)
@@ -533,7 +533,7 @@ public class DirichletLogicTest
         // Arrange
         var kFirst = CreateMatrixK();
         var fFirst = CreateZeroVectorF();
-        var conditionsFirst = new List<DirichleCondition>
+        var conditionsFirst = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0),
             MakeCondition(_node4, 100.0)
@@ -541,7 +541,7 @@ public class DirichletLogicTest
 
         var kSecond = CreateMatrixK();
         var fSecond = CreateZeroVectorF();
-        var conditionsSecond = new List<DirichleCondition>
+        var conditionsSecond = new List<DirichletCondition>
         {
             MakeCondition(_node4, 100.0),
             MakeCondition(_node1, 20.0)
@@ -577,7 +577,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0),
             MakeCondition(_node2, 40.0),
@@ -606,7 +606,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_node1, 20.0),
             MakeCondition(_node2, 40.0),
@@ -643,7 +643,7 @@ public class DirichletLogicTest
         // Arrange
         var k = CreateMatrixK();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>();
+        var conditions = new List<DirichletCondition>();
 
         // Act
         var ex = Assert.Throws<FeaCommonException>(
@@ -658,7 +658,7 @@ public class DirichletLogicTest
     {
         // Arrange
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition> { MakeCondition(_node1, 20.0) };
+        var conditions = new List<DirichletCondition> { MakeCondition(_node1, 20.0) };
 
         // Act
         var ex = Assert.Throws<ArgumentNullException>(
@@ -673,7 +673,7 @@ public class DirichletLogicTest
     {
         // Arrange
         var k = CreateMatrixK();
-        var conditions = new List<DirichleCondition> { MakeCondition(_node1, 20.0) };
+        var conditions = new List<DirichletCondition> { MakeCondition(_node1, 20.0) };
 
         // Act
         var ex = Assert.Throws<ArgumentNullException>(
@@ -740,7 +740,7 @@ public class DirichletLogicTest
             new() { Node = _node4, Freedom = Freedom.Temperature, Value = 0.0 }
         ];
 
-    private static DirichleCondition MakeCondition(IElementNode node, double value)
+    private static DirichletCondition MakeCondition(IElementNode node, double value)
         => new()
         {
             Node = node,

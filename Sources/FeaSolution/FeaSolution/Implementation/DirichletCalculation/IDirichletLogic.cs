@@ -16,5 +16,5 @@ internal interface IDirichletLogic
     /// <param name="vectorF">Vector F.</param>
     /// <param name="dirichleConditions">Collection of Direchle conditions.</param>
     void ApplyDirichlet(IStiffnessMatrix matrixK,
-        SolutionItem[] vectorF, ICollection<DirichleCondition> dirichleConditions);
+        SolutionItem[] vectorF, ICollection<DirichletCondition> dirichleConditions);
 }

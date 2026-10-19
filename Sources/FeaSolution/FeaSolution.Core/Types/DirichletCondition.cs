@@ -4,9 +4,9 @@ using FeaSolution.Core.Interfaces;
 namespace FeaSolution.Core.Types;
 
 /// <summary>
-/// Dirichle condition.
+/// Dirichlet condition.
 /// </summary>
-public class DirichleCondition
+public class DirichletCondition
 {
     public required IElementNode Node { get; init; }
 

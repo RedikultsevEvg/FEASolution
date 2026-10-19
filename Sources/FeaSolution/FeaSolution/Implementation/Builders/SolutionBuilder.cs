@@ -6,6 +6,7 @@ using FeaSolution.Implementation.ConstructionModelSolutions;
 using FeaSolution.Implementation.DirichletCalculation;
 using FeaSolution.Implementation.StiffnessMatrixLogic;
 using FeaSolution.Implementation.StiffnessMatrixs;
+using FeaSolution.MathNet.SleCalculation;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -15,9 +16,12 @@ namespace FeaSolution.Implementation.Builders;
 /// <param name="constructionModel">Construction model.</param>
 public class SolutionBuilder(IConstructionModel constructionModel)
 {
-    public IStiffnessMatrix? GlobalStiffnessMatrix { get; private set; }
+    private IStiffnessMatrix? StiffnessMatrix { get; set; }
 
-    private ICollection<DirichleCondition> DirichleConditions { get; set; } = [];
+    private ICollection<DirichletCondition> DirichletConditions { get; set; } = [];
+
+    private readonly IDirichletLogic _dirichletLogic = new DirichletLogic();
+    private readonly ISleCalculator _sleCalculator = new CholeskySleCalculator();
 
     /// <summary>
     /// Creates a construction model solution.
@@ -26,22 +30,16 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     public ConstructionModelSolution Build()
     {
         ArgumentNullException.ThrowIfNull(constructionModel);
-        if (GlobalStiffnessMatrix is null)
-            throw new InvalidOperationException(
-                $"Global stiffness matrix is not assembled. Call {nameof(AssemblyAsync)} first.");
+        ArgumentNullException.ThrowIfNull(DirichletConditions);
+        FeaSolutionBuilderException.ThrowIfTrue(StiffnessMatrix is null, $"Construction model stiffness matrix is not assembled. Call '{nameof(AssemblyAsync)}' first.");
+        FeaSolutionBuilderException.ThrowIfTrue(DirichletConditions.Count == 0, $"Dirichlet condition collection is empty. Call '{nameof(AddDirichlet)}' first.");
 
-        int size = GlobalStiffnessMatrix.NodeCount;
-
-        // 3. Формируем правую часть. В тесте F = 0.
+        int size = StiffnessMatrix!.NodeCount;
         var vectorF = new SolutionItem[size];
 
-        // 4. Применяем условия Дирихле (модификация K и F).
-        IDirichletLogic dirichletLogic = null!;
-        dirichletLogic.ApplyDirichlet(GlobalStiffnessMatrix, vectorF, DirichleConditions);
-
-        // 5. Решаем K·T = F через CSparse.
-        ISleCalculator sleCalculator = null!;
-        SolutionItem[] vectorT = sleCalculator.SolveSLE(GlobalStiffnessMatrix, vectorF);
+        _dirichletLogic.ApplyDirichlet(StiffnessMatrix, vectorF, DirichletConditions);
+        
+        var vectorT = _sleCalculator.SolveSLE(StiffnessMatrix, vectorF);
 
         return new ConstructionModelSolution
         {
@@ -95,19 +93,19 @@ public class SolutionBuilder(IConstructionModel constructionModel)
             globalStiffnessMatrix.AddMatrix(localMatrix);
         }
 
-        GlobalStiffnessMatrix = globalStiffnessMatrix;
+        StiffnessMatrix = globalStiffnessMatrix;
 
         return this;
     }
 
     /// <summary>
-    /// Adds Direchle condition.
+    /// Adds Direchlet condition.
     /// </summary>
     /// <param name="noteId">Node id.</param>
     /// <param name="freedom">Freedom.</param>
     /// <param name="conditionValue">Condition value.</param>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder AddDirichle(string noteId, Freedom freedom, MatrixValue conditionValue)
+    public SolutionBuilder AddDirichlet(string noteId, Freedom freedom, MatrixValue conditionValue)
     {
         FeaCommonException.ThrowIfTrue(constructionModel == null!, "Can't validate the condition - the construction model is null.");
         FeaCommonException.ThrowIfTrue(constructionModel?.Elements == null || constructionModel?.Elements.Count == 0 , "Can't validate the condition - the construction model is empty (element collection is null or empty).");
@@ -116,7 +114,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         var node = nodes?.FirstOrDefault(n => n.UserId == noteId);
         FeaCommonException.ThrowIfTrue(node == null, $"Can't find the node with id: '{noteId}' in construction model.");
 
-        DirichleConditions.Add(new DirichleCondition
+        DirichletConditions.Add(new DirichletCondition
         {
             Node = node!,
             Freedom = freedom,

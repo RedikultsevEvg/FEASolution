@@ -44,7 +44,7 @@ public class DirichletLogicChainTest
         // Arrange
         var k = CreateChainMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_n1, 20.0),
             MakeCondition(_n5, 100.0)
@@ -83,7 +83,7 @@ public class DirichletLogicChainTest
         // Arrange
         var k = CreateChainMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_n1, 20.0),
             MakeCondition(_n5, 100.0)
@@ -111,7 +111,7 @@ public class DirichletLogicChainTest
         // Arrange
         var k = CreateChainMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_n1, 20.0)
         };
@@ -136,7 +136,7 @@ public class DirichletLogicChainTest
         // Arrange — все пять узлов заданы
         var k = CreateChainMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_n1, 20.0),
             MakeCondition(_n2, 40.0),
@@ -175,7 +175,7 @@ public class DirichletLogicChainTest
         // Arrange
         var kFirst = CreateChainMatrix();
         var fFirst = CreateZeroVectorF();
-        var conditionsFirst = new List<DirichleCondition>
+        var conditionsFirst = new List<DirichletCondition>
         {
             MakeCondition(_n1, 20.0),
             MakeCondition(_n5, 100.0)
@@ -183,7 +183,7 @@ public class DirichletLogicChainTest
 
         var kSecond = CreateChainMatrix();
         var fSecond = CreateZeroVectorF();
-        var conditionsSecond = new List<DirichleCondition>
+        var conditionsSecond = new List<DirichletCondition>
         {
             MakeCondition(_n5, 100.0),
             MakeCondition(_n1, 20.0)
@@ -213,7 +213,7 @@ public class DirichletLogicChainTest
         });
     }
 
-    private static DirichleCondition MakeCondition(IElementNode node, double value)
+    private static DirichletCondition MakeCondition(IElementNode node, double value)
         => new()
         {
             Node = node,

@@ -12,7 +12,7 @@ internal class DirichletLogic : IDirichletLogic
     /// <inheritdoc/>
     public void ApplyDirichlet(IStiffnessMatrix matrixK,
         SolutionItem[] vectorF,
-        ICollection<DirichleCondition> dirichleConditions)
+        ICollection<DirichletCondition> dirichleConditions)
     {
         ArgumentNullException.ThrowIfNull(vectorF);
         ArgumentNullException.ThrowIfNull(matrixK);
@@ -26,7 +26,7 @@ internal class DirichletLogic : IDirichletLogic
     }
 
     internal void ApplyDirichletOnce(IStiffnessMatrix matrixK,
-           SolutionItem[] vectorF, DirichleCondition condition)
+           SolutionItem[] vectorF, DirichletCondition condition)
     {
         ArgumentNullException.ThrowIfNull(matrixK);
         ArgumentNullException.ThrowIfNull(vectorF);

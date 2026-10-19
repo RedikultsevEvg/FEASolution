@@ -36,7 +36,7 @@ public class DirichletLogicTriangleTest
         // Arrange
         var k = CreateTriangleMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_a, 10.0)
         };
@@ -67,7 +67,7 @@ public class DirichletLogicTriangleTest
         // Arrange
         var k = CreateTriangleMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_a, 10.0)
         };
@@ -92,7 +92,7 @@ public class DirichletLogicTriangleTest
         // Arrange — Ta = 10, Tc = 40
         var k = CreateTriangleMatrix();
         var f = CreateZeroVectorF();
-        var conditions = new List<DirichleCondition>
+        var conditions = new List<DirichletCondition>
         {
             MakeCondition(_a, 10.0),
             MakeCondition(_c, 40.0)
@@ -117,7 +117,7 @@ public class DirichletLogicTriangleTest
         });
     }
 
-    private static DirichleCondition MakeCondition(IElementNode node, double value)
+    private static DirichletCondition MakeCondition(IElementNode node, double value)
         => new()
         {
             Node = node,

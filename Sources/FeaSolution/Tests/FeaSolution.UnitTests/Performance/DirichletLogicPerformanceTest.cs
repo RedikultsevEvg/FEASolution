@@ -176,11 +176,11 @@ public class DirichletLogicPerformanceTest
         var (k, nodes) = CreateChainMatrix(n);
         var f = CreateVectorF(nodes);
 
-        var conditions = new List<DirichleCondition>(conditionCount);
+        var conditions = new List<DirichletCondition>(conditionCount);
         for (var i = 0; i < conditionCount; i++)
         {
             var index = i * (n / conditionCount);
-            conditions.Add(new DirichleCondition
+            conditions.Add(new DirichletCondition
             {
                 Node = nodes[index],
                 Freedom = Freedom.Temperature,
@@ -218,10 +218,10 @@ public class DirichletLogicPerformanceTest
         var (k, nodes) = CreateChainMatrix(n);
         var f = CreateVectorF(nodes);
 
-        var conditions = new List<DirichleCondition>(n);
+        var conditions = new List<DirichletCondition>(n);
         for (var i = 0; i < n; i++)
         {
-            conditions.Add(new DirichleCondition
+            conditions.Add(new DirichletCondition
             {
                 Node = nodes[i],
                 Freedom = Freedom.Temperature,
@@ -255,21 +255,21 @@ public class DirichletLogicPerformanceTest
         const int n = 1_000;
         WarmUp(n);
 
-        var conditionsFirst = new List<DirichleCondition>();
-        var conditionsSecond = new List<DirichleCondition>();
+        var conditionsFirst = new List<DirichletCondition>();
+        var conditionsSecond = new List<DirichletCondition>();
 
         {
             var (_, nodes) = CreateChainMatrix(n);
-            conditionsFirst.Add(new DirichleCondition { Node = nodes[0], Freedom = Freedom.Temperature, Value = 20.0 });
-            conditionsFirst.Add(new DirichleCondition { Node = nodes[n / 2], Freedom = Freedom.Temperature, Value = 50.0 });
-            conditionsFirst.Add(new DirichleCondition { Node = nodes[^1], Freedom = Freedom.Temperature, Value = 100.0 });
+            conditionsFirst.Add(new DirichletCondition { Node = nodes[0], Freedom = Freedom.Temperature, Value = 20.0 });
+            conditionsFirst.Add(new DirichletCondition { Node = nodes[n / 2], Freedom = Freedom.Temperature, Value = 50.0 });
+            conditionsFirst.Add(new DirichletCondition { Node = nodes[^1], Freedom = Freedom.Temperature, Value = 100.0 });
             conditionsSecond.AddRange(conditionsFirst.AsEnumerable().Reverse());
         }
 
         // Act — порядок «как есть»
         var (k1, nodes1) = CreateChainMatrix(n);
         var f1 = CreateVectorF(nodes1);
-        var firstConditions = new List<DirichleCondition>
+        var firstConditions = new List<DirichletCondition>
         {
             new() { Node = nodes1[0], Freedom = Freedom.Temperature, Value = 20.0 },
             new() { Node = nodes1[n / 2], Freedom = Freedom.Temperature, Value = 50.0 },
@@ -283,7 +283,7 @@ public class DirichletLogicPerformanceTest
         // Act — обратный порядок
         var (k2, nodes2) = CreateChainMatrix(n);
         var f2 = CreateVectorF(nodes2);
-        var secondConditions = new List<DirichleCondition>
+        var secondConditions = new List<DirichletCondition>
         {
             new() { Node = nodes2[^1], Freedom = Freedom.Temperature, Value = 100.0 },
             new() { Node = nodes2[n / 2], Freedom = Freedom.Temperature, Value = 50.0 },
@@ -364,7 +364,7 @@ public class DirichletLogicPerformanceTest
     /// <summary>
     /// Создаёт условия Дирихле на «краях» цепочки.
     /// </summary>
-    private static List<DirichleCondition> CreateBoundaryConditions(IElementNode[] nodes)
+    private static List<DirichletCondition> CreateBoundaryConditions(IElementNode[] nodes)
         =>
         [
             new() { Node = nodes[0], Freedom = Freedom.Temperature, Value = 20.0 },
