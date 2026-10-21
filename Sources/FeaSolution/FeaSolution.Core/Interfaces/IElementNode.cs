@@ -30,5 +30,5 @@ public interface IElementNode
     /// <summary>
     /// Unique user-defined node identifier.
     /// </summary>
-    string UserId { get; init; }
+    string NodeId { get; init; }
 }

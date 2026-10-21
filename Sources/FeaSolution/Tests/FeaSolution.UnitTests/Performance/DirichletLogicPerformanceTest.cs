@@ -322,7 +322,7 @@ public class DirichletLogicPerformanceTest
         for (var i = 0; i < n; i++)
         {
             var node = Substitute.For<IElementNode>();
-            node.UserId.Returns($"node{i}");
+            node.NodeId.Returns($"node{i}");
             nodes[i] = node;
         }
 

@@ -63,9 +63,10 @@ public class FiniteElementBuilder
     /// Adds 1D node.
     /// </summary>
     /// <param name="x">The X-coordinate.</param>
+    /// <param name="nodeId">Node ID.</param>
     /// <returns>The reference to the current builder.</returns>
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 1D.</exception>
-    public FiniteElementBuilder AddNode(CoordinateValue x)
+    public FiniteElementBuilder AddNode(CoordinateValue x, string nodeId = "")
     {
         if (NodeType.Dimension != Dimensional.OneDimensional)
         {
@@ -75,6 +76,7 @@ public class FiniteElementBuilder
         var node = new ElementNode(NodeType)
         {
             X = x,
+            NodeId = nodeId
         };
 
         Nodes.Add(node);
@@ -86,9 +88,10 @@ public class FiniteElementBuilder
     /// </summary>
     /// <param name="x">The X-coordinate.</param>
     /// <param name="y">The Y-coordinate.</param>
+    /// <param name="nodeId">Node ID.</param>
     /// <returns>The reference to the current builder.</returns>
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 2D.</exception>
-    public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y)
+    public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, string nodeId = "")
     {
         if (NodeType.Dimension != Dimensional.TwoDimensional)
         {
@@ -99,6 +102,7 @@ public class FiniteElementBuilder
         {
             X = x,
             Y = y,
+            NodeId = nodeId
         };
 
         Nodes.Add(node);
@@ -111,9 +115,10 @@ public class FiniteElementBuilder
     /// <param name="x">The X-coordinate.</param>
     /// <param name="y">The Y-coordinate.</param>
     /// <param name="z">The Z-coordinate.</param>
+    /// <param name="nodeId">Node ID.</param>
     /// <returns>The reference to the current builder.</returns>
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 3D.</exception>
-    public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, CoordinateValue z)
+    public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, CoordinateValue z, string nodeId = "")
     {
         if (NodeType.Dimension != Dimensional.ThreeDimensional)
         {
@@ -124,7 +129,8 @@ public class FiniteElementBuilder
         {
             X = x,
             Y = y,
-            Z = z
+            Z = z,
+            NodeId = nodeId
         };
 
         Nodes.Add(node);

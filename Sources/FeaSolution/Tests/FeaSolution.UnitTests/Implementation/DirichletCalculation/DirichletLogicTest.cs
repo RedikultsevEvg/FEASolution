@@ -84,7 +84,7 @@ public class DirichletLogicTest
             if (ReferenceEquals(other, node)) continue;
 
             Assert.That(k[node, other], Is.EqualTo(0.0).Within(1e-10),
-                $"K[{nodeKey}, {other.UserId}] must be zero after Dirichlet.");
+                $"K[{nodeKey}, {other.NodeId}] must be zero after Dirichlet.");
         }
     }
 
@@ -109,7 +109,7 @@ public class DirichletLogicTest
             if (ReferenceEquals(other, node)) continue;
 
             Assert.That(k[other, node], Is.EqualTo(0.0).Within(1e-10),
-                $"K[{other.UserId}, {nodeKey}] must be zero after Dirichlet.");
+                $"K[{other.NodeId}, {nodeKey}] must be zero after Dirichlet.");
         }
     }
 
@@ -142,7 +142,7 @@ public class DirichletLogicTest
 
                     Assert.That(kActual[i, j],
                         Is.EqualTo(kExpected[i, j]).Within(1e-10),
-                        $"K[{i.UserId}, {j.UserId}] must not change after Dirichlet on {nodeKey}.");
+                        $"K[{i.NodeId}, {j.NodeId}] must not change after Dirichlet on {nodeKey}.");
                 }
             }
         });
@@ -204,7 +204,7 @@ public class DirichletLogicTest
         _dirichletLogic.ApplyDirichletOnce(k, f, condition);
 
         // Assert 
-        var constrainedItem = f.First(item => item.Node.UserId == nodeKey);
+        var constrainedItem = f.First(item => item.Node.NodeId == nodeKey);
         Assert.That(constrainedItem.Value, Is.EqualTo(20.0).Within(1e-10));
     }
 
@@ -253,7 +253,7 @@ public class DirichletLogicTest
             for (var i = 0; i < f.Length; i++)
             {
                 Assert.That(f[i].Node, Is.SameAs(_nodes[i]),
-                    $"F[{i}].Node must stay {_nodes[i].UserId}.");
+                    $"F[{i}].Node must stay {_nodes[i].NodeId}.");
                 Assert.That(f[i].Freedom, Is.EqualTo(Freedom.Temperature),
                     $"F[{i}].Freedom must stay Temperature.");
             }
@@ -559,7 +559,7 @@ public class DirichletLogicTest
                 foreach (var j in _nodes)
                 {
                     Assert.That(kSecond[i, j], Is.EqualTo(kFirst[i, j]).Within(1e-10),
-                        $"K[{i.UserId}, {j.UserId}] must be equal regardless of condition order.");
+                        $"K[{i.NodeId}, {j.NodeId}] must be equal regardless of condition order.");
                 }
             }
 
@@ -626,7 +626,7 @@ public class DirichletLogicTest
                 {
                     var expected = i == j ? 1.0 : 0.0;
                     Assert.That(k[_nodes[i], _nodes[j]], Is.EqualTo(expected).Within(1e-10),
-                        $"K[{_nodes[i].UserId}, {_nodes[j].UserId}] must be {(i == j ? "1" : "0")}.");
+                        $"K[{_nodes[i].NodeId}, {_nodes[j].NodeId}] must be {(i == j ? "1" : "0")}.");
                 }
             }
 
@@ -754,13 +754,13 @@ public class DirichletLogicTest
     private static IElementNode CreateNodeMock(string userId)
     {
         var node = Substitute.For<IElementNode>();
-        node.UserId.Returns(userId);
+        node.NodeId.Returns(userId);
         return node;
     }
 
     private IElementNode ResolveNode(string nodeKey)
     {
-        var node = _nodes.FirstOrDefault(n => n.UserId == nodeKey);
+        var node = _nodes.FirstOrDefault(n => n.NodeId == nodeKey);
 
         if (node is null)
             throw new ArgumentOutOfRangeException(

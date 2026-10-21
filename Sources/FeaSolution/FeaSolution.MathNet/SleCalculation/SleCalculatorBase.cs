@@ -106,8 +106,8 @@ public abstract class SleCalculatorBase
             FeaCommonException.ThrowIfTrue(
                 !ReferenceEquals(vectorOfMatrixSize[i].Node, nodes[i]),
                 $"Node order mismatch at index {i}: " +
-                $"vector F has node '{vectorOfMatrixSize[i].Node.UserId ?? "null"}', " +
-                $"but matrix expects node '{nodes[i].UserId ?? "null"}'.");
+                $"vector F has node '{vectorOfMatrixSize[i].Node.NodeId ?? "null"}', " +
+                $"but matrix expects node '{nodes[i].NodeId ?? "null"}'.");
         }
     }
 }

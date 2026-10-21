@@ -157,7 +157,7 @@ public class DirichletLogicChainTest
                 {
                     var expected = i == j ? 1.0 : 0.0;
                     Assert.That(k[_nodes[i], _nodes[j]], Is.EqualTo(expected),
-                        $"K[{_nodes[i].UserId}, {_nodes[j].UserId}] must be {(i == j ? "1" : "0")}.");
+                        $"K[{_nodes[i].NodeId}, {_nodes[j].NodeId}] must be {(i == j ? "1" : "0")}.");
                 }
             }
 
@@ -201,7 +201,7 @@ public class DirichletLogicChainTest
                 foreach (var j in _nodes)
                 {
                     Assert.That(kSecond[i, j], Is.EqualTo(kFirst[i, j]),
-                        $"K[{i.UserId}, {j.UserId}] must be equal regardless of condition order.");
+                        $"K[{i.NodeId}, {j.NodeId}] must be equal regardless of condition order.");
                 }
             }
 
@@ -224,7 +224,7 @@ public class DirichletLogicChainTest
     private static IElementNode CreateNodeMock(string userId)
     {
         var node = Substitute.For<IElementNode>();
-        node.UserId.Returns(userId);
+        node.NodeId.Returns(userId);
         return node;
     }
 

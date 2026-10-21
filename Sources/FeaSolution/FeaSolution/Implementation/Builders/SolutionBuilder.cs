@@ -34,7 +34,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         FeaSolutionBuilderException.ThrowIfTrue(StiffnessMatrix is null, $"Construction model stiffness matrix is not assembled. Call '{nameof(AssemblyAsync)}' first.");
         FeaSolutionBuilderException.ThrowIfTrue(DirichletConditions.Count == 0, $"Dirichlet condition collection is empty. Call '{nameof(AddDirichlet)}' first.");
 
-        int size = StiffnessMatrix!.NodeCount;
+        var size = StiffnessMatrix!.NodeCount;
         var vectorF = new SolutionItem[size];
 
         _dirichletLogic.ApplyDirichlet(StiffnessMatrix, vectorF, DirichletConditions);
@@ -46,6 +46,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
             Items = vectorT
         };
     }
+
 
     // todo: вернуть синхронный метод
     /// <summary>
@@ -101,18 +102,18 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// <summary>
     /// Adds Direchlet condition.
     /// </summary>
-    /// <param name="noteId">Node id.</param>
+    /// <param name="nodeId">Node id.</param>
     /// <param name="freedom">Freedom.</param>
     /// <param name="conditionValue">Condition value.</param>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder AddDirichlet(string noteId, Freedom freedom, MatrixValue conditionValue)
+    public SolutionBuilder AddDirichlet(string nodeId, Freedom freedom, MatrixValue conditionValue)
     {
         FeaCommonException.ThrowIfTrue(constructionModel == null!, "Can't validate the condition - the construction model is null.");
         FeaCommonException.ThrowIfTrue(constructionModel?.Elements == null || constructionModel?.Elements.Count == 0 , "Can't validate the condition - the construction model is empty (element collection is null or empty).");
 
         var nodes = constructionModel?.Elements.SelectMany(e => e.Nodes);
-        var node = nodes?.FirstOrDefault(n => n.UserId == noteId);
-        FeaCommonException.ThrowIfTrue(node == null, $"Can't find the node with id: '{noteId}' in construction model.");
+        var node = nodes?.FirstOrDefault(n => n.NodeId == nodeId);
+        FeaCommonException.ThrowIfTrue(node == null, $"Can't find the node with id: '{nodeId}' in construction model.");
 
         DirichletConditions.Add(new DirichletCondition
         {

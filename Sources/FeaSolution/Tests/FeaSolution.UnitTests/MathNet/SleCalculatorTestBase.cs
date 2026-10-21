@@ -15,7 +15,7 @@ public abstract class SleCalculatorTestBase
     protected static IElementNode MakeNodeMock(string userId)
     {
         var node = Substitute.For<IElementNode>();
-        node.UserId.Returns(userId);
+        node.NodeId.Returns(userId);
         return node;
     }
 

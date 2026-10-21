@@ -128,7 +128,7 @@ public class DirichletLogicTriangleTest
     private static IElementNode CreateNodeMock(string userId)
     {
         var node = Substitute.For<IElementNode>();
-        node.UserId.Returns(userId);
+        node.NodeId.Returns(userId);
         return node;
     }
 
