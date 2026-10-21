@@ -138,6 +138,22 @@ public class FiniteElementBuilder
     }
 
     /// <summary>
+    /// Adds existing node.
+    /// </summary>
+    /// <param name="node">Existing node.</param>
+    /// <returns>The reference to the current builder.</returns>
+    /// <exception cref="FeaElementBuilderException">Raise an exception if builder dimension is not 3D.</exception>
+    public FiniteElementBuilder AddNode(IElementNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        FeaElementBuilderException.ThrowIfTrue(NodeType.Dimension != node.Type.Dimension, $"Node has dimension not equal to '{NodeType.Dimension.ToString()}'");
+
+        Nodes.Add(node);
+        return this;
+    }
+
+    /// <summary>
     /// Adds freedom and options to element.
     /// </summary>
     /// <param name="freedom"></param>

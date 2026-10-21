@@ -17,5 +17,12 @@ public interface IFiniteElement
     /// <summary>
     /// Finite element nodes.
     /// </summary>
-    ICollection<IElementNode> Nodes { get; } 
+    ICollection<IElementNode> Nodes { get; }
+
+    /// <summary>
+    /// Returns node with relevant Id.
+    /// </summary>
+    /// <param name="nodeId">Node id.</param>
+    /// <returns>Node with relevant Id</returns>
+    IElementNode Node(string nodeId);
 }

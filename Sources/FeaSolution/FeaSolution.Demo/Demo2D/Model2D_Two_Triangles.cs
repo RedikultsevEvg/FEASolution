@@ -12,40 +12,42 @@ internal static class Model2DTwoTriangles
         var element1 = new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
-                ThermalConductivity = 0.67,
-                Thickness = 4.4,
+                ThermalConductivity = 1.0,
+                Thickness = 1.0,
             })
             .SetNodesType(ElementNodeType.Type2D)
-            .AddNode(0, 1.0)
-            .AddNode(2.0, 2.0)
-            .AddNode(2.0, 0)
+            .AddNode(0, 1.0, "nodeA")
+            .AddNode(2.0, 2.0, "nodeB")
+            .AddNode(2.0, 0, "nodeC")
             .Build("The first triangle");
 
         var element2 = new FiniteElementBuilder()
             .SetNodesType(ElementNodeType.Type2D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
-                ThermalConductivity = 0.67,
-                Thickness = 5.6,
+                ThermalConductivity = 1.0,
+                Thickness = 1.0,
             })
-            .AddNode(2.0, 2.0)
-            .AddNode(2.0, 0)
-            .AddNode(4.0, 1.0)
+            .AddNode(element1.Node("nodeB"))
+            .AddNode(element1.Node("nodeC"))
+            .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
         var model = new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
-            .Merge()
+            .Merge() // Not implemented yet
             .Build();
 
         var solution = new SolutionBuilder(model)
-            .AssemblyAsync()
+            .AssemblyAsync() // Should be reimplemented to sync mode
             .Result
-            .ValidateForCountOfElement()
-            .ValidateForCommonElements()
-            .ValidateForQualityOfElements()
-            .ValidateForZeroSquareElements()
+            .ValidateForCountOfElement() // Not implemented yet
+            .ValidateForCommonElements() // Not implemented yet 
+            .ValidateForQualityOfElements() // Not implemented yet
+            .ValidateForZeroSquareElements() // Not implemented yet
+            .AddDirichlet("nodeA", Freedom.Temperature, 20.0)
+            .AddDirichlet("nodeD", Freedom.Temperature, 100.0)
             .Build();
 
         DemoAssistant.ConsoleWriteExampleResults(nameof(Get_Solution_For_Two_Triangles_Example), solution);

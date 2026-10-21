@@ -8,12 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FeaSolution.Core\FeaSolution.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="FeaSolution">
       <HintPath>..\FeaSolution\bin\Debug\net10.0\FeaSolution.dll</HintPath>
+    </Reference>
+    <Reference Include="FeaSolution.Core">
+      <HintPath>..\FeaSolution\bin\Debug\net10.0\FeaSolution.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 

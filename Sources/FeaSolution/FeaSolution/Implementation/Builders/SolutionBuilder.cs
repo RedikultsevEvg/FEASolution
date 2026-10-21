@@ -34,19 +34,17 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         FeaSolutionBuilderException.ThrowIfTrue(StiffnessMatrix is null, $"Construction model stiffness matrix is not assembled. Call '{nameof(AssemblyAsync)}' first.");
         FeaSolutionBuilderException.ThrowIfTrue(DirichletConditions.Count == 0, $"Dirichlet condition collection is empty. Call '{nameof(AddDirichlet)}' first.");
 
-        var size = StiffnessMatrix!.NodeCount;
-        var vectorF = new SolutionItem[size];
+        var vectorF = GetVector(StiffnessMatrix!);
 
-        _dirichletLogic.ApplyDirichlet(StiffnessMatrix, vectorF, DirichletConditions);
+        _dirichletLogic.ApplyDirichlet(StiffnessMatrix!, vectorF, DirichletConditions);
         
-        var vectorT = _sleCalculator.SolveSLE(StiffnessMatrix, vectorF);
+        var vectorT = _sleCalculator.SolveSLE(StiffnessMatrix!, vectorF);
 
         return new ConstructionModelSolution
         {
             Items = vectorT
         };
     }
-
 
     // todo: вернуть синхронный метод
     /// <summary>
@@ -109,7 +107,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     public SolutionBuilder AddDirichlet(string nodeId, Freedom freedom, MatrixValue conditionValue)
     {
         FeaCommonException.ThrowIfTrue(constructionModel == null!, "Can't validate the condition - the construction model is null.");
-        FeaCommonException.ThrowIfTrue(constructionModel?.Elements == null || constructionModel?.Elements.Count == 0 , "Can't validate the condition - the construction model is empty (element collection is null or empty).");
+        FeaCommonException.ThrowIfTrue(constructionModel?.Elements == null 
+                                       || constructionModel.Elements.Count == 0 , "Can't validate the condition - the construction model is empty (element collection is null or empty).");
 
         var nodes = constructionModel?.Elements.SelectMany(e => e.Nodes);
         var node = nodes?.FirstOrDefault(n => n.NodeId == nodeId);
@@ -168,4 +167,20 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// </summary>
     /// <returns>The collection of elements.</returns>
     public ICollection<IFiniteElement> GetNotQualityOfElements() => [];
+
+    private SolutionItem[] GetVector(IStiffnessMatrix stiffnessMatrix)
+    {
+        ArgumentNullException.ThrowIfNull(stiffnessMatrix);
+
+        var nodes = stiffnessMatrix.Nodes;
+        var vector = nodes
+            .Select(node => new SolutionItem
+            {
+                Freedom = Freedom.Temperature,
+                Node = node,
+                Value = 0
+            }).ToArray();
+
+        return vector;
+    }
 }

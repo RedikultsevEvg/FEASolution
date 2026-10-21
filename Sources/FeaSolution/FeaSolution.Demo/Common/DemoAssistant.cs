@@ -18,10 +18,11 @@ internal static class DemoAssistant
             foreach (var solutionItem in group)
             {
                 Console.WriteLine(
-                    "  Node: X = {0}, Y = {1}, Z = {2} ; Value = {3}",
+                    "  Node '{3}': X = {0}, Y = {1}, Z = {2} ; Value = {4}",
                     solutionItem.Node.X,
                     solutionItem.Node.Y,
                     solutionItem.Node.Z,
+                    solutionItem.Node.NodeId,
                     solutionItem.Value);
             }
         }
