@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Tests/">
+    <Project Path="Tests/FeaSolution.IntegrationTests/FeaSolution.IntegrationTests.csproj" Id="431b77eb-f293-4684-b885-c77f4f129f7d" />
     <Project Path="Tests/FeaSolution.UnitTests/FeaSolution.UnitTests.csproj" />
   </Folder>
   <Project Path="FeaSolution.Core/FeaSolution.Core.csproj" Id="d4003947-9f20-43c9-85d9-53f55b5d6bbb" />
