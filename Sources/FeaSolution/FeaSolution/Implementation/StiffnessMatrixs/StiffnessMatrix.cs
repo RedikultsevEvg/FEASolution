@@ -65,7 +65,7 @@ public sealed class StiffnessMatrix : IStiffnessMatrix
         }
         set
         {
-            // todo: убрать реализацию - для глобальной используется только AddValue
+            // todo: (на финальный рефакторинг) убрать реализацию - для глобальной используется только AddValue
             if (value == DefaultValue)
             {
                 if (!_nodeToIndex.TryGetValue(firstNode, out var a) ||

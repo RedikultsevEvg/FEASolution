@@ -64,7 +64,8 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         }
         set
         {
-            // todo: этот метод можно убрать, он не используется
+            // todo: (на финальный рефакторинг) этот метод можно убрать, он используется неэффективно.
+            // Вместо него нужен метод установки значения по всем ячейкам одного столбца или строки (смотри логику Дирихле)
             var a = IndexOf(firstNode);
             var b = IndexOf(secondNode);
 
@@ -91,7 +92,7 @@ public sealed class SmallStiffnessMatrix : IStiffnessMatrix
         _matrixData[PackIndex(firstNodeIndex, secondNodeIndex)] = valueToAdd;
     }
 
-    // todo: в целях ускорения переделать в возврат без использования yield
+    // todo: (на финальный рефакторинг) в целях ускорения переделать в возврат без использования yield
     /// <summary>
     /// Обходит ненулевые ячейки верхнего треугольника без аллокаций.
     /// </summary>

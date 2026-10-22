@@ -17,7 +17,7 @@ internal static class StiffnessMatrixExtensions
         }
     }
 
-    // todo: reimplement
+    // todo: переделать на независимость от числа узлов
     public static bool ValidateMatrixIsSymmetric(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);
@@ -36,7 +36,7 @@ internal static class StiffnessMatrixExtensions
         return true;
     }
 
-    // todo: reimplement
+    // todo: переделать на независимость от числа узлов
     public static bool ValidateMatrixHasZeroRowSums(this IStiffnessMatrix matrix, MatrixValue tolerance = 1e-12)
     {
         ArgumentNullException.ThrowIfNull(matrix);
