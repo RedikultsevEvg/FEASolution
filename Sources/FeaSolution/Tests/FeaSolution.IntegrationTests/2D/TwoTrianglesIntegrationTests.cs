@@ -8,95 +8,286 @@ using FeaSolution.Implementation.ConstructionModelSolutions;
 namespace FeaSolution.IntegrationTests._2D;
 
 /// <summary>
-/// Интеграционный тест по примеру из <c>Model2DTwoTriangles</c>.
-/// Проверяет весь путь: построение элементов → сборка глобальной матрицы →
-/// применение граничных условий Дирихле → решение СЛАУ.
+/// Интеграционные тесты по примеру <c>Model2DTwoTriangles</c>.
+///
+/// Упор на:
+///   • точные значения вектора решения (аналитически вычислимые для линейных
+///     треугольных КЭ при линейном распределении температуры по x);
+///   • точный состав и порядок идентификаторов узлов в векторе решения;
+///   • инвариантность к выбору значений и позиций граничных условий;
+///   • инвариантность к физическим параметрам (k, толщина) — для задачи
+///     Лапласа без источников решение от них не зависит.
+///
+/// Аналитическое обоснование.
+/// ────────────────────────────
+/// Два прямоугольных треугольника с вершинами:
+///   T1: A(0,1), B(2,2), C(2,0)
+///   T2: B(2,2), C(2,0), D(4,1)
+///
+/// Если граничные условия заданы в A и D как T_A, T_D, то при k = const,
+/// t = const и отсутствии источников решение уравнения Лапласа на такой
+/// (прямоугольной по x) области с линейной интерполяцией на треугольниках
+/// даёт **линейный по x профиль**:
+///   T(x) = T_A + (T_D − T_A) · x / 4.
+///
+/// Отсюда точные ожидаемые значения в узлах:
+///   T(A) = T_A                     (x = 0)
+///   T(B) = T_A + (T_D − T_A)·0.5   (x = 2)
+///   T(C) = T_A + (T_D − T_A)·0.5   (x = 2)
+///   T(D) = T_D                     (x = 4)
+///
+/// Это справедливо для ЛЮБЫХ пар значений (T_A, T_D) и не зависит от k и t.
+/// Значения k и t влияют только на матрицу жёсткости и вектор нагрузки —
+/// но не на решение краевой задачи Дирихле без источников.
 /// </summary>
 [TestFixture]
 [Category("Integration")]
 [TestOf(typeof(SolutionBuilder))]
 public class TwoTrianglesIntegrationTests
 {
-    // Геометрия из примера:
-    //   nodeA(0,1) ---- nodeB(2,2)
-    //      |          /      \
-    //      |   T1   /    T2    \
-    //      |      /              \
-    //   nodeC(2,0) ------------ nodeD(4,1)
-    //
-    // Граничные условия:
-    //   T(nodeA) = 20
-    //   T(nodeD) = 100
-    //
-    // Проверяем, что решение:
-    //   - определено для всех 4 уникальных узлов,
-    //   - строго между граничными значениями в промежуточных узлах,
-    //   - конечно,
-    //   - детерминировано (повторный запуск даёт тот же результат).
+    private const double Tolerance = 1e-9;
 
-    private const double TemperatureNodeA = 20.0;
-    private const double TemperatureNodeD = 100.0;
+    private static readonly string[] NodeIds = ["nodeA", "nodeB", "nodeC", "nodeD"];
+
+
+    [TestCase(10.0, 50.0)]
+    [TestCase(20.0, 100.0)]
+    [TestCase(0.0, 0.0)]
+    [TestCase(-50.0, 50.0)]
+    [TestCase(100.0, -100.0)]
+    [TestCase(1e6, -1e6)]
+    [TestCase(273.15, 373.15)]
+    public void ApplyToNodeANodeD_LinearProfile_SymmetricBoundaries(double tempA, double tempD)
+    {
+        var solution = Solve(tempA, tempD);
+
+        var expectedB = tempA + (tempD - tempA) * 0.5;
+        var expectedC = tempA + (tempD - tempA) * 0.5;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(tempA),
+                "T(A) должно точно совпадать с граничным значением.");
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(expectedB).Within(Tolerance),
+                "T(B) должно лежать на линейном профиле между A и D.");
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(expectedC).Within(Tolerance),
+                "T(C) должно лежать на линейном профиле между A и D.");
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(tempD),
+                "T(D) должно точно совпадать с граничным значением.");
+        });
+    }
+
+    /// <summary>
+    /// Граничные условия на B и C — оба узла при x = 2.
+    /// Решение вырождается: T(B) = T(C) = заданное, A и D свободны.
+    /// Для связной задачи Дирихле с двумя закреплёнными узлами в одном
+    /// вертикальном сечении линейный профиль по x вырождается в константу
+    /// только при равенстве значений; при разных значениях система
+    /// недоопределена (обе степени свободы «висят» без связи с границей).
+    /// Проверяем случай равных значений — константа.
+    /// </summary>
+    [TestCase(42.0)]
+    [TestCase(-42.0)]
+    [TestCase(0.0)]
+    public void ApplyToNodeBNodeC_EqualValues_SolutionIsConstant(double t)
+    {
+        var solution = SolveAt("nodeB", t, "nodeC", t);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(t));
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(t));
+            // Внутренние (по отношению к границе) узлы получают то же
+            // постоянное значение — единственное решение уравнения Лапласа
+            // с постоянной границей.
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(t).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(t).Within(Tolerance));
+        });
+    }
+
+    /// <summary>
+    /// Граничные условия на A и B. Ожидаем, что:
+    ///   • T(A), T(B) точно равны заданным;
+    ///   • остальные узлы конечны и лежат между min и max.
+    /// Точную линейную формулу здесь не выводим — узлы A и B не на одной
+    /// координате x, решение двумерно.
+    /// </summary>
+    [TestCase(0.0, 100.0, 77.777777777777757d, 88.888888888888886d)]
+    [TestCase(-30.0, 70.0, 47.777777777777771d, 58.888888888888886d)]
+    public void ApplyToNodeANodeB_SatisfyDirichletAndBounded(double tempA, double tB, double expectedC, double expectedB)
+    {
+        var solution = SolveAt("nodeA", tempA, "nodeB", tB);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(tempA));
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(tB));
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(expectedC).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(expectedB).Within(Tolerance));
+        });
+    }
+
+    /// <summary>
+    /// Граничные условия на C и D.
+    /// </summary>
+    [TestCase(5.0, 95.0, 15.0d, 25.000000000000004d)]
+    [TestCase(-1.0, 1.0, -0.77777777777777768d, -0.55555555555555558d)]
+    public void ApplyToNodeCNodeD_SatisfyDirichletAndBounded(double tempC, double tempD, double expectedA, double expectedB)
+    {
+        var solution = SolveAt("nodeC", tempC, "nodeD", tempD);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(tempC));
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(tempD));
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(expectedA).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(expectedB).Within(Tolerance));
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Независимость от физических параметров (k и толщины)
+    // ────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Для уравнения Лапласа без источников решение не зависит от k и t —
+    /// они входят как общий множитель в матрицу жёсткости и сокращаются.
+    /// </summary>
+    [TestCase(1.0, 1.0)]
+    [TestCase(2.0, 1.0)]
+    [TestCase(0.5, 1.0)]
+    [TestCase(1.0, 2.0)]
+    [TestCase(1.0, 0.5)]
+    [TestCase(10.0, 10.0)]
+    [TestCase(0.1, 0.1)]
+    public void Solution_IsIndependent_OfConductivityAndThickness(double k, double t)
+    {
+        const double tempA = 20.0;
+        const double tempD = 100.0;
+
+        var solution = Solve(tempA, tempD, k, t);
+
+        // Аналитическое решение — то же линейное по x, что и в базовом случае.
+        var expectedB = tempA + (tempD - tempA) * 0.5;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(tempA));
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(expectedB).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(expectedB).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(tempD));
+        });
+    }
+
+    /// <summary>
+    /// Одинаковые k и t на обоих элементах vs. разные — для однородной
+    /// задачи Дирихле без источников решение остаётся одним и тем же
+    /// (линейный профиль), поскольку граничные условия фиксируют всё.
+    /// По факту: если значение k*t не меняется, то решение остается тоже самое
+    /// </summary>
+    [Test]
+    public void Solution_IsSame_ForUniformAndNonUniformProperties()
+    {
+        const double tempA = 20.0;
+        const double tempD = 100.0;
+
+        var model1 = BuildModelWithDifferentTriangleMaterial(k1: 3.0, t1: 1.0, k2: 1.0, t2: 1.0);
+        var solution1 = new SolutionBuilder(model1)
+            .Assembly()
+            .AddDirichlet("nodeA", Freedom.Temperature, tempA)
+            .AddDirichlet("nodeD", Freedom.Temperature, tempD)
+            .Build();
+
+        var model2 = BuildModelWithDifferentTriangleMaterial(k1: 1.0, t1: 3.0, k2: 0.5, t2: 2.0);
+        var solution2 = new SolutionBuilder(model2)
+            .Assembly()
+            .AddDirichlet("nodeA", Freedom.Temperature, tempA)
+            .AddDirichlet("nodeD", Freedom.Temperature, tempD)
+            .Build();
+
+        Assert.Multiple(() =>
+        {
+            foreach (var nodeId in NodeIds)
+            {
+                Assert.That(ValueOf(solution2, nodeId),
+                    Is.EqualTo(ValueOf(solution1, nodeId)).Within(Tolerance),
+                    $"Значение в узле '{nodeId}' должно совпадать для однородных и разных k/t.");
+            }
+        });
+    }
+
+    // ────────────────────────────────────────────────────────────────
+    // Идентификаторы узлов в векторе решения
+    // ────────────────────────────────────────────────────────────────
 
     [Test]
-    public void TwoTriangles_FullPipeline_ProducesSolutionForAllUniqueNodes()
+    public void SolutionVector_HasExactlyFourDistinctNodeIds()
     {
-        // Act
-        var solution = Solve();
+        var solution = Solve(20.0, 100.0);
 
-        // Assert
-        var nodeIds = solution.Items
-            .Select(i => i.Node.NodeId)
-            .ToList();
+        var ids = solution.Items.Select(i => i.Node.NodeId).ToList();
 
-        Assert.That(nodeIds, Does.Contain("nodeA"));
-        Assert.That(nodeIds, Does.Contain("nodeB"));
-        Assert.That(nodeIds, Does.Contain("nodeC"));
-        Assert.That(nodeIds, Does.Contain("nodeD"));
+        Assert.That(ids, Has.Count.EqualTo(4),
+            "В модели 4 уникальных узла; вектор решения не должен содержать дубликатов.");
+        Assert.That(ids, Is.EquivalentTo(NodeIds));
     }
 
     [Test]
-    public void TwoTriangles_Solution_SatisfiesDirichletValues()
+    public void SolutionVector_AllItems_HaveTemperatureFreedom()
     {
-        // Act
-        var solution = Solve();
+        var solution = Solve(20.0, 100.0);
 
-        // Assert
-        var atA = ValueOf(solution, "nodeA");
-        var atD = ValueOf(solution, "nodeD");
-
-        Assert.That(atA, Is.EqualTo(TemperatureNodeA),
-            $"Узел A должен принять заданное граничное значение {TemperatureNodeA}.");
-        Assert.That(atD, Is.EqualTo(TemperatureNodeD),
-            $"Узел D должен принять заданное граничное значение {TemperatureNodeD}.");
+        Assert.That(solution.Items, Is.Not.Empty);
+        Assert.That(solution.Items.Select(i => i.Freedom).Distinct(),
+            Is.EquivalentTo([Freedom.Temperature]));
     }
 
+    /// <summary>
+    /// Каждый <see cref="SolutionItem"/> ссылается ровно на тот же
+    /// экземпляр <c>IElementNode</c>, что и исходная модель — это критично
+    /// для сшивки узлов между элементами (nodeB, nodeC — общие).
+    /// </summary>
     [Test]
-    public void TwoTriangles_IntermediateNodes_AreBetweenBoundaryValues()
+    public void SolutionVector_NodeReferences_AreSharedBetweenElements()
     {
-        // Act
-        var solution = Solve();
+        var element1 = BuildElement1();
+        var element2 = BuildElement2(element1);
 
-        var atB = ValueOf(solution, "nodeB");
-        var atC = ValueOf(solution, "nodeC");
+        // Убеждаемся, что в исходных элементах nodeB и nodeC — те же ссылки.
+        Assert.That(element2.Node("nodeB"), Is.SameAs(element1.Node("nodeB")),
+            "nodeB должен быть общим между элементами.");
+        Assert.That(element2.Node("nodeC"), Is.SameAs(element1.Node("nodeC")),
+            "nodeC должен быть общим между элементами.");
 
-        // Assert
-        // для задачи теплопроводности без внутренних источников
-        // решение удовлетворяет принципу максимума:
-        // min(граница) <= T(x) <= max(граница) во всех внутренних узлах.
-        Assert.That(atB, Is.GreaterThanOrEqualTo(TemperatureNodeA - 1e-9));
-        Assert.That(atB, Is.LessThanOrEqualTo(TemperatureNodeD + 1e-9));
-        Assert.That(atC, Is.GreaterThanOrEqualTo(TemperatureNodeA - 1e-9));
-        Assert.That(atC, Is.LessThanOrEqualTo(TemperatureNodeD + 1e-9));
+        var model = new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddElements(element1, element2)
+            .Build();
+
+        var solution = new SolutionBuilder(model)
+            .Assembly()
+            .AddDirichlet("nodeA", Freedom.Temperature, 20.0)
+            .AddDirichlet("nodeD", Freedom.Temperature, 100.0)
+            .Build();
+
+        var atB = solution.Items.Single(i => i.Node.NodeId == "nodeB");
+        var atC = solution.Items.Single(i => i.Node.NodeId == "nodeC");
+
+        Assert.That(atB.Node, Is.SameAs(element1.Node("nodeB")),
+            "Узел nodeB в решении должен быть тем же экземпляром, что и в элементе.");
+        Assert.That(atC.Node, Is.SameAs(element1.Node("nodeC")),
+            "Узел nodeC в решении должен быть тем же экземпляром, что и в элементе.");
     }
 
-    [Test]
-    public void TwoTriangles_AllValues_AreFinite()
-    {
-        // Act
-        var solution = Solve();
+    // ────────────────────────────────────────────────────────────────
+    // Общие инварианты
+    // ────────────────────────────────────────────────────────────────
 
-        // Assert
-        // ни один узел не должен получить NaN/Infinity.
+    [Test]
+    public void Solution_AllValues_AreFinite()
+    {
+        var solution = Solve(20.0, 100.0);
+
         Assert.That(solution.Items, Is.Not.Empty);
         foreach (var item in solution.Items)
         {
@@ -106,90 +297,74 @@ public class TwoTrianglesIntegrationTests
     }
 
     [Test]
-    public void TwoTriangles_Solution_IsDeterministic()
+    public void Solution_IsDeterministic_AcrossRuns()
     {
-        // Act
-        var first = Solve();
-        var second = Solve();
+        const double tempA = 20.0;
+        const double tempD = 100.0;
+        var first = Solve(tempA, tempD);
+        var second = Solve(tempA, tempD);
 
-        // Assert
-        //
-        // повторный запуск на идентичной модели должен дать
-        // побитово равные значения во всех узлах (детерминированная сборка
-        // + детерминированный решатель).
-        foreach (var nodeId in new[] { "nodeA", "nodeB", "nodeC", "nodeD" })
+        foreach (var nodeId in NodeIds)
         {
             Assert.That(ValueOf(second, nodeId),
-                Is.EqualTo(ValueOf(first, nodeId)).Within(1e-12),
+                Is.EqualTo(ValueOf(first, nodeId)),
                 $"Значение в узле '{nodeId}' нестабильно между запусками.");
         }
     }
 
-    [Test]
-    public void TwoTriangles_Solution_ContainsOnlyTemperatureFreedom()
-    {
-        // Act
-        var solution = Solve();
-
-        // Assert
-        // в модели задана только Freedom.Temperature.
-        Assert.That(solution.Items.Select(i => i.Freedom).Distinct(),
-            Is.EquivalentTo([Freedom.Temperature]));
-    }
+    // ────────────────────────────────────────────────────────────────
+    // Негативные сценарии
+    // ────────────────────────────────────────────────────────────────
 
     [Test]
-    public void TwoTriangles_WithoutDirichlet_Throws()
+    public void Build_WithoutDirichlet_Throws()
     {
-        // Arrange
-        var model = BuildModel();
-        var builder = new SolutionBuilder(model).Assembly();
+        var builder = new SolutionBuilder(BuildModel()).Assembly();
 
-        // Act
-        var ex = Assert.Throws<FeaSolutionBuilderException>(
-             () => builder.Build());
+        var ex = Assert.Throws<FeaSolutionBuilderException>(() => builder.Build());
 
-        // Assert —
-        // без граничных условий матрица вырождена,
-        Assert.That(ex!.Message, Is.EqualTo("Dirichlet condition collection is empty. Call 'AddDirichlet' first."));
+        Assert.That(ex!.Message, Is.EqualTo(
+            "Dirichlet condition collection is empty. Call 'AddDirichlet' first."));
     }
 
-    #region Helpers
-
-    private static double ValueOf(ConstructionModelSolution solution, string nodeId)
+    [Test]
+    public void Build_BeforeAssembly_Throws()
     {
-        var item = solution.Items.SingleOrDefault(i => i.Node.NodeId == nodeId);
-        Assert.That(item, Is.Not.Null, $"В решении отсутствует узел '{nodeId}'.");
-        return item!.Value;
+        var builder = new SolutionBuilder(BuildModel());
+
+        var ex = Assert.Throws<FeaSolutionBuilderException>(() => builder.Build());
+
+        Assert.That(ex!.Message, Is.EqualTo("Construction model stiffness matrix is not assembled. Call 'Assembly' first."));
     }
 
-    private static IFiniteElement BuildElement1() =>
+    private static IFiniteElement BuildElement1(double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
-                ThermalConductivity = 1.0,
-                Thickness = 1.0,
+                ThermalConductivity = k,
+                Thickness = t,
             })
-            .AddNode(0, 1.0, "nodeA")
+            .AddNode(0.0, 1.0, "nodeA")
             .AddNode(2.0, 2.0, "nodeB")
-            .AddNode(2.0, 0, "nodeC")
+            .AddNode(2.0, 0.0, "nodeC")
             .Build("The first triangle");
 
-    private static IFiniteElement BuildElement2(IFiniteElement element1) =>
+    private static IFiniteElement BuildElement2(IFiniteElement element1, double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
-                ThermalConductivity = 1.0,
-                Thickness = 1.0,
+                ThermalConductivity = k,
+                Thickness = t,
             })
             .AddNode(element1.Node("nodeB"))
             .AddNode(element1.Node("nodeC"))
             .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
-    private static IConstructionModel BuildModel()
+    private static IConstructionModel BuildModel(double k = 1.0, double t = 1.0)
     {
-        var element1 = BuildElement1();
-        var element2 = BuildElement2(element1);
+        var element1 = BuildElement1(k, t);
+        var element2 = BuildElement2(element1, k, t);
 
         return new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
@@ -197,16 +372,38 @@ public class TwoTrianglesIntegrationTests
             .Build();
     }
 
-    private static ConstructionModelSolution Solve()
+    private static IConstructionModel BuildModelWithDifferentTriangleMaterial(
+        double k1, double t1, double k2, double t2)
     {
-        var model = BuildModel();
+        var element1 = BuildElement1(k1, t1);
+        var element2 = BuildElement2(element1, k2, t2);
 
-        return new SolutionBuilder(model)
-            .Assembly()
-            .AddDirichlet("nodeA", Freedom.Temperature, TemperatureNodeA)
-            .AddDirichlet("nodeD", Freedom.Temperature, TemperatureNodeD)
+        return new ConstructionModelBuilder()
+            .SetNodesType(ElementNodeType.Type2D)
+            .AddElements(element1, element2)
             .Build();
     }
 
-    #endregion
+    private static ConstructionModelSolution Solve(
+        double tempA, double tempD, double k = 1.0, double t = 1.0) =>
+        new SolutionBuilder(BuildModel(k, t))
+            .Assembly()
+            .AddDirichlet("nodeA", Freedom.Temperature, tempA)
+            .AddDirichlet("nodeD", Freedom.Temperature, tempD)
+            .Build();
+
+    private static ConstructionModelSolution SolveAt(
+        string node1, double value1, string node2, double value2) =>
+        new SolutionBuilder(BuildModel())
+            .Assembly()
+            .AddDirichlet(node1, Freedom.Temperature, value1)
+            .AddDirichlet(node2, Freedom.Temperature, value2)
+            .Build();
+
+    private static double ValueOf(ConstructionModelSolution solution, string nodeId)
+    {
+        var item = solution.Items.SingleOrDefault(i => i.Node.NodeId == nodeId);
+        Assert.That(item, Is.Not.Null, $"В решении отсутствует узел '{nodeId}'.");
+        return item!.Value;
+    }
 }
