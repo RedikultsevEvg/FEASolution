@@ -30,7 +30,7 @@ public class SolutionBuilderTests
         var builder = new SolutionBuilder(_constructionModelMock.Object);
 
         // Act
-        var result = builder.AssemblyAsync().Result;
+        var result = builder.Assembly();
 
         // Assert
         Assert.That(result, Is.SameAs(builder),
@@ -44,7 +44,7 @@ public class SolutionBuilderTests
         var builder = new SolutionBuilder(_constructionModelMock.Object);
 
         // Act
-        var result = builder.AssemblyAsync().Result;
+        var result = builder.Assembly();
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -58,9 +58,9 @@ public class SolutionBuilderTests
 
         // Act
         var result = builder
-            .AssemblyAsync().Result
-            .AssemblyAsync().Result
-            .AssemblyAsync().Result;
+            .Assembly()
+            .Assembly()
+            .Assembly();
 
         // Assert
         Assert.That(result, Is.SameAs(builder));
@@ -73,7 +73,7 @@ public class SolutionBuilderTests
         var builder = new SolutionBuilder(_constructionModelMock.Object);
 
         // Act & Assert
-        Assert.DoesNotThrowAsync(() => builder.AssemblyAsync());
+        Assert.DoesNotThrow(() => builder.Assembly());
     }
 
     [Test]
@@ -84,10 +84,10 @@ public class SolutionBuilderTests
 
         // Act
         var result = builder
-            .AssemblyAsync().Result
+            .Assembly()
             .ValidateForCountOfElement()
             .ValidateForCommonElements()
-            .AssemblyAsync().Result;
+            .Assembly();
 
         // Assert
         Assert.That(result, Is.SameAs(builder),

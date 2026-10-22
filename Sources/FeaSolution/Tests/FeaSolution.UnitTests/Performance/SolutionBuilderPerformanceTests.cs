@@ -18,7 +18,7 @@ public class SolutionBuilderPerformanceTests
     [OneTimeSetUp]
     public void WarmUp()
     {
-        _ = new SolutionBuilder(TriangularMeshFactory.Create(100)).AssemblyAsync();
+        _ = new SolutionBuilder(TriangularMeshFactory.Create(100)).Assembly();
     }
 
     [Test]
@@ -26,7 +26,7 @@ public class SolutionBuilderPerformanceTests
     [TestCase(2_500, 50)]
     [TestCase(5_000, 100)]
     [TestCase(10_000, 500)]
-    public async Task Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount, int expectedMaxMiliSeconds)
+    public void Assembly_WithManyElements_CompletesWithinReasonableTime(int elementCount, int expectedMaxMiliSeconds)
     {
         // Arrange
         var model = TriangularMeshFactory.Create(elementCount);
@@ -40,7 +40,7 @@ public class SolutionBuilderPerformanceTests
 
         // Act
         var sw = Stopwatch.StartNew();
-        await builder.AssemblyAsync();
+        builder.Assembly();
         sw.Stop();
 
         // Assert + диагностика
@@ -67,8 +67,8 @@ public class SolutionBuilderPerformanceTests
         const int largeCount = 4_000;
         const int expectedScaling = 10;
 
-        var smallTime = await MeasureAssemblyAsync(smallCount);
-        var largeTime = await MeasureAssemblyAsync(largeCount);
+        var smallTime = MeasureAssembly(smallCount);
+        var largeTime = MeasureAssembly(largeCount);
 
         var ratio = largeTime / (double)Math.Max(smallTime, 1);
 
@@ -99,7 +99,7 @@ public class SolutionBuilderPerformanceTests
         var builder = new SolutionBuilder(model);
 
         var sw = Stopwatch.StartNew();
-        Assert.DoesNotThrowAsync(() => builder.AssemblyAsync());
+        Assert.DoesNotThrow(() => builder.Assembly());
         sw.Stop();
 
         TestContext.WriteLine(
@@ -110,7 +110,7 @@ public class SolutionBuilderPerformanceTests
     //[Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
     [TestCase(50_000, 2_000)]
     [TestCase(100_000, 4_000)]
-    public async Task Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)
+    public void Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)
     {
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
@@ -122,7 +122,7 @@ public class SolutionBuilderPerformanceTests
             .Count();
 
         var sw = Stopwatch.StartNew();
-        await builder.AssemblyAsync();
+        builder.Assembly();
         sw.Stop();
 
         TestContext.WriteLine(
@@ -134,17 +134,17 @@ public class SolutionBuilderPerformanceTests
         Assert.That(sw.ElapsedMilliseconds, Is.LessThan(expectedMaxMiliSeconds));
     }
 
-    private static async Task<long> MeasureAssemblyAsync(int elementCount)
+    private static long MeasureAssembly(int elementCount)
     {
         var model = TriangularMeshFactory.Create(elementCount);
         var builder = new SolutionBuilder(model);
 
         // Прогрев на маленькой модели
         _ = new SolutionBuilder(TriangularMeshFactory.Create(50))
-            .AssemblyAsync();
+            .Assembly();
 
         var sw = Stopwatch.StartNew();
-        await builder.AssemblyAsync();
+        builder.Assembly();
         sw.Stop();
         return sw.ElapsedMilliseconds;
     }

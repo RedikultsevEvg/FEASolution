@@ -31,7 +31,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     {
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(DirichletConditions);
-        FeaSolutionBuilderException.ThrowIfTrue(StiffnessMatrix is null, $"Construction model stiffness matrix is not assembled. Call '{nameof(AssemblyAsync)}' first.");
+        FeaSolutionBuilderException.ThrowIfTrue(StiffnessMatrix is null, $"Construction model stiffness matrix is not assembled. Call '{nameof(Assembly)}' first.");
         FeaSolutionBuilderException.ThrowIfTrue(DirichletConditions.Count == 0, $"Dirichlet condition collection is empty. Call '{nameof(AddDirichlet)}' first.");
 
         var vectorF = GetVector(StiffnessMatrix!);
@@ -46,13 +46,11 @@ public class SolutionBuilder(IConstructionModel constructionModel)
         };
     }
 
-    // todo: вернуть синхронный метод
     /// <summary>
     /// Calculate construction model stiffness matrix.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public async Task<SolutionBuilder> AssemblyAsync(
-        CancellationToken cancellationToken = default)
+    public SolutionBuilder Assembly(CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(constructionModel.Elements);
@@ -67,11 +65,11 @@ public class SolutionBuilder(IConstructionModel constructionModel)
             CancellationToken = cancellationToken
         };
 
-        await Parallel.ForAsync(
+        Parallel.For(
             fromInclusive: 0,
             toExclusive: elements.Count,
             options,
-            (i, _) =>
+            i =>
             {
                 options.CancellationToken.ThrowIfCancellationRequested();
 
@@ -82,9 +80,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
                     finiteElement.Nodes.Count);
 
                 localMatrices[i] = logic.GetMatrix(finiteElement);
-                return ValueTask.CompletedTask;
             });
-        
+
         IStiffnessMatrix globalStiffnessMatrix = StiffnessMatrixFactory.CreateNew();
         foreach (var localMatrix in localMatrices)
         {

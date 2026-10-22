@@ -43,8 +43,7 @@ internal static class Model2DTwoTriangles
         // var konturNodes = model.GetNodesFromElements(3);
 
         var solution = new SolutionBuilder(model)
-            .AssemblyAsync() // Should be reimplemented to sync mode
-            .Result
+            .Assembly() 
             .ValidateForCountOfElement() // Not implemented yet
             .ValidateForCommonElements() // Not implemented yet 
             .ValidateForQualityOfElements() // Not implemented yet
