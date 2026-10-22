@@ -7,7 +7,6 @@ using FeaSolution.Implementation.FiniteElements;
 
 namespace FeaSolution.Implementation.Builders;
 
-// todo: необходим нагрузочный тест на билдер!
 public class FiniteElementBuilder
 {
     private ElementNodeType? NodeType { get; set; } 
