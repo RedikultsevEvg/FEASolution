@@ -10,7 +10,7 @@ namespace FeaSolution.Implementation.Builders;
 // todo: необходим нагрузочный тест на билдер!
 public class FiniteElementBuilder
 {
-    private ElementNodeType NodeType { get; set; } = new();
+    private ElementNodeType? NodeType { get; set; } 
 
     private ICollection<IElementNode> Nodes { get; } = [];
 
@@ -22,10 +22,10 @@ public class FiniteElementBuilder
     /// <returns>The new element.</returns>
     public IFiniteElement Build(string userId = "")
     {
-        ArgumentNullException.ThrowIfNull(NodeType);
         ArgumentNullException.ThrowIfNull(Nodes);
         FeaElementBuilderException.ThrowIfTrue(Nodes.Count == 0, $"Can't build element with empty node collection. Use '{nameof(AddNode)}' to add nodes.");
         FeaElementBuilderException.ThrowIfTrue(Freedoms.Count == 0, $"Can't build element with empty freedom collection. Use '{nameof(AddFreedom)}' to add freedoms.");
+        ArgumentNullException.ThrowIfNull(NodeType);
 
         var elementTypeFreedoms = new List<(Freedom, IElementOptions)>();
         elementTypeFreedoms.AddRange(Freedoms);
@@ -47,19 +47,6 @@ public class FiniteElementBuilder
     }
 
     /// <summary>
-    /// Sets the node type for elements.
-    /// </summary>
-    /// <param name="nodeType">Node type.</param>
-    /// <returns>The reference to the current builder.</returns>
-    public FiniteElementBuilder SetNodesType(ElementNodeType nodeType)
-    {
-        FeaElementBuilderException.ThrowIfTrue(Nodes.Count != 0, "You have to remove all nodes before changing node type.");
-
-        NodeType = nodeType;
-        return this;
-    }
-
-    /// <summary>
     /// Adds 1D node.
     /// </summary>
     /// <param name="x">The X-coordinate.</param>
@@ -68,12 +55,9 @@ public class FiniteElementBuilder
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 1D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x, string nodeId = "")
     {
-        if (NodeType.Dimension != Dimensional.OneDimensional)
-        {
-            throw new FeaElementBuilderException(NodeType);
-        }
+        ValidateNodesType(ElementNodeType.Type1D);
 
-        var node = new ElementNode(NodeType)
+        var node = new ElementNode(NodeType!)
         {
             X = x,
             NodeId = nodeId
@@ -93,12 +77,9 @@ public class FiniteElementBuilder
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 2D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, string nodeId = "")
     {
-        if (NodeType.Dimension != Dimensional.TwoDimensional)
-        {
-            throw new FeaElementBuilderException(NodeType);
-        }
+        ValidateNodesType(ElementNodeType.Type2D);
 
-        var node = new ElementNode(NodeType)
+        var node = new ElementNode(NodeType!)
         {
             X = x,
             Y = y,
@@ -120,12 +101,9 @@ public class FiniteElementBuilder
     /// <exception cref="FeaCommonException">Raise an exception if builder dimension is not 3D.</exception>
     public FiniteElementBuilder AddNode(CoordinateValue x, CoordinateValue y, CoordinateValue z, string nodeId = "")
     {
-        if (NodeType.Dimension != Dimensional.ThreeDimensional)
-        {
-            throw new FeaElementBuilderException(NodeType);
-        }
+        ValidateNodesType(ElementNodeType.Type3D);
 
-        var node = new ElementNode(NodeType)
+        var node = new ElementNode(NodeType!)
         {
             X = x,
             Y = y,
@@ -147,8 +125,7 @@ public class FiniteElementBuilder
     {
         ArgumentNullException.ThrowIfNull(node);
 
-        FeaElementBuilderException.ThrowIfTrue(NodeType.Dimension != node.Type.Dimension, $"Node has dimension not equal to '{NodeType.Dimension.ToString()}'");
-
+        ValidateNodesType(node.Type);
         Nodes.Add(node);
         return this;
     }
@@ -164,5 +141,13 @@ public class FiniteElementBuilder
         FeaElementBuilderException.ThrowIfTrue(options == null!, "Can't add null options.");
         Freedoms.Add((freedom,options)!);
         return this;
+    }
+
+    private void ValidateNodesType(ElementNodeType nodeType)
+    {
+        NodeType ??= nodeType;
+
+        FeaElementBuilderException.ThrowIfTrue(NodeType.Dimension != nodeType.Dimension,
+            $"Node has dimension not equal to '{NodeType.Dimension.ToString()}'");
     }
 }

@@ -511,8 +511,7 @@ public class ConstructionModelBuilderTests
 
     private static IFiniteElement CreateTestElement(Dimensional dimension, params Freedom[] freedoms)
     {
-        var builder = new FiniteElementBuilder()
-            .SetNodesType(GetNodeType(dimension));
+        var builder = new FiniteElementBuilder();
 
         foreach (var freedom in freedoms)
         {
@@ -543,14 +542,6 @@ public class ConstructionModelBuilderTests
 
     private static IFiniteElement CreateTestElement(Dimensional dimension)
         => CreateTestElement(dimension, Freedom.Temperature);
-
-    private static ElementNodeType GetNodeType(Dimensional dimension) => dimension switch
-    {
-        Dimensional.OneDimensional => ElementNodeType.Type1D,
-        Dimensional.TwoDimensional => ElementNodeType.Type2D,
-        Dimensional.ThreeDimensional => ElementNodeType.Type3D,
-        _ => throw new ArgumentOutOfRangeException(nameof(dimension), dimension, null)
-    };
 
     private static ICollection<IFiniteElement> GetElements(ConstructionModelBuilder builder)
     {

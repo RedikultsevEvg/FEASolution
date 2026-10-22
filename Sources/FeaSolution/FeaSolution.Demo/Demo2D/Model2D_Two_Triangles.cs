@@ -15,14 +15,12 @@ internal static class Model2DTwoTriangles
                 ThermalConductivity = 1.0,
                 Thickness = 1.0,
             })
-            .SetNodesType(ElementNodeType.Type2D) // to remove
             .AddNode(0, 1.0, "nodeA")
             .AddNode(2.0, 2.0, "nodeB")
             .AddNode(2.0, 0, "nodeC")
             .Build("The first triangle");
 
         var element2 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type2D) // to remove
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 1.0,

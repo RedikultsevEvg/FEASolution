@@ -9,7 +9,6 @@ internal static class Model3DExamples
     public static void Build_Model_From_Element()
     {
         var element1 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -29,7 +28,6 @@ internal static class Model3DExamples
     public static void Build_Model_From_3_Elements()
     {
         var element1 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -41,7 +39,6 @@ internal static class Model3DExamples
             .Build();
 
         var element2 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -53,7 +50,6 @@ internal static class Model3DExamples
             .Build();
 
         var element3 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -73,7 +69,6 @@ internal static class Model3DExamples
     public static void Build_Model_From_CollectionOfElements()
     {
         var element1 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -85,7 +80,6 @@ internal static class Model3DExamples
             .Build();
 
         var element2 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,
@@ -97,7 +91,6 @@ internal static class Model3DExamples
             .Build();
 
         var element3 = new FiniteElementBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 0.67,

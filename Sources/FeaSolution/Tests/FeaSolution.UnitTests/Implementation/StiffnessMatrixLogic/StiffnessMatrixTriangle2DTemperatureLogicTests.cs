@@ -42,7 +42,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = thickness,
                 ThermalConductivity = thermalConductivity
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0, 1.0)
             .AddNode(2.0, 2.0)
             .AddNode(2.0, 0)
@@ -76,7 +75,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = thickness,
                 ThermalConductivity = thermalConductivity
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(2.0, 2.0)
             .AddNode(4.0, 1.0)
             .AddNode(2.0, 0)
@@ -104,7 +102,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type1D)
             .AddNode(0.0)
             .AddNode(1.0)
             .AddNode(2.0)
@@ -127,7 +124,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(1.0, 1.0)
@@ -156,7 +152,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -179,7 +174,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -199,7 +193,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
         var wrongOptions = Substitute.For<IElementOptions>();
         var element = new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, wrongOptions)
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -226,7 +219,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 1.0)
             .AddNode(2.0, 2.0)
@@ -249,7 +241,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
@@ -276,7 +267,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 0.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -308,7 +298,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 0.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -335,7 +324,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(h, 0.0)
             .AddNode(0.0, h)
@@ -378,7 +366,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(0.0, 0.0)
             .AddNode(1.0, 0.0)
             .AddNode(0.0, 1.0)
@@ -431,8 +418,7 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 {
                     Thickness = 1.0,
                     ThermalConductivity = 1.0
-                })
-                .SetNodesType(ElementNodeType.Type2D);
+                });
 
             foreach (var (x, y) in pts)
                 b.AddNode(x, y);
@@ -516,7 +502,6 @@ public class StiffnessMatrixTriangle2DTemperatureLogicTests
                 Thickness = 1.0,
                 ThermalConductivity = 1.0
             })
-            .SetNodesType(ElementNodeType.Type2D)
             .AddNode(a.x, a.y)
             .AddNode(b.x, b.y)
             .AddNode(c.x, c.y)

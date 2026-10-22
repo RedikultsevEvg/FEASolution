@@ -4,6 +4,7 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
+using FeaSolution.Implementation.ElementNodes;
 using FeaSolution.Implementation.FiniteElements;
 
 namespace FeaSolution.UnitTests.Implementation.Builders;
@@ -23,16 +24,11 @@ public class FiniteElementBuilderTests
     #region Build
 
     [Test]
-    public void Build_ShouldReturnNonNullElement()
+    public void Build_ShouldReturnElementWithCorrectNodeTypeAndDefaultUserId()
     {
         // Arrange
         _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
+            .AddFreedom(Freedom.Temperature, CreateOptions())
             .AddNode(1.3, 2.4);
 
         // Act
@@ -40,49 +36,25 @@ public class FiniteElementBuilderTests
 
         // Assert
         Assert.That(element, Is.Not.Null);
-        Assert.That(element, Is.InstanceOf<IFiniteElement>());
-    }
-
-    [Test]
-    public void Build_WithDefaultUserId_ShouldCreateElement()
-    {
-        // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
-            .AddNode(1.3, 2.4);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
         Assert.That(element, Is.InstanceOf<FiniteElement>());
+        Assert.That(element.Type.NodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
+        Assert.That(element.UserId, Is.EqualTo(string.Empty));
+        Assert.That(element.Nodes, Has.Count.EqualTo(1));
     }
 
     [Test]
-    public void Build_WithCustomUserId_ShouldCreateElement()
+    public void Build_WithCustomUserId_ShouldSetUserId()
     {
         // Arrange
         const string userId = "user-123";
         _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
+            .AddFreedom(Freedom.Temperature, CreateOptions())
             .AddNode(1.3, 2.4);
 
         // Act
         var element = _builder.Build(userId);
 
         // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element, Is.InstanceOf<FiniteElement>());
         Assert.That(element.UserId, Is.EqualTo(userId));
     }
 
@@ -91,12 +63,7 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
+            .AddFreedom(Freedom.Temperature, CreateOptions())
             .AddNode(1.3, 2.4);
 
         // Act
@@ -108,80 +75,10 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void Build_WhenHasNodeType_ShouldReturnElementWithCorrectNodeType()
+    public void Build_WithEmptyNodes_ShouldThrowNodeCollectionException()
     {
         // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type1D)
-            .AddNode(1.3);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element.Type.NodeType, Is.EqualTo(ElementNodeType.Type1D));
-    }
-
-    [Test]
-    public void Build_WhenHasOneNode_ShouldReturnElementWithOneNode()
-    {
-        // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
-            .AddNode(1.3, 2.4);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element.Nodes, Has.Count.EqualTo(1));
-    }
-
-    [Test]
-    public void Build_WhenHasTreeNodes_ShouldReturnElementWithTreeNode()
-    {
-        // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(ElementNodeType.Type2D)
-            .AddNode(1.3, 2.4)
-            .AddNode(2.3, 3.4)
-            .AddNode(3.3, 4.4);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element, Is.Not.Null);
-        Assert.That(element.Nodes, Has.Count.EqualTo(3));
-    }
-
-    [Test]
-    public void Build_WithEmptyNodes_ShouldThrowWithExpectedMessage()
-    {
-        // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            });
+        _builder.AddFreedom(Freedom.Temperature, CreateOptions());
 
         // Act
         var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.Build());
@@ -192,12 +89,10 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void Build_WithEmptyFreedoms_ShouldThrowWithExpectedMessage()
+    public void Build_WithEmptyFreedoms_ShouldThrowFreedomCollectionException()
     {
         // Arrange
-        _builder
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
-            .AddNode(1.3, 2.4);
+        _builder.AddNode(1.3, 2.4);
 
         // Act
         var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.Build());
@@ -214,34 +109,8 @@ public class FiniteElementBuilderTests
         var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.Build());
 
         // Assert
-        Assert.That(ex!.Message, Is.EqualTo("Can't build element with empty node collection. Use 'AddNode' to add nodes."));
-    }
-
-    [Test]
-    public void Build_WhenHasFreedoms_ShouldReturnElementWithCorrectFreedoms()
-    {
-        // Arrange
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
-            .AddNode(1.3, 2.4);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
-        Assert.That(element.Type.Freedoms.ElementAt(0).Item1, Is.EqualTo(Freedom.Temperature));
-        Assert.That(element.Type.Freedoms.ElementAt(1).Item1, Is.EqualTo(Freedom.AnotherFreedom));
+        Assert.That(ex!.Message, Is.EqualTo(
+            "Can't build element with empty node collection. Use 'AddNode' to add nodes."));
     }
 
     [Test]
@@ -249,12 +118,7 @@ public class FiniteElementBuilderTests
     {
         // Arrange
         _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
+            .AddFreedom(Freedom.Temperature, CreateOptions())
             .AddNode(1.1, 2.2)
             .AddNode(3.3, 4.4);
 
@@ -263,6 +127,7 @@ public class FiniteElementBuilderTests
 
         // Assert
         var nodes = element.Nodes.ToList();
+        Assert.That(nodes, Has.Count.EqualTo(2));
         Assert.That(nodes[0].X, Is.EqualTo(1.1));
         Assert.That(nodes[0].Y, Is.EqualTo(2.2));
         Assert.That(nodes[1].X, Is.EqualTo(3.3));
@@ -270,206 +135,15 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void Build_WithEmptyUserId_ShouldSetUserIdToEmptyString()
+    public void Build_WhenHasFreedoms_ShouldReturnElementWithCorrectFreedoms()
     {
         // Arrange
         _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddFreedom(Freedom.AnotherFreedom, CreateOptions())
             .AddNode(1.3, 2.4);
 
         // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element.UserId, Is.EqualTo(string.Empty));
-    }
-
-    [Test]
-    public void Build_ShouldPreserveNodeType()
-    {
-        // Arrange
-        var nodeType = CreateNodeType(Dimensional.ThreeDimensional);
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .SetNodesType(nodeType)
-            .AddNode(1.0, 2.0, 3.0);
-
-        // Act
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element.Type.NodeType.Dimension, Is.EqualTo(Dimensional.ThreeDimensional));
-    }
-
-    #endregion
-
-    #region SetNodesType
-
-    [Test]
-    public void SetNodesType_WithValidType_ShouldReturnSameBuilderInstance()
-    {
-        // Arrange
-        var nodeType = CreateNodeType(Dimensional.OneDimensional);
-
-        // Act
-        var result = _builder.SetNodesType(nodeType);
-
-        // Assert
-        Assert.That(result, Is.SameAs(_builder));
-    }
-
-    [Test]
-    public void SetNodesType_WhenNodesAreNotEmpty_ShouldThrowWithExpectedMessage()
-    {
-        // Arrange
-        var nodeType = CreateNodeType(Dimensional.OneDimensional);
-        _builder.SetNodesType(nodeType);
-        _builder.AddNode(1.0);
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.SetNodesType(nodeType));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("You have to remove all nodes before changing node type."));
-    }
-
-    [Test]
-    public void SetNodesType_WhenCalledMultipleTimesWithoutNodes_ShouldSucceed()
-    {
-        // Arrange
-        var firstType = CreateNodeType(Dimensional.OneDimensional);
-        var secondType = CreateNodeType(Dimensional.TwoDimensional);
-
-        // Act
-        var result = _builder
-            .SetNodesType(firstType)
-            .SetNodesType(secondType);
-
-        // Assert
-        Assert.That(result, Is.SameAs(_builder));
-    }
-
-    [Test]
-    public void SetNodesType_WhenNodesAreEmpty_ShouldAllowChange()
-    {
-        // Arrange
-        var firstType = CreateNodeType(Dimensional.OneDimensional);
-        var secondType = CreateNodeType(Dimensional.ThreeDimensional);
-
-        // Act
-        _builder.SetNodesType(firstType);
-        _builder.SetNodesType(secondType);
-
-        // Assert — проверяем, что тип действительно изменился
-        _builder.AddNode(1.0, 2.0, 3.0);
-        Assert.That(GetNodes(_builder), Has.Count.EqualTo(1));
-    }
-
-    [Test]
-    public void SetNodesType_WithNullNodeType_ShouldThrowOrAllowNull()
-    {
-        // Act & Assert — поведение зависит от реализации;
-        // если null не допускается, это должно быть явно проверено
-        // (в текущей реализации null приведёт к NRE при AddNode)
-        Assert.DoesNotThrow(() => _builder.SetNodesType(null!));
-    }
-
-    [Test]
-    public void SetNodesType_WhenNodesAreNotEmpty_ShouldNotChangeNodeType()
-    {
-        // Arrange
-        var originalType = CreateNodeType(Dimensional.OneDimensional);
-        _builder.SetNodesType(originalType);
-        _builder.AddNode(1.0);
-
-        var newType = CreateNodeType(Dimensional.TwoDimensional);
-
-        // Act
-        try { _builder.SetNodesType(newType); } catch (FeaElementBuilderException) { }
-
-        // Assert — тип не должен измениться, поэтому 1D-узел всё ещё добавляется
-        Assert.DoesNotThrow(() => _builder.AddNode(2.0));
-    }
-
-    #endregion
-
-    #region SetFreedoms
-
-    [Test]
-    public void SetFreedoms_WithValidFreedoms_ShouldReturnSameBuilderInstance()
-    {
-        // Act
-        var result = _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            });
-
-        // Assert
-        Assert.That(result, Is.SameAs(_builder));
-    }
-
-    [Test]
-    public void SetFreedoms_WithMultipleFreedoms_ShouldAddAllFreedoms()
-    {
-        // Arrange
-        _builder
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
-            .AddNode(1.3, 2.4);
-
-        // Act
-        _builder
-            .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            })
-            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            });
-        var element = _builder.Build();
-
-        // Assert
-        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(3));
-    }
-
-    [Test]
-    public void SetFreedoms_WhenCalledMultipleTimes_ShouldAccumulateFreedoms()
-    {
-        // Arrange
-        _builder
-            .SetNodesType(CreateNodeType(Dimensional.TwoDimensional))
-            .AddNode(1.3, 2.4);
-
-        // Act
-        _builder.AddFreedom(Freedom.Temperature, new TemperatureElementOptions
-        {
-            ThermalConductivity = 2,
-            Thickness = 1
-        });
-        _builder
-            .AddFreedom(Freedom.AnotherFreedom, new TemperatureElementOptions
-            {
-                ThermalConductivity = 2,
-                Thickness = 1
-            });
         var element = _builder.Build();
 
         // Assert
@@ -479,233 +153,210 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void SetFreedoms_WithNull_ShouldThrowArgumentNullException()
-    {
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder
-            .AddFreedom(Freedom.Temperature, null!));
-    }
-
-    #endregion
-
-    #region AddNode — common tests
-
-    [Test]
-    public void AddNode_WhenCalledMultipleTimes_ShouldAddNodesToCollection()
+    public void Build_ShouldCopyFreedoms_NotShareReference()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
+        _builder
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddNode(1.3, 2.4);
+
+        var element = _builder.Build();
 
         // Act
-        _builder.AddNode(0.0);
-        _builder.AddNode(1.0);
-        _builder.AddNode(2.0);
+        _builder.AddFreedom(Freedom.AnotherFreedom, CreateOptions());
 
         // Assert
-        var nodes = GetNodes(_builder);
-        Assert.That(nodes, Has.Count.EqualTo(3));
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(1),
+            "Freedoms должны копироваться при сборке — добавление после Build не должно влиять на элемент.");
     }
 
     [Test]
-    public void AddNode_WithoutSettingNodeType_ShouldThrowBecauseDefaultIsNotOneDimensional()
+    public void Build_ShouldShareNodesReference_KnownBug()
     {
-        // Act & Assert
-        var e = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
-        Assert.That(e.Message, Is.EqualTo("The current accepted node type is 0. You should use another method to specify all dimentions."));
+        // Документирует текущее (потенциально ошибочное) поведение:
+        // билдер передаёт свою коллекцию Nodes по ссылке в собранный элемент.
+        // После Build добавление узла в билдер меняет и element.Nodes.
+        // Если поведение будет исправлено — этот тест должен упасть и его нужно удалить.
+
+        // Arrange
+        _builder
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddNode(1.3, 2.4);
+
+        var element = _builder.Build();
+
+        // Act
+        _builder.AddNode(5.5, 6.6);
+
+        // Assert
+        Assert.That(element.Nodes, Has.Count.EqualTo(2),
+            "Известный баг: Nodes разделяются по ссылке между билдером и элементом.");
     }
 
     #endregion
 
-    #region AddNode — 1D
+    #region AddFreedom
 
     [Test]
-    public void AddNode1D_WithOneDimensionalNodeType_ShouldReturnSameBuilderInstance()
+    public void AddFreedom_ShouldReturnSameBuilderInstance()
     {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
         // Act
-        var result = _builder.AddNode(5.0);
+        var result = _builder.AddFreedom(Freedom.Temperature, CreateOptions());
 
         // Assert
         Assert.That(result, Is.SameAs(_builder));
     }
 
     [Test]
-    public void AddNode1D_WithNonOneDimensionalNodeType_ShouldThrowWithExpectedMessage()
+    public void AddFreedom_MultipleCalls_ShouldAccumulate()
     {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
         // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
+        _builder
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddFreedom(Freedom.AnotherFreedom, CreateOptions())
+            .AddFreedom(Freedom.AnotherFreedom, CreateOptions());
 
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is TwoDimensional. You should use another method to specify all dimentions."));
+        // Assert — Build не упадёт из-за freedooms, проверяем через собранный элемент
+        _builder.AddNode(1.3, 2.4);
+        var element = _builder.Build();
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(3));
     }
 
     [Test]
-    public void AddNode1D_ShouldStoreCorrectXCoordinate()
+    public void AddFreedom_WithNullOptions_ShouldThrow()
+    {
+        // Act & Assert
+        Assert.Throws<FeaElementBuilderException>(() =>
+            _builder.AddFreedom(Freedom.Temperature, null!));
+    }
+
+    [Test]
+    public void AddFreedom_WithDuplicateFreedom_ShouldAddTwice_KnownBehavior()
+    {
+        // Документирует текущее поведение: дубликаты freedom не отсеиваются.
+
+        // Act
+        _builder
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddFreedom(Freedom.Temperature, CreateOptions())
+            .AddNode(1.3, 2.4);
+
+        var element = _builder.Build();
+
+        // Assert
+        Assert.That(element.Type.Freedoms, Has.Count.EqualTo(2));
+    }
+
+    #endregion
+
+    #region AddNode — 1D / 2D / 3D
+
+    [Test]
+    public void AddNode1D_ShouldStoreX_AndZeroYZ()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
         const double expectedX = 3.14;
 
         // Act
-        _builder.AddNode(expectedX);
-
-        // Assert
-        var nodes = GetNodes(_builder);
-        Assert.That(nodes, Has.Count.EqualTo(1));
-        Assert.That(nodes.First().X, Is.EqualTo(expectedX));
-    }
-
-    [Test]
-    public void AddNode1D_WithDifferentCoordinates_ShouldStoreEachCoordinate()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        _builder.AddNode(1.5);
-        _builder.AddNode(-2.5);
-        _builder.AddNode(0.0);
-
-        // Assert
-        var nodes = GetNodes(_builder).ToList();
-        Assert.That(nodes[0].X, Is.EqualTo(1.5));
-        Assert.That(nodes[1].X, Is.EqualTo(-2.5));
-        Assert.That(nodes[2].X, Is.EqualTo(0.0));
-    }
-
-    [Test]
-    public void AddNode1D_ShouldNotSetYAndZCoordinates()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        _builder.AddNode(7.0);
+        var result = _builder.AddNode(expectedX);
 
         // Assert
         var node = GetNodes(_builder).Single();
+        Assert.That(result, Is.SameAs(_builder));
+        Assert.That(node.X, Is.EqualTo(expectedX));
         Assert.That(node.Y, Is.EqualTo(0.0));
         Assert.That(node.Z, Is.EqualTo(0.0));
     }
 
     [Test]
-    public void AddNode1D_WithNegativeCoordinate_ShouldStoreNegativeValue()
+    public void AddNode2D_ShouldStoreXY_AndZeroZ()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        _builder.AddNode(-42.0);
-
-        // Assert
-        Assert.That(GetNodes(_builder).Single().X, Is.EqualTo(-42.0));
-    }
-
-    [Test]
-    public void AddNode1D_WithZeroCoordinate_ShouldStoreZero()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        _builder.AddNode(0.0);
-
-        // Assert
-        Assert.That(GetNodes(_builder).Single().X, Is.EqualTo(0.0));
-    }
-
-    #endregion
-
-    #region AddNode — 2D
-
-    [Test]
-    public void AddNode2D_WithTwoDimensionalNodeType_ShouldReturnSameBuilderInstance()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act
-        var result = _builder.AddNode(1.0, 2.0);
-
-        // Assert
-        Assert.That(result, Is.SameAs(_builder));
-    }
-
-    [Test]
-    public void AddNode2D_WithNonTwoDimensionalNodeType_ShouldThrowWithExpectedMessage()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is OneDimensional. You should use another method to specify all dimentions."));
-    }
-
-    [Test]
-    public void AddNode2D_WithThreeDimensionalNodeType_ShouldThrow()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-    }
-
-    [Test]
-    public void AddNode2D_ShouldStoreCorrectCoordinates()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
         const double expectedX = 1.5;
         const double expectedY = -3.25;
 
         // Act
-        _builder.AddNode(expectedX, expectedY);
+        var result = _builder.AddNode(expectedX, expectedY);
 
         // Assert
         var node = GetNodes(_builder).Single();
+        Assert.That(result, Is.SameAs(_builder));
         Assert.That(node.X, Is.EqualTo(expectedX));
         Assert.That(node.Y, Is.EqualTo(expectedY));
+        Assert.That(node.Z, Is.EqualTo(0.0));
     }
 
     [Test]
-    public void AddNode2D_ShouldNotSetZCoordinate()
+    public void AddNode3D_ShouldStoreXYZ()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
+        const double expectedX = 1.1;
+        const double expectedY = 2.2;
+        const double expectedZ = 3.3;
 
         // Act
-        _builder.AddNode(1.0, 2.0);
+        var result = _builder.AddNode(expectedX, expectedY, expectedZ);
 
         // Assert
-        Assert.That(GetNodes(_builder).Single().Z, Is.EqualTo(0.0));
+        var node = GetNodes(_builder).Single();
+        Assert.That(result, Is.SameAs(_builder));
+        Assert.That(node.X, Is.EqualTo(expectedX));
+        Assert.That(node.Y, Is.EqualTo(expectedY));
+        Assert.That(node.Z, Is.EqualTo(expectedZ));
+    }
+
+    [TestCase(-42.0)]
+    [TestCase(0.0)]
+    [TestCase(123.456)]
+    public void AddNode1D_ShouldStoreAnyCoordinate(double x)
+    {
+        // Act
+        _builder.AddNode(x);
+
+        // Assert
+        Assert.That(GetNodes(_builder).Single().X, Is.EqualTo(x));
+    }
+
+    [TestCase(0.0, 0.0)]
+    [TestCase(-1.0, -2.0)]
+    [TestCase(1.0, -2.0)]
+    [TestCase(-1.0, 2.0)]
+    public void AddNode2D_ShouldStoreAnyCoordinates(double x, double y)
+    {
+        // Act
+        _builder.AddNode(x, y);
+
+        // Assert
+        var node = GetNodes(_builder).Single();
+        Assert.That(node.X, Is.EqualTo(x));
+        Assert.That(node.Y, Is.EqualTo(y));
+    }
+
+    [Test]
+    public void AddNode1D_WhenCalledTwice_ShouldAddTwoNodes()
+    {
+        // Act
+        _builder.AddNode(1.0).AddNode(2.0);
+
+        // Assert
+        var nodes = GetNodes(_builder).ToList();
+        Assert.That(nodes, Has.Count.EqualTo(2));
+        Assert.That(nodes[0].X, Is.EqualTo(1.0));
+        Assert.That(nodes[1].X, Is.EqualTo(2.0));
     }
 
     [Test]
     public void AddNode2D_WhenCalledMultipleTimes_ShouldAddAllNodes()
     {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
         // Act
-        _builder.AddNode(0.0, 0.0);
-        _builder.AddNode(1.0, 0.0);
-        _builder.AddNode(1.0, 1.0);
-        _builder.AddNode(0.0, 1.0);
+        _builder.AddNode(0.0, 0.0)
+            .AddNode(1.0, 0.0)
+            .AddNode(1.0, 1.0)
+            .AddNode(0.0, 1.0);
 
         // Assert
         var nodes = GetNodes(_builder).ToList();
         Assert.That(nodes, Has.Count.EqualTo(4));
-        Assert.That(nodes[0].X, Is.EqualTo(0.0));
-        Assert.That(nodes[0].Y, Is.EqualTo(0.0));
         Assert.That(nodes[2].X, Is.EqualTo(1.0));
         Assert.That(nodes[2].Y, Is.EqualTo(1.0));
         Assert.That(nodes[3].X, Is.EqualTo(0.0));
@@ -713,118 +364,13 @@ public class FiniteElementBuilderTests
     }
 
     [Test]
-    public void AddNode2D_WithNegativeCoordinates_ShouldStoreNegativeValues()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act
-        _builder.AddNode(-1.0, -2.0);
-
-        // Assert
-        var node = GetNodes(_builder).Single();
-        Assert.That(node.X, Is.EqualTo(-1.0));
-        Assert.That(node.Y, Is.EqualTo(-2.0));
-    }
-
-    [Test]
-    public void AddNode2D_WithZeroCoordinates_ShouldStoreZeros()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act
-        _builder.AddNode(0.0, 0.0);
-
-        // Assert
-        var node = GetNodes(_builder).Single();
-        Assert.That(node.X, Is.EqualTo(0.0));
-        Assert.That(node.Y, Is.EqualTo(0.0));
-    }
-
-    #endregion
-
-    #region AddNode — 3D
-
-    [Test]
-    public void AddNode3D_WithThreeDimensionalNodeType_ShouldReturnSameBuilderInstance()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-
-        // Act
-        var result = _builder.AddNode(1.0, 2.0, 3.0);
-
-        // Assert
-        Assert.That(result, Is.SameAs(_builder));
-    }
-
-    [Test]
-    public void AddNode3D_WithNonThreeDimensionalNodeType_ShouldThrowWithExpectedMessage()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is OneDimensional. You should use another method to specify all dimentions."));
-    }
-
-    [Test]
-    public void AddNode3D_WithTwoDimensionalNodeType_ShouldThrow()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
-    }
-
-    [Test]
-    public void AddNode3D_ShouldStoreCorrectXAndYCoordinates()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-        const double expectedX = 1.1;
-        const double expectedY = 2.2;
-
-        // Act
-        _builder.AddNode(expectedX, expectedY, 3.3);
-
-        // Assert
-        var node = GetNodes(_builder).Single();
-        Assert.That(node.X, Is.EqualTo(expectedX));
-        Assert.That(node.Y, Is.EqualTo(expectedY));
-    }
-
-    [Test]
-    public void AddNode3D_ShouldStoreCorrectZCoordinate()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-        const double expectedZ = 3.3;
-
-        // Act
-        _builder.AddNode(1.1, 2.2, expectedZ);
-
-        // Assert
-        var node = GetNodes(_builder).Single();
-        Assert.That(node.Z, Is.EqualTo(expectedZ));
-    }
-
-    [Test]
     public void AddNode3D_WhenCalledMultipleTimes_ShouldAddAllNodes()
     {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-
         // Act
-        _builder.AddNode(0.0, 0.0, 0.0);
-        _builder.AddNode(1.0, 0.0, 0.0);
-        _builder.AddNode(0.0, 1.0, 0.0);
-        _builder.AddNode(0.0, 0.0, 1.0);
+        _builder.AddNode(0.0, 0.0, 0.0)
+            .AddNode(1.0, 0.0, 0.0)
+            .AddNode(0.0, 1.0, 0.0)
+            .AddNode(0.0, 0.0, 1.0);
 
         // Assert
         var nodes = GetNodes(_builder).ToList();
@@ -834,167 +380,125 @@ public class FiniteElementBuilderTests
         Assert.That(nodes[3].Z, Is.EqualTo(1.0));
     }
 
+    #endregion
+
+    #region AddNode — mismatch dimension
+
     [Test]
-    public void AddNode3D_WithNegativeCoordinates_ShouldStoreNegativeValues()
+    public void AddNode_DifferentDimensionsInSameBuilder_1DThen2D_ShouldThrow()
     {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
+        // Arrange — первый AddNode(1D) фиксирует тип 1D
+        _builder.AddNode(1.0);
 
-        // Act
-        _builder.AddNode(-1.0, -2.0, -3.0);
+        // Act & Assert
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
+        Assert.That(ex!.Message, Does.Contain("OneDimensional"));
+    }
 
-        // Assert
-        var node = GetNodes(_builder).Single();
-        Assert.That(node.X, Is.EqualTo(-1.0));
-        Assert.That(node.Y, Is.EqualTo(-2.0));
-        Assert.That(node.Z, Is.EqualTo(-3.0));
+    [Test]
+    public void AddNode_DifferentDimensionsInSameBuilder_1DThen3D_ShouldThrow()
+    {
+        _builder.AddNode(1.0);
+
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        Assert.That(ex!.Message, Does.Contain("OneDimensional"));
+    }
+
+    [Test]
+    public void AddNode_DifferentDimensionsInSameBuilder_2DThen1D_ShouldThrow()
+    {
+        _builder.AddNode(1.0, 2.0);
+
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
+        Assert.That(ex!.Message, Does.Contain("TwoDimensional"));
+    }
+
+    [Test]
+    public void AddNode_DifferentDimensionsInSameBuilder_2DThen3D_ShouldThrow()
+    {
+        _builder.AddNode(1.0, 2.0);
+
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
+        Assert.That(ex!.Message, Does.Contain("TwoDimensional"));
+    }
+
+    [Test]
+    public void AddNode_DifferentDimensionsInSameBuilder_3DThen1D_ShouldThrow()
+    {
+        _builder.AddNode(1.0, 2.0, 3.0);
+
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
+        Assert.That(ex!.Message, Does.Contain("ThreeDimensional"));
+    }
+
+    [Test]
+    public void AddNode_DifferentDimensionsInSameBuilder_3DThen2D_ShouldThrow()
+    {
+        _builder.AddNode(1.0, 2.0, 3.0);
+
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
+        Assert.That(ex!.Message, Does.Contain("ThreeDimensional"));
     }
 
     #endregion
 
-    #region AddNode — cross-check
+    #region AddNode(IElementNode)
 
     [Test]
-    public void AddNode_1DMethod_ShouldNotBeUsableWhenTypeIs2D()
+    public void AddNodeByInstance_ShouldAddNode()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
+        var node = new ElementNode(ElementNodeType.Type2D) { X = 1.0, Y = 2.0, NodeId = "n1" };
 
+        // Act
+        var result = _builder.AddNode(node);
+
+        // Assert
+        Assert.That(result, Is.SameAs(_builder));
+        Assert.That(GetNodes(_builder).Single(), Is.SameAs(node));
+    }
+
+    [Test]
+    public void AddNodeByInstance_WithNull_ShouldThrowArgumentNullException()
+    {
         // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => _builder.AddNode(null!));
+    }
+
+    [Test]
+    public void AddNodeByInstance_ShouldSetNodeTypeOnFirstCall()
+    {
+        // Arrange
+        var node = new ElementNode(ElementNodeType.Type3D) { X = 1.0, Y = 2.0, Z = 3.0 };
+
+        // Act
+        _builder.AddNode(node);
+
+        // Assert — второй узел другой размерности должен бросить
         Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
     }
 
     [Test]
-    public void AddNode_2DMethod_ShouldNotBeUsableWhenTypeIs1D()
+    public void AddNodeByInstance_WithMismatchedDimension_ShouldThrow()
     {
         // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
+        _builder.AddNode(1.0, 2.0);
+        var node3D = new ElementNode(ElementNodeType.Type3D) { X = 1.0, Y = 2.0, Z = 3.0 };
 
         // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-    }
-
-    [Test]
-    public void AddNode_3DMethod_ShouldNotBeUsableWhenTypeIs1D()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
-    }
-
-    [Test]
-    public void AddNode_3DMethod_ShouldNotBeUsableWhenTypeIs2D()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
-    }
-
-    [Test]
-    public void AddNode_ExceptionMessage_ShouldContainCurrentDimension()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
-
-        // Assert
-        Assert.That(ex!.Message, Does.Contain(Dimensional.TwoDimensional.ToString()));
-    }
-
-    #endregion
-
-    #region AddNode — edge cases
-
-    [Test]
-    public void AddNode1D_WhenNodeTypeIsDefault_ShouldThrow()
-    {
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
-    }
-
-    [Test]
-    public void AddNode2D_WhenNodeTypeIsDefault_ShouldThrow()
-    {
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-    }
-
-    [Test]
-    public void AddNode3D_WhenNodeTypeIsDefault_ShouldThrow()
-    {
-        // Act & Assert
-        Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0, 3.0));
-    }
-
-    [Test]
-    public void AddNode1D_WhenCalledTwice_ShouldAddTwoNodes()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        _builder.AddNode(1.0).AddNode(2.0);
-
-        // Assert
-        Assert.That(GetNodes(_builder), Has.Count.EqualTo(2));
-    }
-
-    [Test]
-    public void AddNode_ExceptionMessage_ShouldContainCurrentDimensionFor1D()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.OneDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is OneDimensional. You should use another method to specify all dimentions."));
-    }
-
-    [Test]
-    public void AddNode_ExceptionMessage_ShouldContainCurrentDimensionFor2D()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.TwoDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is TwoDimensional. You should use another method to specify all dimentions."));
-    }
-
-    [Test]
-    public void AddNode_ExceptionMessage_ShouldContainCurrentDimensionFor3D()
-    {
-        // Arrange
-        _builder.SetNodesType(CreateNodeType(Dimensional.ThreeDimensional));
-
-        // Act
-        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(1.0, 2.0));
-
-        // Assert
-        Assert.That(ex!.Message, Is.EqualTo("The current accepted node type is ThreeDimensional. You should use another method to specify all dimentions."));
+        var ex = Assert.Throws<FeaElementBuilderException>(() => _builder.AddNode(node3D));
+        Assert.That(ex!.Message, Does.Contain("TwoDimensional"));
     }
 
     #endregion
 
     #region Helpers
 
-    private static ElementNodeType CreateNodeType(Dimensional dimension)
+    private static TemperatureElementOptions CreateOptions() => new()
     {
-        return new ElementNodeType
-        {
-            Dimension = dimension
-        };
-    }
+        ThermalConductivity = 2,
+        Thickness = 1
+    };
 
     private static ICollection<IElementNode> GetNodes(FiniteElementBuilder builder)
     {
