@@ -201,7 +201,7 @@ public class TwoEqualTrianglesIntegrationTests
         const double tempD = 100.0;
 
         var model1 = BuildModelWithDifferentTriangleMaterial(
-            thermalConductivity1: 3.0, thickness1: 1.0, 
+            thermalConductivity1: 3.0, thickness1: 1.0,
             thermalConductivity2: 1.0, thickness2: 1.0);
 
         var model2 = BuildModelWithDifferentTriangleMaterial(
@@ -228,6 +228,67 @@ public class TwoEqualTrianglesIntegrationTests
                     Is.EqualTo(ValueOf(solution1, nodeId)).Within(Tolerance),
                     $"Значение в узле '{nodeId}' должно совпадать для однородных и разных k/t.");
             }
+        });
+    }
+
+    /// <summary>
+    /// При разных thermalConductivity у треугольников температура на общем
+    /// ребре BC перестаёт быть серединой и определяется балансом потоков.
+    ///
+    /// Вывод формулы.
+    /// ──────────────
+    /// Область состоит из двух прямоугольных треугольников, у которых ребро BC
+    /// лежит на прямой x = 2, а узлы A и D — на x = 0 и x = 4 соответственно.
+    /// Решение Лапласа без источников в каждом треугольнике линейно по x,
+    /// поэтому температура на BC постоянна: T(B) = T(C) = T_m.
+    ///
+    /// Поток через T1 (A → BC):  q₁ = k₁ · (T_m − T_A) / 2
+    /// Поток через T2 (BC → D):  q₂ = k₂ · (T_D − T_m) / 2
+    /// Из баланса q₁ = q₂:
+    ///   k₁ · (T_m − T_A) = k₂ · (T_D − T_m)
+    ///   T_m · (k₁ + k₂) = k₁·T_A + k₂·T_D
+    ///   T_m = (k₁·T_A + k₂·T_D) / (k₁ + k₂)
+    ///
+    /// Формула не зависит от толщины (она входит множителем в оба потока
+    /// и сокращается) и от абсолютных размеров по x, пока ребро BC делит
+    /// расстояние A→D пополам.
+    /// </summary>
+    [TestCase(1.0, 1.0, 20.0, 100.0, 60.0)]                    // симметрия — середина
+    [TestCase(2.0, 1.0, 20.0, 100.0, 140.0 / 3.0)]              // левый горячее
+    [TestCase(1.0, 2.0, 20.0, 100.0, 220.0 / 3.0)]              // правый горячее
+    [TestCase(10.0, 1.0, 20.0, 100.0, 300.0 / 11.0)]            // сильный контраст влево
+    [TestCase(1.0, 10.0, 20.0, 100.0, 1020.0 / 11.0)]           // сильный контраст вправо
+    [TestCase(3.0, 7.0, 20.0, 100.0, 76.0)]                     // несимметричные целые
+    [TestCase(7.0, 3.0, 20.0, 100.0, 44.0)]                     // зеркально предыдущему
+    [TestCase(0.5, 2.0, 20.0, 100.0, 84.0)]                     // дробные k
+    [TestCase(4.0, 0.5, 20.0, 100.0, 130.0 / 4.5)]              // обратный контраст
+    [TestCase(1.0, 1.0, 0.0, 0.0, 0.0)]                         // нулевые границы
+    [TestCase(1.0, 1.0, -50.0, 50.0, 0.0)]                      // симметрично около нуля
+    [TestCase(2.0, 3.0, 10.0, 40.0, (2.0 * 10.0 + 3.0 * 40.0) / 5.0)]  // произвольный набор
+    public void DifferentThermalConductivity_ProducesExactEdgeTemperature(
+        double thermalConductivity1, double thermalConductivity2, double tempA, double tempD, double expectedEdgeTemp)
+    {
+        var model = BuildModelWithDifferentTriangleMaterial(
+            thermalConductivity1, thickness1: 1.0,
+            thermalConductivity2, thickness2: 1.0);
+
+        var solution = new SolutionBuilder(model)
+            .Assembly()
+            .AddDirichlet("nodeA", Freedom.Temperature, tempA)
+            .AddDirichlet("nodeD", Freedom.Temperature, tempD)
+            .Build();
+
+        Assert.Multiple(() =>
+        {
+            // Граничные значения фиксированы точно.
+            Assert.That(ValueOf(solution, "nodeA"), Is.EqualTo(tempA),
+                "T(A) фиксирована граничным условием.");
+            Assert.That(ValueOf(solution, "nodeD"), Is.EqualTo(tempD),
+                "T(D) фиксирована граничным условием.");
+
+            // Ребро BC: T(B) = T(C) = (k₁·T_A + k₂·T_D) / (k₁ + k₂).
+            Assert.That(ValueOf(solution, "nodeB"), Is.EqualTo(expectedEdgeTemp).Within(Tolerance));
+            Assert.That(ValueOf(solution, "nodeC"), Is.EqualTo(expectedEdgeTemp).Within(Tolerance));
         });
     }
 
