@@ -171,12 +171,12 @@ public class TwoEqualTrianglesIntegrationTests
     [TestCase(1.0, 0.5)]
     [TestCase(10.0, 10.0)]
     [TestCase(0.1, 0.1)]
-    public void Solution_IsIndependent_OfConductivityAndThickness(double k, double t)
+    public void Solution_IsIndependent_OfConductivityAndThickness(double thermalConductivity, double thickness)
     {
         const double tempA = 20.0;
         const double tempD = 100.0;
 
-        var solution = Solve(tempA, tempD, k, t);
+        var solution = Solve(tempA, tempD, thermalConductivity, thickness);
 
         // Аналитическое решение — то же линейное по x, что и в базовом случае.
         var expectedB = tempA + (tempD - tempA) * 0.5;
@@ -191,26 +191,29 @@ public class TwoEqualTrianglesIntegrationTests
     }
 
     /// <summary>
-    /// Одинаковые k и t на обоих элементах vs. разные — для однородной
-    /// задачи Дирихле без источников решение остаётся одним и тем же
-    /// (линейный профиль), поскольку граничные условия фиксируют всё.
-    /// 
-    /// По факту: если значение k*t не меняется, то решение остается тоже самое
+    /// Если значения (thermalConductivity) и (thickness) меняются но (thermalConductivity * thickness) не меняется,
+    /// то решение остается тоже самое.
     /// </summary>
     [Test]
-    public void Solution_IsSame_ForUniformAndNonUniformProperties()
+    public void Solution_IsSame_ForTheSameThermalConductivityMultyThickness()
     {
         const double tempA = 20.0;
         const double tempD = 100.0;
 
-        var model1 = BuildModelWithDifferentTriangleMaterial(k1: 3.0, t1: 1.0, k2: 1.0, t2: 1.0);
+        var model1 = BuildModelWithDifferentTriangleMaterial(
+            thermalConductivity1: 3.0, thickness1: 1.0, 
+            thermalConductivity2: 1.0, thickness2: 1.0);
+
+        var model2 = BuildModelWithDifferentTriangleMaterial(
+            thermalConductivity1: 1.0, thickness1: 3.0,
+            thermalConductivity2: 0.5, thickness2: 2.0);
+
         var solution1 = new SolutionBuilder(model1)
             .Assembly()
             .AddDirichlet("nodeA", Freedom.Temperature, tempA)
             .AddDirichlet("nodeD", Freedom.Temperature, tempD)
             .Build();
 
-        var model2 = BuildModelWithDifferentTriangleMaterial(k1: 1.0, t1: 3.0, k2: 0.5, t2: 2.0);
         var solution2 = new SolutionBuilder(model2)
             .Assembly()
             .AddDirichlet("nodeA", Freedom.Temperature, tempA)
@@ -349,12 +352,12 @@ public class TwoEqualTrianglesIntegrationTests
         Assert.That(ex!.Message, Is.EqualTo("Construction model stiffness matrix is not assembled. Call 'Assembly' first."));
     }
 
-    private static IFiniteElement BuildElement1(double k = 1.0, double t = 1.0) =>
+    private static IFiniteElement BuildElement1(double thermalConductivity = 1.0, double thickness = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
-                ThermalConductivity = k,
-                Thickness = t,
+                ThermalConductivity = thermalConductivity,
+                Thickness = thickness,
             })
             .AddNode(0.0, 1.0, "nodeA")
             .AddNode(2.0, 2.0, "nodeB")
@@ -373,10 +376,10 @@ public class TwoEqualTrianglesIntegrationTests
             .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
-    private static IConstructionModel BuildModel(double k = 1.0, double t = 1.0)
+    private static IConstructionModel BuildModel(double thermalConductivity = 1.0, double thickness = 1.0)
     {
-        var element1 = BuildElement1(k, t);
-        var element2 = BuildElement2(element1, k, t);
+        var element1 = BuildElement1(thermalConductivity, thickness);
+        var element2 = BuildElement2(element1, thermalConductivity, thickness);
 
         return new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
@@ -385,10 +388,10 @@ public class TwoEqualTrianglesIntegrationTests
     }
 
     private static IConstructionModel BuildModelWithDifferentTriangleMaterial(
-        double k1, double t1, double k2, double t2)
+        double thermalConductivity1, double thickness1, double thermalConductivity2, double thickness2)
     {
-        var element1 = BuildElement1(k1, t1);
-        var element2 = BuildElement2(element1, k2, t2);
+        var element1 = BuildElement1(thermalConductivity1, thickness1);
+        var element2 = BuildElement2(element1, thermalConductivity2, thickness2);
 
         return new ConstructionModelBuilder()
             .SetNodesType(ElementNodeType.Type2D)
@@ -397,8 +400,8 @@ public class TwoEqualTrianglesIntegrationTests
     }
 
     private static ConstructionModelSolution Solve(
-        double tempA, double tempD, double k = 1.0, double t = 1.0) =>
-        new SolutionBuilder(BuildModel(k, t))
+        double tempA, double tempD, double thermalConductivity = 1.0, double thickness = 1.0) =>
+        new SolutionBuilder(BuildModel(thermalConductivity, thickness))
             .Assembly()
             .AddDirichlet("nodeA", Freedom.Temperature, tempA)
             .AddDirichlet("nodeD", Freedom.Temperature, tempD)
