@@ -5,7 +5,7 @@ using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo2D;
 
-internal static class Model2DTwoTriangles
+internal static class TwoEqualTriangles2D
 {
     public static void Get_Solution_For_Two_Triangles_Example()
     {

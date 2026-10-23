@@ -18,7 +18,7 @@ Model2DExamples.Build_Model_From_3_Elements();
 
 Model2DExamples.Build_Model_From_CollectionOfElements();
 
-Model2DTwoTriangles.Get_Solution_For_Two_Triangles_Example();
+TwoEqualTriangles2D.Get_Solution_For_Two_Triangles_Example();
 
 // 3D
 Model3DExamples.Build_Model_From_Element();

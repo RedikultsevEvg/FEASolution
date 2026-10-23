@@ -20,10 +20,21 @@ namespace FeaSolution.IntegrationTests._2D;
 ///
 /// Аналитическое обоснование.
 /// ────────────────────────────
-/// Два прямоугольных треугольника с вершинами:
+/// Два равных равнобедренных треугольника с вершинами:
 ///   T1: A(0,1), B(2,2), C(2,0)
 ///   T2: B(2,2), C(2,0), D(4,1)
 ///
+///        B    
+///      / | \
+///     /  |  \
+///    /   |   \
+/// A /    |    \ D
+///   \    |    /
+///    \   |   /
+///     \  |  /
+///      \ | /
+///        C
+/// 
 /// Если граничные условия заданы в A и D как T_A, T_D, то при k = const,
 /// t = const и отсутствии источников решение уравнения Лапласа на такой
 /// (прямоугольной по x) области с линейной интерполяцией на треугольниках
@@ -43,7 +54,7 @@ namespace FeaSolution.IntegrationTests._2D;
 [TestFixture]
 [Category("Integration")]
 [TestOf(typeof(SolutionBuilder))]
-public class TwoTrianglesIntegrationTests
+public class TwoEqualTrianglesIntegrationTests
 {
     private const double Tolerance = 1e-9;
 
@@ -183,6 +194,7 @@ public class TwoTrianglesIntegrationTests
     /// Одинаковые k и t на обоих элементах vs. разные — для однородной
     /// задачи Дирихле без источников решение остаётся одним и тем же
     /// (линейный профиль), поскольку граничные условия фиксируют всё.
+    /// 
     /// По факту: если значение k*t не меняется, то решение остается тоже самое
     /// </summary>
     [Test]
