@@ -20,7 +20,6 @@ internal static class Model3DExamples
             .Build();
 
         new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddElements(element1)
             .Build();
     }
@@ -61,7 +60,6 @@ internal static class Model3DExamples
             .Build();
 
         new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddElements(element1, element2, element3)
             .Build();
     }
@@ -104,7 +102,6 @@ internal static class Model3DExamples
         var elementCollection = new [] { element1, element2, element3 };
 
         new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type3D)
             .AddElements(elementCollection)
             .Build();
     }

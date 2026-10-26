@@ -32,7 +32,6 @@ internal static class TwoEqualTriangles2D
             .Build("The second triangle");
 
         var model = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D) // to remove
             .AddElements(element1, element2)
             .Merge() // Not implemented yet  - exception if 2
             .Build();

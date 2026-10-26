@@ -427,7 +427,6 @@ public class FourIsoscelesTrianglesIntegrationTests
         var triangle4 = BuildElementT4(triangle3, k, t);
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(triangle1, triangle2, triangle3, triangle4)
             .Build();
     }

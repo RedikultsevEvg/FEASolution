@@ -252,7 +252,6 @@ public class TwoTrianglesCoordinatesIntegrationTests
         var element2 = BuildBaseElement2(element1);
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Build();
     }
@@ -276,7 +275,6 @@ public class TwoTrianglesCoordinatesIntegrationTests
             .Build("The second triangle");
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Build();
     }

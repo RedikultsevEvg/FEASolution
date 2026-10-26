@@ -216,7 +216,6 @@ public class FourEquilateralTrianglesExactValuesTests
         var t4 = BuildElementT4(t2, t3);
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(t1, t2, t3, t4)
             .Build();
     }

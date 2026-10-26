@@ -377,7 +377,6 @@ public class TwoEqualTrianglesIntegrationTests
             "nodeC должен быть общим между элементами.");
 
         var model = new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Build();
 
@@ -484,7 +483,6 @@ public class TwoEqualTrianglesIntegrationTests
         var element2 = BuildElement2(element1, thermalConductivity, thickness);
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Build();
     }
@@ -496,7 +494,6 @@ public class TwoEqualTrianglesIntegrationTests
         var element2 = BuildElement2(element1, thermalConductivity2, thickness2);
 
         return new ConstructionModelBuilder()
-            .SetNodesType(ElementNodeType.Type2D)
             .AddElements(element1, element2)
             .Build();
     }

@@ -26,11 +26,11 @@ public class ConstructionModelBuilder
     /// <exception cref="ArgumentNullException"></exception>
     public ConstructionModel Build()
     {
-        FeaModelBuilderException.ThrowIfTrue(NodeType == null, NodeTypeNullExceptionMessage);
-
         FeaModelBuilderException.ThrowIfTrue(
             !Elements.Any(), 
             $"Can't build the model with empty element collection. Use '{nameof(AddElements)}' to add elements.");
+
+        FeaModelBuilderException.ThrowIfTrue(NodeType == null, NodeTypeNullExceptionMessage);
 
         var freedomsIntersection = Elements
             .Select(e => e.Type
@@ -57,23 +57,6 @@ public class ConstructionModelBuilder
     }
 
     /// <summary>
-    /// Sets the node type for all finite elements in construction model.
-    /// </summary>
-    /// <param name="nodeType">Node type.</param>
-    /// <returns>The reference to the current builder.</returns>
-    public  ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
-    {
-        ArgumentNullException.ThrowIfNull(nodeType);
-        if (Elements.Count != 0)
-        {
-            throw new FeaModelBuilderException("You have to remove all elements before changing node type.");
-        }
-
-        NodeType = nodeType;
-        return this;
-    }
-
-    /// <summary>
     /// Adds elements to the model.
     /// </summary>
     /// <param name="elements">Collection of elements.</param>
@@ -82,9 +65,33 @@ public class ConstructionModelBuilder
     public ConstructionModelBuilder AddElements(params ICollection<IFiniteElement> elements)
     {
         ArgumentNullException.ThrowIfNull(elements);
-        FeaModelBuilderException.ThrowIfTrue(NodeType == null, NodeTypeNullExceptionMessage);
-        FeaModelBuilderException.ThrowIfTrue(elements.Any(element => element.Type.NodeType.Dimension != NodeType!.Dimension),
-            $"Dimensional of all elements should be equal to {NodeType!.Dimension.ToString()}.");
+
+        FeaModelBuilderException.ThrowIfTrue(
+            elements.Count == 0,
+            "Can't add an empty element collection. Pass at least one element.");
+
+        FeaModelBuilderException.ThrowIfTrue(elements.Any(e => e == null!),
+            "Element collection contains null elements.");
+
+        var distinctDimensions = elements
+            .Select(element => element.Type.NodeType.Dimension)
+            .Distinct()
+            .ToArray();
+
+        FeaModelBuilderException.ThrowIfTrue(
+            distinctDimensions.Length > 1,
+            $"All added elements should have the same dimension. " +
+            $"Found dimensions: {string.Join(", ", distinctDimensions)}.");
+
+        var dimension = distinctDimensions[0];
+
+        FeaModelBuilderException.ThrowIfTrue(NodeType != null && NodeType.Dimension != dimension,
+            $"Dimension of added elements ({dimension}) should be equal to the already configured node type dimension ({NodeType?.Dimension}).");
+
+        if (NodeType == null)
+        {
+            SetNodesType(elements.First().Type.NodeType);
+        }
 
         foreach (var element in elements)
         {
@@ -107,6 +114,17 @@ public class ConstructionModelBuilder
             // merge all elements in model.
         }
 
+        return this;
+    }
+
+    private ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
+    {
+        ArgumentNullException.ThrowIfNull(nodeType);
+        FeaModelBuilderException.ThrowIfTrue(
+            Elements.Count != 0,
+            "You have to remove all elements before changing node type.");
+
+        NodeType = nodeType;
         return this;
     }
 }
