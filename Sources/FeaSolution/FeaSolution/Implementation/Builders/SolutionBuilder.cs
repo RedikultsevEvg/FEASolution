@@ -54,6 +54,8 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     {
         ArgumentNullException.ThrowIfNull(constructionModel);
         ArgumentNullException.ThrowIfNull(constructionModel.Elements);
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel.CommonFreedoms == null! || constructionModel.CommonFreedoms.Count == 0,
+            "The freedom for solution is not defined.");
 
         var freedoms = constructionModel.CommonFreedoms;
         var elements = constructionModel.Elements;
@@ -126,7 +128,17 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// If less then 2 - throw an exception.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder ValidateForCountOfElement() => this;
+    public SolutionBuilder ValidateForCountOfElement()
+    {
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel == null!,"The construction model is not defined (equal null).");
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel!.Elements == null!,
+            "The construction model element collection is not defined (equal null).");
+
+        var elementCount = constructionModel.Elements!.Count;
+        FeaSolutionBuilderException.ThrowIfTrue(elementCount < 2, "The construction model contains not enough elements (less then two).");
+
+        return this;
+    }
 
     /// <summary>
     /// Validates if there is at least one common node in model.

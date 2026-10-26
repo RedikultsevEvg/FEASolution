@@ -37,15 +37,19 @@ internal static class TwoEqualTriangles2D
             .Merge() // Not implemented yet  - exception if 2
             .Build();
 
+        // var zeroElements = model.GetZeroSquareElements(); // Not implemented yet
+        // var notQualityElements = model.GetNotQualityOfElements(); // Not implemented yet
+
         // 
         // var konturNodes = model.GetNodesFromElements(3);
 
         var solution = new SolutionBuilder(model)
             .Assembly() 
-            .ValidateForCountOfElement() // Not implemented yet
+            .ValidateForCountOfElement() 
             .ValidateForCommonElements() // Not implemented yet 
             .ValidateForQualityOfElements() // Not implemented yet
             .ValidateForZeroSquareElements() // Not implemented yet
+            .ValidateAll() // Not implemented yet
             .AddDirichlet("nodeA", Freedom.Temperature, 20.0)
             .AddDirichlet("nodeD", Freedom.Temperature, 100.0)
             .Build();
