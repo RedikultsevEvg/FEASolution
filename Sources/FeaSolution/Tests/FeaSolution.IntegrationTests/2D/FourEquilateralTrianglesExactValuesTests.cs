@@ -1,6 +1,5 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
-using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 
@@ -176,11 +175,11 @@ public class FourEquilateralTrianglesExactValuesTests
     /// T2 = B(0, 0), C(4, 0), D(2, H). Все стороны = 4.
     /// B, C — из T1.
     /// </summary>
-    private static IFiniteElement BuildElementT2(IFiniteElement t1) =>
+    private static IFiniteElement BuildElementT2() =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options())
-            .AddNode(t1.Node("nodeB"))
-            .AddNode(t1.Node("nodeC"))
+            .AddNode(0.0, 0.0)
+            .AddNode(4.0, 0.0)
             .AddNode(2.0, H, "nodeD")
             .Build("T2: B, C, D");
 
@@ -188,11 +187,11 @@ public class FourEquilateralTrianglesExactValuesTests
     /// T3 = B(0, 0), D(2, H), F(-2, H). Все стороны = 4.
     /// B — из T1, D — из T2.
     /// </summary>
-    private static IFiniteElement BuildElementT3(IFiniteElement t1, IFiniteElement t2) =>
+    private static IFiniteElement BuildElementT3() =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options())
-            .AddNode(t1.Node("nodeB"))
-            .AddNode(t2.Node("nodeD"))
+            .AddNode(0.0, 0.0)
+            .AddNode(2.0, H)
             .AddNode(-2.0, H, "nodeF")
             .Build("T3: B, D, F");
 
@@ -200,23 +199,24 @@ public class FourEquilateralTrianglesExactValuesTests
     /// T4 = D(2, H), F(-2, H), G(0, 2H). Все стороны = 4.
     /// D — из T2, F — из T3.
     /// </summary>
-    private static IFiniteElement BuildElementT4(IFiniteElement t2, IFiniteElement t3) =>
+    private static IFiniteElement BuildElementT4() =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options())
-            .AddNode(t2.Node("nodeD"))
-            .AddNode(t3.Node("nodeF"))
+            .AddNode(2.0, H)
+            .AddNode(-2.0, H)
             .AddNode(0.0, 2.0 * H, "nodeG")
             .Build("T4: D, F, G");
 
     private static IConstructionModel BuildModel()
     {
         var t1 = BuildElementT1();
-        var t2 = BuildElementT2(t1);
-        var t3 = BuildElementT3(t1, t2);
-        var t4 = BuildElementT4(t2, t3);
+        var t2 = BuildElementT2();
+        var t3 = BuildElementT3();
+        var t4 = BuildElementT4();
 
         return new ConstructionModelBuilder()
             .AddElements(t1, t2, t3, t4)
+            .Merge()
             .Build();
     }
 

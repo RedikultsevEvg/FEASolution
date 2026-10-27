@@ -1,14 +1,13 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
-using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 
 namespace FeaSolution.IntegrationTests._2D;
 
 /// <summary>
-/// Интеграционные тесты задачи теплопроводности на сетке из 4 равнобедренных треугольников.
+/// Интеграционные тесты задачи теплопроводности на сетке из 4 РАВНОБЕДРЕННЫХ(2 стороны равны) треугольников.
 ///
 /// Геометрия.
 /// ──────────
@@ -146,9 +145,12 @@ public class FourIsoscelesTrianglesIntegrationTests
     public void SharedNodes_AreSingleInstancesAcrossElements()
     {
         var t1 = BuildElementT1();
-        var t2 = BuildElementT2(t1);
-        var t3 = BuildElementT3(t2);
-        var t4 = BuildElementT4(t3);
+        var t2 = BuildElementT2();
+        var t3 = BuildElementT3();
+        var t4 = BuildElementT4();
+        new ConstructionModelBuilder()
+            .AddElements(t1, t2, t3, t4)
+            .Merge();
 
         Assert.Multiple(() =>
         {
@@ -384,35 +386,35 @@ public class FourIsoscelesTrianglesIntegrationTests
             .Build("T1: A, B, C");
 
     /// <summary>
-    /// T2 = BCD: B(2,2), C(2,0), D(4,1). B, C — из T1.
+    /// T2 = BCD: B(2,2), C(2,0), D(4,1). 
     /// </summary>
-    private static IFiniteElement BuildElementT2(IFiniteElement t1, double k = 1.0, double t = 1.0) =>
+    private static IFiniteElement BuildElementT2(double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options(k, t))
-            .AddNode(t1.Node("nodeB"))
-            .AddNode(t1.Node("nodeC"))
+            .AddNode(2.0, 2.0)
+            .AddNode(2.0, 0.0)
             .AddNode(4.0, 1.0, "nodeD")
             .Build("T2: B, C, D");
 
     /// <summary>
-    /// T3 = BDF: B(2,2), D(4,1), F(4,3). B и D — из T2.
+    /// T3 = BDF: B(2,2), D(4,1), F(4,3). 
     /// </summary>
-    private static IFiniteElement BuildElementT3(IFiniteElement t2, double k = 1.0, double t = 1.0) =>
+    private static IFiniteElement BuildElementT3(double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options(k, t))
-            .AddNode(t2.Node("nodeB"))
-            .AddNode(t2.Node("nodeD"))
+            .AddNode(2.0, 2.0)
+            .AddNode(4.0, 1.0)
             .AddNode(4.0, 3.0, "nodeF")
             .Build("T3: B, D, F");
 
     /// <summary>
-    /// T4 = FGH: F(4,3), G(6,2), H(6,0). F — из T3.
+    /// T4 = FGH: F(4,3), G(6,2), H(6,0). 
     /// </summary>
-    private static IFiniteElement BuildElementT4(IFiniteElement t3, double k = 1.0, double t = 1.0) =>
+    private static IFiniteElement BuildElementT4(double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, Options(k, t))
-            .AddNode(t3.Node("nodeF"))
-            .AddNode(t3.Node("nodeD"))
+            .AddNode(4.0, 3.0)
+            .AddNode(4.0, 1.0)
             .AddNode(6.0, 2.0, "nodeG")
             .Build("T4: F, D, G");
 
@@ -422,12 +424,13 @@ public class FourIsoscelesTrianglesIntegrationTests
     private static IConstructionModel BuildModel(double k = 1.0, double t = 1.0)
     {
         var triangle1 = BuildElementT1(k, t);
-        var triangle2 = BuildElementT2(triangle1, k, t);
-        var triangle3 = BuildElementT3(triangle2, k, t);
-        var triangle4 = BuildElementT4(triangle3, k, t);
+        var triangle2 = BuildElementT2(k, t);
+        var triangle3 = BuildElementT3(k, t);
+        var triangle4 = BuildElementT4(k, t);
 
         return new ConstructionModelBuilder()
             .AddElements(triangle1, triangle2, triangle3, triangle4)
+            .Merge()
             .Build();
     }
 

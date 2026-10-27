@@ -1,6 +1,5 @@
 ﻿using FeaSolution.Core.Enums;
 using FeaSolution.Core.Interfaces;
-using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 using FeaSolution.Implementation.ConstructionModelSolutions;
 
@@ -137,7 +136,7 @@ public class TwoTrianglesCoordinatesIntegrationTests
     // Мы считаем теплопроводность пластины, а тут получается, что пластина как бы загнута внутрь самой себя. Физически этого быть не может.
     // Проверка наверное должна быть такая, что ни один узел не может находиться внутри элемента - либо принадлежать ему, либо лежать снаружи.
     [TestCase(1.0, 66.666666666666671d)] // второй треугольник внутри первого
-    [TestCase(0.0, 100.0/2)] // второй треугольник полностью накрывает первый
+    [TestCase(0.5, 57.142857142857139d)] // второй треугольник полностью накрывает первый
     public void MoveNodeD_AlongX_ReturnsExpectedResult(
         double xCoordinateNodeD, double expectedTemperature)
     {
@@ -220,15 +219,15 @@ public class TwoTrianglesCoordinatesIntegrationTests
             .AddNode(2.0, 0.0, "nodeC")
             .Build("The first triangle");
 
-    private static IFiniteElement BuildBaseElement2(IFiniteElement element1) =>
+    private static IFiniteElement BuildBaseElement2(double yCoordinateNodeB) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = 1.0,
                 Thickness = 1.0,
             })
-            .AddNode(element1.Node("nodeB"))
-            .AddNode(element1.Node("nodeC"))
+            .AddNode(2.0, yCoordinateNodeB) // node B
+            .AddNode(2.0, 0.0)
             .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
@@ -249,10 +248,11 @@ public class TwoTrianglesCoordinatesIntegrationTests
             .AddNode(2.0, 0.0, "nodeC")
             .Build("The first triangle");
 
-        var element2 = BuildBaseElement2(element1);
+        var element2 = BuildBaseElement2(yCoordinateNodeB);
 
         return new ConstructionModelBuilder()
             .AddElements(element1, element2)
+            .Merge()
             .Build();
     }
 
@@ -269,13 +269,14 @@ public class TwoTrianglesCoordinatesIntegrationTests
                 ThermalConductivity = 1.0,
                 Thickness = 1.0,
             })
-            .AddNode(element1.Node("nodeB"))
-            .AddNode(element1.Node("nodeC"))
+            .AddNode(2.0, 2.0)
+            .AddNode(2.0, 0.0)
             .AddNode(xCoordinateNodeD, 1.0, "nodeD")
             .Build("The second triangle");
 
         return new ConstructionModelBuilder()
             .AddElements(element1, element2)
+            .Merge()
             .Build();
     }
 

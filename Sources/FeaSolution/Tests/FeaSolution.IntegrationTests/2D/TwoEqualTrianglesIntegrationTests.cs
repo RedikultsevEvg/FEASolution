@@ -368,17 +368,15 @@ public class TwoEqualTrianglesIntegrationTests
     public void SolutionVector_NodeReferences_AreSharedBetweenElements()
     {
         var element1 = BuildElement1();
-        var element2 = BuildElement2(element1);
-
-        // Убеждаемся, что в исходных элементах nodeB и nodeC — те же ссылки.
-        Assert.That(element2.Node("nodeB"), Is.SameAs(element1.Node("nodeB")),
-            "nodeB должен быть общим между элементами.");
-        Assert.That(element2.Node("nodeC"), Is.SameAs(element1.Node("nodeC")),
-            "nodeC должен быть общим между элементами.");
-
+        var element2 = BuildElement2();
         var model = new ConstructionModelBuilder()
             .AddElements(element1, element2)
+            .Merge()
             .Build();
+
+        // Убеждаемся, что в исходных элементах nodeB и nodeC — те же ссылки.
+        Assert.That(element2.Node("nodeB"), Is.SameAs(element1.Node("nodeB")));
+        Assert.That(element2.Node("nodeC"), Is.SameAs(element1.Node("nodeC")));
 
         var solution = new SolutionBuilder(model)
             .Assembly()
@@ -389,10 +387,8 @@ public class TwoEqualTrianglesIntegrationTests
         var atB = solution.Items.Single(i => i.Node.NodeId == "nodeB");
         var atC = solution.Items.Single(i => i.Node.NodeId == "nodeC");
 
-        Assert.That(atB.Node, Is.SameAs(element1.Node("nodeB")),
-            "Узел nodeB в решении должен быть тем же экземпляром, что и в элементе.");
-        Assert.That(atC.Node, Is.SameAs(element1.Node("nodeC")),
-            "Узел nodeC в решении должен быть тем же экземпляром, что и в элементе.");
+        Assert.That(atB.Node, Is.SameAs(element1.Node("nodeB")));
+        Assert.That(atC.Node, Is.SameAs(element1.Node("nodeC")));
     }
 
     // ────────────────────────────────────────────────────────────────
@@ -465,25 +461,26 @@ public class TwoEqualTrianglesIntegrationTests
             .AddNode(2.0, 0.0, "nodeC")
             .Build("The first triangle");
 
-    private static IFiniteElement BuildElement2(IFiniteElement element1, double k = 1.0, double t = 1.0) =>
+    private static IFiniteElement BuildElement2(double k = 1.0, double t = 1.0) =>
         new FiniteElementBuilder()
             .AddFreedom(Freedom.Temperature, new TemperatureElementOptions
             {
                 ThermalConductivity = k,
                 Thickness = t,
             })
-            .AddNode(element1.Node("nodeB"))
-            .AddNode(element1.Node("nodeC"))
+            .AddNode(2.0, 2.0)
+            .AddNode(2.0, 0.0)
             .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
     private static IConstructionModel BuildModel(double thermalConductivity = 1.0, double thickness = 1.0)
     {
         var element1 = BuildElement1(thermalConductivity, thickness);
-        var element2 = BuildElement2(element1, thermalConductivity, thickness);
+        var element2 = BuildElement2(thermalConductivity, thickness);
 
         return new ConstructionModelBuilder()
             .AddElements(element1, element2)
+            .Merge()
             .Build();
     }
 
@@ -491,10 +488,11 @@ public class TwoEqualTrianglesIntegrationTests
         double thermalConductivity1, double thickness1, double thermalConductivity2, double thickness2)
     {
         var element1 = BuildElement1(thermalConductivity1, thickness1);
-        var element2 = BuildElement2(element1, thermalConductivity2, thickness2);
+        var element2 = BuildElement2(thermalConductivity2, thickness2);
 
         return new ConstructionModelBuilder()
             .AddElements(element1, element2)
+            .Merge()
             .Build();
     }
 
