@@ -2,6 +2,7 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.ConstructionModels;
+using FeaSolution.Implementation.ElementNodes;
 
 namespace FeaSolution.Implementation.Builders;
 
@@ -102,20 +103,28 @@ public class ConstructionModelBuilder
     }
 
     /// <summary>
-    /// Find and union the common nodes.
+    /// Find and union the common nodes. The null-value element collection is accepted and means to merge nodes in all model elements.
     /// </summary>
-    /// <param name="elementsToMerge">Elements to merge. The null-value accepted and means to merge nodes in all model elements.</param>
+    /// <param name="elementsToMerge">Elements to merge.</param>
     /// <param name="delta">Maximum difference in coordinates for common node.</param>
     /// <returns></returns>
     public ConstructionModelBuilder Merge(IEnumerable<IFiniteElement>? elementsToMerge = null, CoordinateValue delta = DeltaDefaultValue)
     {
+        var elements = elementsToMerge;
         if (elementsToMerge == null)
         {
-            // merge all elements in model.
+            elements = Elements;
         }
+
+        FeaModelBuilderException.ThrowIfTrue(elements == null,"The collection to merge is null.");
+        FeaModelBuilderException.ThrowIfTrue(!elements.Any(),"The collection to merge is null.");
+
+        NodeMerger.MergeEqualNodes(elements, delta);
 
         return this;
     }
+
+
 
     private ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
     {
