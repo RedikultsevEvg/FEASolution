@@ -123,9 +123,7 @@ public class ConstructionModelBuilder
 
         return this;
     }
-
-
-
+    
     private ConstructionModelBuilder SetNodesType(ElementNodeType nodeType)
     {
         ArgumentNullException.ThrowIfNull(nodeType);

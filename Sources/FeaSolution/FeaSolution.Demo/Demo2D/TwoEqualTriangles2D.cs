@@ -33,7 +33,7 @@ internal static class TwoEqualTriangles2D
 
         var model = new ConstructionModelBuilder()
             .AddElements(element1, element2)
-            .Merge() // Not implemented yet  - exception if 2
+            .Merge() 
             .Build();
 
         // var zeroElements = model.GetZeroSquareElements(); // Not implemented yet

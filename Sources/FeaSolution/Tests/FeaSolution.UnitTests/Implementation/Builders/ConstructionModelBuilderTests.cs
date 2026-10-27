@@ -4,6 +4,8 @@ using FeaSolution.Core.Exceptions;
 using FeaSolution.Core.Interfaces;
 using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
+using FeaSolution.Implementation.ElementNodes;
+using Moq;
 
 namespace FeaSolution.UnitTests.Implementation.Builders;
 
@@ -200,6 +202,205 @@ public class ConstructionModelBuilderTests
         // Assert
         Assert.That(model.Elements, Has.Count.EqualTo(3));
         Assert.That(model.AllowedNodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
+    }
+
+    #endregion
+
+    #region Merge
+
+    private const string NullMergeCollectionMessage = "The collection to merge is null.";
+
+    [Test]
+    [Description("Merge должен мержить все элементы билдера, если elementsToMerge == null.")]
+    public void Merge_WhenElementsToMergeIsNull_MergesAllBuilderElements()
+    {
+        // Arrange
+        var n1 = CreateNode(1, 2, 3);
+        var n2 = CreateNode(1, 2, 3);
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, n1);
+        var e2 = CreateElementWithNodes(Dimensional.TwoDimensional, n2);
+
+        _builder.AddElements(e1, e2);
+
+        // Act
+        _builder.Merge();
+
+        // Assert
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(n1));
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(e2.Nodes.ElementAt(0)),
+            "После Merge без аргументов оба элемента должны ссылаться на один экземпляр узла.");
+    }
+
+    [Test]
+    [Description("Merge должен возвращать тот же экземпляр builder для fluent-цепочек.")]
+    public void Merge_ReturnsSameBuilderInstance()
+    {
+        // Arrange
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, CreateNode(0, 0, 0));
+        var e2 = CreateElementWithNodes(Dimensional.TwoDimensional, CreateNode(0, 0, 0));
+        _builder.AddElements(e1, e2);
+
+        // Act
+        var result = _builder.Merge();
+
+        // Assert
+        Assert.That(result, Is.SameAs(_builder));
+    }
+
+    [Test]
+    [Description("Merge должен мержить только переданные элементы, не трогая остальные элементы билдера.")]
+    public void Merge_WhenExplicitElementsPassed_MergesOnlyThoseElements()
+    {
+        // Arrange
+        var n1 = CreateNode(1, 2, 3);
+        var n2 = CreateNode(1, 2, 3);
+        var n3 = CreateNode(1, 2, 3);
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, n1);
+        var e2 = CreateElementWithNodes(Dimensional.TwoDimensional, n2);
+        var e3 = CreateElementWithNodes(Dimensional.TwoDimensional, n3);
+
+        _builder.AddElements(e1, e2, e3);
+
+        // Act — мержим только e1 и e2.
+        _builder.Merge([e1, e2]);
+
+        // Assert — e1 и e2 слились.
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(e2.Nodes.ElementAt(0)));
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(n1));
+        // e3 не участвовал — его узел не тронут.
+        Assert.That(e3.Nodes.ElementAt(0), Is.SameAs(n3));
+        Assert.That(e3.Nodes.ElementAt(0), Is.Not.SameAs(e1.Nodes.ElementAt(0)));
+    }
+
+    [Test]
+    [Description("Merge должен бросать FeaModelBuilderException на пустой явной коллекции с текущим сообщением.")]
+    public void Merge_WithEmptyCollection_ThrowsWithExpectedMessage()
+    {
+        // Arrange
+        var e = CreateElementWithNodes(Dimensional.TwoDimensional, CreateNode(0, 0, 0));
+        _builder.AddElements(e);
+
+        // Act
+        var ex = Assert.Throws<FeaModelBuilderException>(
+            () => _builder.Merge(Array.Empty<IFiniteElement>()));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NullMergeCollectionMessage));
+    }
+
+    [Test]
+    [Description("Merge должен бросать FeaModelBuilderException, если у билдера нет элементов (elementsToMerge == null).")]
+    public void Merge_WhenBuilderHasNoElements_ThrowsWithExpectedMessage()
+    {
+        // Act
+        var ex = Assert.Throws<FeaModelBuilderException>(() => _builder.Merge());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NullMergeCollectionMessage));
+    }
+
+    [Test]
+    [Description("Merge должен использовать delta по умолчанию (0.0001), если delta не передан.")]
+    public void Merge_WhenDeltaNotSpecified_UsesDefaultDelta()
+    {
+        // Arrange — разница 0.00005 < 0.0001 → должны слиться.
+        var n1 = CreateNode(0.0, 0.0, 0.0);
+        var n2 = CreateNode(0.00005, 0.00005, 0.00005);
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, n1);
+        var e2 = CreateElementWithNodes(Dimensional.TwoDimensional, n2);
+        _builder.AddElements(e1, e2);
+
+        // Act
+        _builder.Merge();
+
+        // Assert
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(e2.Nodes.ElementAt(0)));
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(n1));
+    }
+
+    [Test]
+    [Description("Merge должен учитывать явно переданный delta и не сливать узлы вне его.")]
+    public void Merge_WithExplicitDelta_DoesNotMergeOutsideDelta()
+    {
+        // Arrange — разница 0.005 > delta=0.001 → не сливаются.
+        var n1 = CreateNode(0.0, 0.0, 0.0);
+        var n2 = CreateNode(0.005, 0.0, 0.0);
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, n1);
+        var e2 = CreateElementWithNodes(Dimensional.TwoDimensional, n2);
+        _builder.AddElements(e1, e2);
+
+        // Act
+        _builder.Merge(delta: 0.001);
+
+        // Assert
+        Assert.That(e1.Nodes.ElementAt(0), Is.SameAs(n1));
+        Assert.That(e2.Nodes.ElementAt(0), Is.SameAs(n2));
+        Assert.That(e1.Nodes.ElementAt(0), Is.Not.SameAs(e2.Nodes.ElementAt(0)));
+    }
+
+    [Test]
+    [Description("Merge должен бросать FeaModelBuilderException на отрицательный delta (прокидывается из NodeMerger).")]
+    public void Merge_WithNegativeDelta_ThrowsFeaModelBuilderException()
+    {
+        // Arrange
+        var e1 = CreateElementWithNodes(Dimensional.TwoDimensional, CreateNode(0, 0, 0));
+        _builder.AddElements(e1);
+
+        // Act
+        var ex = Assert.Throws<FeaModelBuilderException>(
+            () => _builder.Merge(delta: -0.001));
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo("The merge delta should be non-negative."));
+    }
+
+    [Test]
+    [Description("Merge должен работать для трёх треугольников с общим центральным узлом (интеграционный сценарий).")]
+    public void Merge_ThreeTrianglesWithSharedCenter_MergesSharedNodesAcrossElements()
+    {
+        // Arrange — топология «веер»: T1=(V0,V1,Vc), T2=(V1,V3,Vc), T3=(V3,V5,Vc).
+        var v0 = CreateNode(0, 1, 0);
+        var v1a = CreateNode(-1, 0, 0);
+        var vca = CreateNode(0, 0, 0);
+        var v1b = CreateNode(-1, 0, 0);
+        var v3b = CreateNode(1, 0, 0);
+        var vcb = CreateNode(0, 0, 0);
+        var v3c = CreateNode(1, 0, 0);
+        var v5 = CreateNode(0, -1, 0);
+        var vcc = CreateNode(0, 0, 0);
+
+        var t1 = CreateElementWithNodes(Dimensional.TwoDimensional, v0, v1a, vca);
+        var t2 = CreateElementWithNodes(Dimensional.TwoDimensional, v1b, v3b, vcb);
+        var t3 = CreateElementWithNodes(Dimensional.TwoDimensional, v3c, v5, vcc);
+        _builder.AddElements(t1, t2, t3);
+
+        // Act
+        _builder.Merge(delta: 0.0);
+
+        // Assert — центральный узел общий для всех трёх.
+        var center = t1.Nodes.ElementAt(2);
+        Assert.That(center, Is.SameAs(t2.Nodes.ElementAt(2)));
+        Assert.That(center, Is.SameAs(t3.Nodes.ElementAt(2)));
+        Assert.That(center, Is.SameAs(vca));
+
+        // Assert — V1 общий только для T1 и T2.
+        var v1 = t1.Nodes.ElementAt(1);
+        Assert.That(v1, Is.SameAs(t2.Nodes.ElementAt(0)));
+        Assert.That(v1, Is.SameAs(v1a));
+
+        // Assert — V3 общий только для T2 и T3.
+        var v3 = t2.Nodes.ElementAt(1);
+        Assert.That(v3, Is.SameAs(t3.Nodes.ElementAt(0)));
+        Assert.That(v3, Is.SameAs(v3b));
+
+        // Assert — внешние узлы не слились.
+        Assert.That(t1.Nodes.ElementAt(0), Is.SameAs(v0));
+        Assert.That(t3.Nodes.ElementAt(1), Is.SameAs(v5));
+
+        // Assert — количество узлов в каждом треугольнике не изменилось.
+        Assert.That(t1.Nodes.Count, Is.EqualTo(3));
+        Assert.That(t2.Nodes.Count, Is.EqualTo(3));
+        Assert.That(t3.Nodes.Count, Is.EqualTo(3));
     }
 
     #endregion
@@ -492,6 +693,42 @@ public class ConstructionModelBuilderTests
             Dimensional.ThreeDimensional => ElementNodeType.Type3D,
             _ => throw new ArgumentOutOfRangeException(nameof(dimension), dimension, null)
         };
+
+    private static IElementNode CreateNode(
+    double x, double y, double z,
+    string id = "",
+    ElementNodeType? type = null)
+    {
+        return new ElementNode(type ?? ElementNodeType.Type3D)
+        {
+            NodeId = id,
+            X = x,
+            Y = y,
+            Z = z
+        };
+    }
+
+    private static IFiniteElement CreateElementWithNodes(Dimensional dimensional, params IElementNode[] nodes)
+    {
+        var nodesList = new List<IElementNode>(nodes);
+
+        var elementMock = new Mock<IFiniteElement>();
+        elementMock.SetupGet(e => e.Nodes).Returns(nodesList);
+        elementMock.SetupGet(e => e.Type).Returns(new FiniteElementType
+        {
+            NodeType = new ElementNodeType
+            {
+                Dimension = dimensional
+            },
+            Freedoms = [(Freedom.Temperature,new TemperatureElementOptions
+            {
+                Thickness = 1,
+                ThermalConductivity = 1
+            })]
+        });
+
+        return elementMock.Object;
+    }
 
     #endregion
 }
