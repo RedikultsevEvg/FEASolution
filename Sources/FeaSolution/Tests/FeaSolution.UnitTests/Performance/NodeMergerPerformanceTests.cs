@@ -12,7 +12,6 @@ namespace FeaSolution.UnitTests.Performance;
 /// </summary>
 [TestFixture]
 [Category("Performance")]
-[Explicit]
 [TestOf(typeof(NodeMerger))]
 public class NodeMergerPerformanceTests
 {
@@ -30,11 +29,11 @@ public class NodeMergerPerformanceTests
     }
 
     [Test]
-    [TestCase(1_000, 200)]
-    [TestCase(2_500, 1_000)]
-    [TestCase(5_000, 3_000)]
-    [TestCase(10_000, 20_000)]
-    [TestCase(50_000, 500_000)]
+    [TestCase(1_000, 50)]
+    [TestCase(2_500, 50)]
+    [TestCase(5_000, 100)]
+    [TestCase(10_000, 200)]
+    [TestCase(50_000, 1000)]
     public void MergeEqualNodes_WithManyElements_CompletesWithinReasonableTime(
         int elementCount, int expectedMaxMilliseconds)
     {
