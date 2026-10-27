@@ -9,7 +9,7 @@ namespace FeaSolution.UnitTests.Performance;
 /// </summary>
 [TestFixture]
 [Category("Performance")]
-public class SolutionBuilderPerformanceTests
+public class SolutionBuilderAssemblyPerformanceTests
 {
     /// <summary>
     /// Прогрев JIT: первый вызов AssemblyAsync() компилирует методы и инициализирует
@@ -61,7 +61,7 @@ public class SolutionBuilderPerformanceTests
     /// при увеличении числа элементов в 4 раза.
     /// </summary>
     [Test]
-    public async Task Assembly_ScalesRoughlyLinearly_WithElementCount()
+    public void Assembly_ScalesRoughlyLinearly_WithElementCount()
     {
         const int smallCount = 1_000;
         const int largeCount = 4_000;
@@ -107,7 +107,6 @@ public class SolutionBuilderPerformanceTests
     }
 
     [Test]
-    //[Explicit("Тяжёлый нагрузочный тест, запускать вручную.")]
     [TestCase(50_000, 2_000)]
     [TestCase(100_000, 4_000)]
     public void Assembly_VeryLargeMesh_Completes(int elementCount, int expectedMaxMiliSeconds)

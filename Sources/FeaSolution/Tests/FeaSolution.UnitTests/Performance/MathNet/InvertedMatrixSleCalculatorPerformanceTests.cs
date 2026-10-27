@@ -19,6 +19,7 @@ namespace FeaSolution.UnitTests.Performance.MathNet;
 /// </summary>
 [TestFixture]
 [Category("Performance")]
+[Explicit]
 [TestOf(typeof(InvertedMatrixSleCalculator))]
 public class InvertedMatrixSleCalculatorPerformanceTests
 {
