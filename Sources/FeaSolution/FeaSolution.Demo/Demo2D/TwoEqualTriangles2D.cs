@@ -1,5 +1,4 @@
 ﻿using FeaSolution.Core.Enums;
-using FeaSolution.Core.Types;
 using FeaSolution.Demo.Common;
 using FeaSolution.Implementation.Builders;
 
@@ -26,8 +25,8 @@ internal static class TwoEqualTriangles2D
                 ThermalConductivity = 1.0,
                 Thickness = 1.0,
             })
-            .AddNode(element1.Node("nodeB"))
-            .AddNode(element1.Node("nodeC"))
+            .AddNode(2.0, 2.0)
+            .AddNode(2.0, 0)
             .AddNode(4.0, 1.0, "nodeD")
             .Build("The second triangle");
 
