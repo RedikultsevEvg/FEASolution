@@ -97,7 +97,7 @@ public class SolutionBuilderTests
         var result = builder
             .Assembly()
             .ValidateForCountOfElement()
-            .ValidateForCommonElements()
+            .ValidateForCommonNodes()
             .Assembly();
 
         // Assert
@@ -203,7 +203,7 @@ public class SolutionBuilderTests
         // Act
         var result = builder
             .ValidateForCountOfElement()
-            .ValidateForCommonElements()
+            .ValidateForCommonNodes()
             .ValidateForZeroSquareElements()
             .ValidateForQualityOfElements()
             .ValidateForCountOfElement();
@@ -230,11 +230,11 @@ public class SolutionBuilderTests
 
     #endregion
 
-    #region ValidateForCommonElements
+    #region ValidateForCommonNodes
 
     [Test]
     [Description("Метод должен возвращать тот же экземпляр builder для поддержки fluent-цепочек.")]
-    public void ValidateForCommonElements_ReturnsSameBuilderInstance()
+    public void ValidateForCommonNodes_ReturnsSameBuilderInstance()
     {
         // Arrange
         var sharedNode = CreateTestNode("shared", 0, 0);
@@ -243,7 +243,7 @@ public class SolutionBuilderTests
             CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
 
         // Act
-        var result = builder.ValidateForCommonElements();
+        var result = builder.ValidateForCommonNodes();
 
         // Assert
         Assert.That(result, Is.SameAs(builder),
@@ -252,7 +252,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Метод не должен бросать исключение, если два элемента разделяют один и тот же экземпляр узла.")]
-    public void ValidateForCommonElements_DoesNotThrow_WhenElementsShareNodeInstance()
+    public void ValidateForCommonNodes_DoesNotThrow_WhenElementsShareNodeInstance()
     {
         // Arrange
         var sharedNode = CreateTestNode("shared", 0, 0);
@@ -261,12 +261,12 @@ public class SolutionBuilderTests
             CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
 
         // Act & Assert
-        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+        Assert.DoesNotThrow(() => builder.ValidateForCommonNodes());
     }
 
     [Test]
     [Description("Метод не должен бросать исключение, если общий узел есть у трёх и более элементов.")]
-    public void ValidateForCommonElements_DoesNotThrow_WhenSharedNodeBelongsToManyElements()
+    public void ValidateForCommonNodes_DoesNotThrow_WhenSharedNodeBelongsToManyElements()
     {
         // Arrange
         var sharedNode = CreateTestNode("shared", 0, 0);
@@ -276,12 +276,12 @@ public class SolutionBuilderTests
             CreateTestElementWithNodes("element 3", sharedNode, CreateTestNode("e3-n2", 3, 0), CreateTestNode("e3-n3", 2, 1)));
 
         // Act & Assert
-        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+        Assert.DoesNotThrow(() => builder.ValidateForCommonNodes());
     }
 
     [Test]
     [Description("Метод должен бросать FeaSolutionBuilderException, если каждый элемент имеет собственные уникальные узлы.")]
-    public void ValidateForCommonElements_Throws_WhenAllElementsAreIsolated()
+    public void ValidateForCommonNodes_Throws_WhenAllElementsAreIsolated()
     {
         // Arrange
         var builder = CreateBuilderWithElements(
@@ -291,7 +291,7 @@ public class SolutionBuilderTests
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
@@ -299,7 +299,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Узлы с одинаковым непустым NodeId, но разными экземплярами, не считаются общими — сравнение идёт по ссылке.")]
-    public void ValidateForCommonElements_Throws_WhenSameNodeIdButDifferentInstances()
+    public void ValidateForCommonNodes_Throws_WhenSameNodeIdButDifferentInstances()
     {
         // Arrange
         var builder = CreateBuilderWithElements(
@@ -308,7 +308,7 @@ public class SolutionBuilderTests
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
@@ -316,7 +316,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Узлы с NodeId == null из разных элементов не должны склеиваться в одну группу и давать ложный общий узел.")]
-    public void ValidateForCommonElements_Throws_WhenAllNodeIdsAreNullAndDistinct()
+    public void ValidateForCommonNodes_Throws_WhenAllNodeIdsAreNullAndDistinct()
     {
         // Arrange
         var builder = CreateBuilderWithElements(
@@ -325,7 +325,7 @@ public class SolutionBuilderTests
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
@@ -333,7 +333,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Узлы с пустым NodeId из разных элементов не должны склеиваться в одну группу.")]
-    public void ValidateForCommonElements_Throws_WhenAllNodeIdsAreEmptyAndDistinct()
+    public void ValidateForCommonNodes_Throws_WhenAllNodeIdsAreEmptyAndDistinct()
     {
         // Arrange
         var builder = CreateBuilderWithElements(
@@ -342,7 +342,7 @@ public class SolutionBuilderTests
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
@@ -350,7 +350,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Общий узел без NodeId, переданный по ссылке, должен распознаваться корректно.")]
-    public void ValidateForCommonElements_DoesNotThrow_WhenSharedNodeHasNullId()
+    public void ValidateForCommonNodes_DoesNotThrow_WhenSharedNodeHasNullId()
     {
         // Arrange
         var sharedNode = CreateTestNode(null!, 0, 0);
@@ -359,19 +359,19 @@ public class SolutionBuilderTests
             CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode(null!, 2, 0), CreateTestNode(null!, 1, 1)));
 
         // Act & Assert
-        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+        Assert.DoesNotThrow(() => builder.ValidateForCommonNodes());
     }
 
     [Test]
     [Description("Метод должен бросать FeaSolutionBuilderException, если constructionModel == null.")]
-    public void ValidateForCommonElements_Throws_WhenConstructionModelIsNull()
+    public void ValidateForCommonNodes_Throws_WhenConstructionModelIsNull()
     {
         // Arrange
         var builder = new SolutionBuilder(null!);
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(ModelNotDefinedMessage));
@@ -379,7 +379,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Метод должен бросать FeaSolutionBuilderException, если Elements == null.")]
-    public void ValidateForCommonElements_Throws_WhenElementsIsNull()
+    public void ValidateForCommonNodes_Throws_WhenElementsIsNull()
     {
         // Arrange
         _constructionModelMock.Setup(i => i.Elements).Returns((ICollection<IFiniteElement>)null!);
@@ -387,7 +387,7 @@ public class SolutionBuilderTests
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message,
@@ -396,14 +396,14 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Метод должен бросать FeaSolutionBuilderException, если коллекция элементов пуста.")]
-    public void ValidateForCommonElements_Throws_WhenElementsIsEmpty()
+    public void ValidateForCommonNodes_Throws_WhenElementsIsEmpty()
     {
         // Arrange
         var builder = CreateBuilderWithElements();
 
         // Act
         var ex = Assert.Throws<FeaSolutionBuilderException>(
-            () => builder.ValidateForCommonElements());
+            () => builder.ValidateForCommonNodes());
 
         // Assert
         Assert.That(ex!.Message, Is.EqualTo(EmptyElementsMessage));
@@ -411,7 +411,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Метод не должен модифицировать состояние builder — повторный вызов даёт тот же результат.")]
-    public void ValidateForCommonElements_IsIdempotent()
+    public void ValidateForCommonNodes_IsIdempotent()
     {
         // Arrange
         var sharedNode = CreateTestNode("shared", 0, 0);
@@ -420,8 +420,8 @@ public class SolutionBuilderTests
             CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
 
         // Act
-        var first = builder.ValidateForCommonElements();
-        var second = builder.ValidateForCommonElements();
+        var first = builder.ValidateForCommonNodes();
+        var second = builder.ValidateForCommonNodes();
 
         // Assert
         Assert.That(first, Is.SameAs(builder));
@@ -430,7 +430,7 @@ public class SolutionBuilderTests
 
     [Test]
     [Description("Метод должен корректно работать в цепочке с другими Validate-методами.")]
-    public void ValidateForCommonElements_CanBeChainedWithOtherValidationMethods()
+    public void ValidateForCommonNodes_CanBeChainedWithOtherValidationMethods()
     {
         // Arrange
         var sharedNode = CreateTestNode("shared", 0, 0);
@@ -441,10 +441,10 @@ public class SolutionBuilderTests
         // Act
         var result = builder
             .ValidateForCountOfElement()
-            .ValidateForCommonElements()
+            .ValidateForCommonNodes()
             .ValidateForZeroSquareElements()
             .ValidateForQualityOfElements()
-            .ValidateForCommonElements();
+            .ValidateForCommonNodes();
 
         // Assert
         Assert.That(result, Is.SameAs(builder),

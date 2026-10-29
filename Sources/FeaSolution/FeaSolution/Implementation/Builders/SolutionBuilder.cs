@@ -145,7 +145,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// If no - throw an exception.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder ValidateForCommonElements()
+    public SolutionBuilder ValidateForCommonNodes()
     {
         FeaSolutionBuilderException.ThrowIfTrue(constructionModel == null!,
             "The construction model is not defined (equal null).");
@@ -187,7 +187,7 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     {
         return this
             .ValidateForCountOfElement()
-            .ValidateForCommonElements();
+            .ValidateForCommonNodes();
     }
     
     /// <summary>
