@@ -44,7 +44,7 @@ internal static class TwoEqualTriangles2D
         var solution = new SolutionBuilder(model)
             .Assembly() 
             .ValidateForCountOfElement() 
-            .ValidateForCommonElements() // Not implemented yet 
+            .ValidateForCommonElements() 
             .ValidateForQualityOfElements() // Not implemented yet
             .ValidateForZeroSquareElements() // Not implemented yet
             .ValidateAll() // Not implemented yet

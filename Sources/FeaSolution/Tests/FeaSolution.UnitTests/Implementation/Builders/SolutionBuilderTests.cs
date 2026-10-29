@@ -19,6 +19,13 @@ public class SolutionBuilderTests
     private const string ModelNotDefinedMessage =
         "The construction model is not defined (equal null).";
 
+    private const string NoCommonNodesMessage =
+        "The construction model has no common nodes. All elements are isolated, " +
+        "which makes the solution physically meaningless.";
+
+    private const string EmptyElementsMessage =
+        "The construction model element collection is empty.";
+
     private Mock<IConstructionModel> _constructionModelMock = null!;
 
     [SetUp]
@@ -81,7 +88,10 @@ public class SolutionBuilderTests
     public void Assembly_CanBeChainedWithOtherBuilderMethods()
     {
         // Arrange
-        var builder = CreateBuilder();
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
 
         // Act
         var result = builder
@@ -185,7 +195,10 @@ public class SolutionBuilderTests
     public void ValidateForCountOfElement_CanBeChainedWithOtherValidationMethods()
     {
         // Arrange
-        var builder = CreateBuilder();
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
 
         // Act
         var result = builder
@@ -217,7 +230,250 @@ public class SolutionBuilderTests
 
     #endregion
 
+    #region ValidateForCommonElements
+
+    [Test]
+    [Description("Метод должен возвращать тот же экземпляр builder для поддержки fluent-цепочек.")]
+    public void ValidateForCommonElements_ReturnsSameBuilderInstance()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
+
+        // Act
+        var result = builder.ValidateForCommonElements();
+
+        // Assert
+        Assert.That(result, Is.SameAs(builder),
+            "ValidateForCommonElements must return the same builder instance.");
+    }
+
+    [Test]
+    [Description("Метод не должен бросать исключение, если два элемента разделяют один и тот же экземпляр узла.")]
+    public void ValidateForCommonElements_DoesNotThrow_WhenElementsShareNodeInstance()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
+
+        // Act & Assert
+        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+    }
+
+    [Test]
+    [Description("Метод не должен бросать исключение, если общий узел есть у трёх и более элементов.")]
+    public void ValidateForCommonElements_DoesNotThrow_WhenSharedNodeBelongsToManyElements()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)),
+            CreateTestElementWithNodes("element 3", sharedNode, CreateTestNode("e3-n2", 3, 0), CreateTestNode("e3-n3", 2, 1)));
+
+        // Act & Assert
+        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+    }
+
+    [Test]
+    [Description("Метод должен бросать FeaSolutionBuilderException, если каждый элемент имеет собственные уникальные узлы.")]
+    public void ValidateForCommonElements_Throws_WhenAllElementsAreIsolated()
+    {
+        // Arrange
+        var builder = CreateBuilderWithElements(
+            CreateTestElement("element 1"),
+            CreateTestElement("element 2"),
+            CreateTestElement("element 3"));
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
+    }
+
+    [Test]
+    [Description("Узлы с одинаковым непустым NodeId, но разными экземплярами, не считаются общими — сравнение идёт по ссылке.")]
+    public void ValidateForCommonElements_Throws_WhenSameNodeIdButDifferentInstances()
+    {
+        // Arrange
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", CreateTestNode("same-id", 0, 0), CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", CreateTestNode("same-id", 0, 0), CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
+    }
+
+    [Test]
+    [Description("Узлы с NodeId == null из разных элементов не должны склеиваться в одну группу и давать ложный общий узел.")]
+    public void ValidateForCommonElements_Throws_WhenAllNodeIdsAreNullAndDistinct()
+    {
+        // Arrange
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", CreateTestNode(null!, 0, 0), CreateTestNode(null!, 1, 0), CreateTestNode(null!, 0, 1)),
+            CreateTestElementWithNodes("element 2", CreateTestNode(null!, 2, 0), CreateTestNode(null!, 3, 0), CreateTestNode(null!, 2, 1)));
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
+    }
+
+    [Test]
+    [Description("Узлы с пустым NodeId из разных элементов не должны склеиваться в одну группу.")]
+    public void ValidateForCommonElements_Throws_WhenAllNodeIdsAreEmptyAndDistinct()
+    {
+        // Arrange
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", CreateTestNode(string.Empty, 0, 0), CreateTestNode(string.Empty, 1, 0), CreateTestNode(string.Empty, 0, 1)),
+            CreateTestElementWithNodes("element 2", CreateTestNode(string.Empty, 2, 0), CreateTestNode(string.Empty, 3, 0), CreateTestNode(string.Empty, 2, 1)));
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(NoCommonNodesMessage));
+    }
+
+    [Test]
+    [Description("Общий узел без NodeId, переданный по ссылке, должен распознаваться корректно.")]
+    public void ValidateForCommonElements_DoesNotThrow_WhenSharedNodeHasNullId()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode(null!, 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode(null!, 1, 0), CreateTestNode(null!, 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode(null!, 2, 0), CreateTestNode(null!, 1, 1)));
+
+        // Act & Assert
+        Assert.DoesNotThrow(() => builder.ValidateForCommonElements());
+    }
+
+    [Test]
+    [Description("Метод должен бросать FeaSolutionBuilderException, если constructionModel == null.")]
+    public void ValidateForCommonElements_Throws_WhenConstructionModelIsNull()
+    {
+        // Arrange
+        var builder = new SolutionBuilder(null!);
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(ModelNotDefinedMessage));
+    }
+
+    [Test]
+    [Description("Метод должен бросать FeaSolutionBuilderException, если Elements == null.")]
+    public void ValidateForCommonElements_Throws_WhenElementsIsNull()
+    {
+        // Arrange
+        _constructionModelMock.Setup(i => i.Elements).Returns((ICollection<IFiniteElement>)null!);
+        var builder = CreateBuilder();
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message,
+            Is.EqualTo("The construction model element collection is not defined (equal null)."));
+    }
+
+    [Test]
+    [Description("Метод должен бросать FeaSolutionBuilderException, если коллекция элементов пуста.")]
+    public void ValidateForCommonElements_Throws_WhenElementsIsEmpty()
+    {
+        // Arrange
+        var builder = CreateBuilderWithElements();
+
+        // Act
+        var ex = Assert.Throws<FeaSolutionBuilderException>(
+            () => builder.ValidateForCommonElements());
+
+        // Assert
+        Assert.That(ex!.Message, Is.EqualTo(EmptyElementsMessage));
+    }
+
+    [Test]
+    [Description("Метод не должен модифицировать состояние builder — повторный вызов даёт тот же результат.")]
+    public void ValidateForCommonElements_IsIdempotent()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
+
+        // Act
+        var first = builder.ValidateForCommonElements();
+        var second = builder.ValidateForCommonElements();
+
+        // Assert
+        Assert.That(first, Is.SameAs(builder));
+        Assert.That(second, Is.SameAs(builder));
+    }
+
+    [Test]
+    [Description("Метод должен корректно работать в цепочке с другими Validate-методами.")]
+    public void ValidateForCommonElements_CanBeChainedWithOtherValidationMethods()
+    {
+        // Arrange
+        var sharedNode = CreateTestNode("shared", 0, 0);
+        var builder = CreateBuilderWithElements(
+            CreateTestElementWithNodes("element 1", sharedNode, CreateTestNode("e1-n2", 1, 0), CreateTestNode("e1-n3", 0, 1)),
+            CreateTestElementWithNodes("element 2", sharedNode, CreateTestNode("e2-n2", 2, 0), CreateTestNode("e2-n3", 1, 1)));
+
+        // Act
+        var result = builder
+            .ValidateForCountOfElement()
+            .ValidateForCommonElements()
+            .ValidateForZeroSquareElements()
+            .ValidateForQualityOfElements()
+            .ValidateForCommonElements();
+
+        // Assert
+        Assert.That(result, Is.SameAs(builder),
+            "ValidateForCommonElements must integrate with other validation methods without breaking the chain.");
+    }
+
+    #endregion
+
     #region Test data factories
+
+    private static IFiniteElement CreateTestElementWithNodes(
+        string elementId,
+        params IElementNode[] nodes)
+    {
+        return new FiniteElement
+        {
+            Type = new FiniteElementType
+            {
+                NodeType = ElementNodeType.Type2D,
+                Freedoms = [(Freedom.Temperature, new TemperatureElementOptions
+                {
+                    Thickness = 1,
+                    ThermalConductivity = 1
+                })]
+            },
+            Nodes = nodes,
+            ElementId = elementId
+        };
+    }
 
     private static IFiniteElement CreateTestElement(string elementId)
     {

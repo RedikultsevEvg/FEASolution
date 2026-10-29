@@ -145,7 +145,27 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// If no - throw an exception.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder ValidateForCommonElements() => this;
+    public SolutionBuilder ValidateForCommonElements()
+    {
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel == null!,
+            "The construction model is not defined (equal null).");
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel!.Elements == null!,
+            "The construction model element collection is not defined (equal null).");
+        FeaSolutionBuilderException.ThrowIfTrue(constructionModel.Elements!.Count == 0,
+            "The construction model element collection is empty.");
+
+        var hasCommonNode = constructionModel
+            .Elements
+            .SelectMany(e => e.Nodes)
+            .GroupBy(n => n, ReferenceEqualityComparer.Instance)
+            .Any(g => g.Count() > 1);
+
+        FeaSolutionBuilderException.ThrowIfTrue(!hasCommonNode,
+            "The construction model has no common nodes. All elements are isolated, " +
+            "which makes the solution physically meaningless.");
+
+        return this;
+    }
 
     /// <summary>
     /// Validates for the zero square elements.
