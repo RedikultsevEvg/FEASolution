@@ -47,7 +47,7 @@ internal static class TwoEqualTriangles2D
             .ValidateForCommonElements() 
             .ValidateForQualityOfElements() // Not implemented yet
             .ValidateForZeroSquareElements() // Not implemented yet
-            .ValidateAll() // Not implemented yet
+            .ValidateAll() 
             .AddDirichlet("nodeA", Freedom.Temperature, 20.0)
             .AddDirichlet("nodeD", Freedom.Temperature, 100.0)
             .Build();

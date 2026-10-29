@@ -183,7 +183,12 @@ public class SolutionBuilder(IConstructionModel constructionModel)
     /// Does all available validations.
     /// </summary>
     /// <returns>The reference to the current builder.</returns>
-    public SolutionBuilder ValidateAll() => this;
+    public SolutionBuilder ValidateAll()
+    {
+        return this
+            .ValidateForCountOfElement()
+            .ValidateForCommonElements();
+    }
     
     /// <summary>
     /// Gets the zero square elements.
