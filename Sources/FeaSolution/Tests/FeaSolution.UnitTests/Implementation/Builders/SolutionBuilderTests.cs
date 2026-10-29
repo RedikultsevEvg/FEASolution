@@ -238,7 +238,7 @@ public class SolutionBuilderTests
                 CreateTestNode($"{elementId}-node-2", 2, 2),
                 CreateTestNode($"{elementId}-node-3", 2, 0),
             ],
-            UserId = elementId
+            ElementId = elementId
         };
     }
 

@@ -38,7 +38,7 @@ public class FiniteElementBuilderTests
         Assert.That(element, Is.Not.Null);
         Assert.That(element, Is.InstanceOf<FiniteElement>());
         Assert.That(element.Type.NodeType.Dimension, Is.EqualTo(Dimensional.TwoDimensional));
-        Assert.That(element.UserId, Is.EqualTo(string.Empty));
+        Assert.That(element.ElementId, Is.EqualTo(string.Empty));
         Assert.That(element.Nodes, Has.Count.EqualTo(1));
     }
 
@@ -46,16 +46,16 @@ public class FiniteElementBuilderTests
     public void Build_WithCustomUserId_ShouldSetUserId()
     {
         // Arrange
-        const string userId = "user-123";
+        const string elementId = "user-123";
         _builder
             .AddFreedom(Freedom.Temperature, CreateOptions())
             .AddNode(1.3, 2.4);
 
         // Act
-        var element = _builder.Build(userId);
+        var element = _builder.Build(elementId);
 
         // Assert
-        Assert.That(element.UserId, Is.EqualTo(userId));
+        Assert.That(element.ElementId, Is.EqualTo(elementId));
     }
 
     [Test]

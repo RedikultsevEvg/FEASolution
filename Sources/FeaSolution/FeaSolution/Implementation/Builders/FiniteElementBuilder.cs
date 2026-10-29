@@ -37,7 +37,7 @@ public class FiniteElementBuilder
 
         var newElement = new FiniteElement
         {
-            UserId = userId,
+            ElementId = userId,
             Type = elementType,
             Nodes = Nodes,
         };

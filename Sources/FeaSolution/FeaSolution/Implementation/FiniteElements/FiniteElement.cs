@@ -8,7 +8,7 @@ namespace FeaSolution.Implementation.FiniteElements;
 public class FiniteElement : IFiniteElement
 {
     /// <inheritdoc/>
-    public string UserId { get; init; } = "";
+    public string ElementId { get; init; } = "";
 
     /// <inheritdoc/>
     public required FiniteElementType Type { get; init; } 

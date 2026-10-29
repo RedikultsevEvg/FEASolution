@@ -4,11 +4,10 @@ namespace FeaSolution.Core.Interfaces;
 
 public interface IFiniteElement
 {
-    // todo Переименовать в elementId
     /// <summary>
-    /// Unique user-defined identifier within the solution.
+    /// Unique user-defined element identifier.
     /// </summary>
-    string UserId { get; }
+    string ElementId { get; }
 
     /// <summary>
     /// Finite element type.
