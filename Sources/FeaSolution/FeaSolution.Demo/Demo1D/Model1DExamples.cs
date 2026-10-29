@@ -1,5 +1,4 @@
 ﻿using FeaSolution.Core.Enums;
-using FeaSolution.Core.Types;
 using FeaSolution.Implementation.Builders;
 
 namespace FeaSolution.Demo.Demo1D;

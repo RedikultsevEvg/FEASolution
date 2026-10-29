@@ -35,12 +35,6 @@ internal static class TwoEqualTriangles2D
             .Merge() 
             .Build();
 
-        // var zeroElements = model.GetZeroSquareElements(); // Not implemented yet
-        // var notQualityElements = model.GetNotQualityOfElements(); // Not implemented yet
-
-        // 
-        // var konturNodes = model.GetNodesFromElements(3);
-
         var solution = new SolutionBuilder(model)
             .Assembly() 
             .ValidateForCountOfElement() 
@@ -53,5 +47,12 @@ internal static class TwoEqualTriangles2D
             .Build();
 
         DemoAssistant.ConsoleWriteExampleResults(nameof(Get_Solution_For_Two_Triangles_Example), solution);
+
+        // Plans:
+        // var zeroElements = model.GetZeroSquareElements(); // Not implemented yet, discuss about Dimension
+        // var notQualityElements = model.GetNotQualityOfElements(); // Not implemented yet, discuss about Dimension
+
+        // 
+        // var konturNodes = model.GetNodes(sharedForElementNumber);
     }
 }
