@@ -20,6 +20,8 @@ Model2DExamples.Build_Model_From_CollectionOfElements();
 
 TwoEqualTriangles2D.Get_Solution_For_Two_Triangles_Example();
 
+ConstructModelFromCoordinatesArray2D.Get_Solution_From_Coordinates_Array_Example();
+
 // 3D
 Model3DExamples.Build_Model_From_Element();
 

@@ -10,6 +10,7 @@ internal static class DemoAssistant
 
         Console.WriteLine("=========================================");
         Console.WriteLine($"Demo of {methodName}");
+        int index = 0;
         foreach (var group in solutionItemsGroupedByFreedom)
         {
             Console.WriteLine();
@@ -18,12 +19,13 @@ internal static class DemoAssistant
             foreach (var solutionItem in group)
             {
                 Console.WriteLine(
-                    "  Node '{3}': X = {0}, Y = {1}, Z = {2} ; Value = {4}",
+                    "  Node {5} '{3}': X = {0}, Y = {1}, Z = {2} ; Value = {4}",
                     solutionItem.Node.X,
                     solutionItem.Node.Y,
                     solutionItem.Node.Z,
                     solutionItem.Node.NodeId,
-                    solutionItem.Value);
+                    solutionItem.Value,
+                    ++index);
             }
         }
         Console.WriteLine();
